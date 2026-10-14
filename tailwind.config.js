@@ -44,6 +44,7 @@ export default {
         tortoise: '#3d2314',
       },
       fontFamily: {
+        magic: ['"Cinzel Decorative"', 'serif'],
         crest: ['Cinzel', 'serif'],
         display: ['"Playfair Display"', 'serif'],
         classic: ['"Cormorant Garamond"', '"Noto Serif KR"', 'serif'],
