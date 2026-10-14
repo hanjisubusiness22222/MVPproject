@@ -52,23 +52,19 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
   const handleRsvpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. 봇 허니팟 검증
     if (hpCheck.trim() !== '') return;
 
-    // 2. 이름 검증
     const cleanName = sanitizeText(name, 20);
     if (!cleanName || cleanName.length < 2) {
       setErrorMessage('성함을 올바르게 입력해 주세요. (2자 이상)');
       return;
     }
 
-    // 3. 전화번호 검증
     if (!validatePhone(phone)) {
       setErrorMessage('올바른 휴대폰 번호를 입력해 주세요. (예: 010-1234-5678)');
       return;
     }
 
-    // 4. 개인정보 동의 검증
     if (!privacyAgreed) {
       setErrorMessage('개인정보 수집 및 행사 안내 목적 이용에 동의해 주세요.');
       return;
@@ -112,7 +108,6 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
         });
       }
 
-      // 로컬 스토리지에 신청 백업 기록
       const existingRsvps = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
       existingRsvps.push({
         studentNumber,
@@ -121,7 +116,6 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       });
       localStorage.setItem('planet_rsvps', JSON.stringify(existingRsvps));
 
-      // 성공 축포
       confetti({
         particleCount: 100,
         spread: 70,
@@ -151,32 +145,34 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
   };
 
   return (
-    <div className="min-h-screen bg-[#242b26] text-[#f7f5ed] font-sans selection:bg-[#b82828]/30 selection:text-[#f7f5ed]">
+    <div className="min-h-screen bg-[#fcfbf9] text-[#1f1b18] font-sans selection:bg-[#b82828]/20 selection:text-[#b82828]">
       
       {/* 상단 엠블럼 및 네비게이션 헤더 */}
-      <header className="sticky top-0 z-40 bg-[#17241b]/95 backdrop-blur-md border-b border-[#ffffff]/15 px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e4dc] px-4 py-3 sm:px-6 shadow-sm">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           
           {/* 좌측: 티저로 돌아가기 & 학교 로고 */}
           <div className="flex items-center space-x-3">
             <button
               onClick={onBackToTeaser}
-              className="p-1.5 rounded-lg border border-[#ffffff]/25 bg-[#121c15] hover:bg-[#203325] text-[#f7f5ed] transition-colors flex items-center space-x-1 text-xs font-serif"
-              title="칠판 티저로 돌아가기"
+              className="p-1.5 rounded-lg border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 text-xs font-serif"
+              title="교실 칠판으로 돌아가기"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">교실 칠판</span>
             </button>
             
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded border border-[#ffffff]/30 bg-[#16231b] flex items-center justify-center text-[#f7f5ed] font-serif font-bold text-xs shadow-inner">
-                P
-              </div>
+              <img 
+                src="./planet-logo.png" 
+                alt="플래닛 로고" 
+                className="w-8 h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
+              />
               <div>
-                <div className="text-xs font-serif font-bold text-[#f7f5ed] tracking-wide">
+                <div className="text-xs font-serif font-bold text-[#1f1b18] tracking-wide">
                   플래닛 독서학교
                 </div>
-                <div className="text-[10px] text-[#a8b8ae] font-serif">
+                <div className="text-[10px] text-[#666] font-serif">
                   제2026-1호 가정통신문
                 </div>
               </div>
@@ -197,7 +193,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
                 className={`px-2.5 py-1.5 rounded text-xs font-serif transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#b82828] text-white font-bold shadow-sm'
-                    : 'text-[#cfc5b2] hover:text-white hover:bg-[#1f3325]'
+                    : 'text-[#555] hover:text-[#111] hover:bg-[#f0ece1]'
                 }`}
               >
                 {tab.label}
@@ -217,13 +213,12 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
           <div className="space-y-6 animate-fadeIn">
             
             {/* 갱지 가정통신문 카드 */}
-            <div className="relative retro-gazette-paper p-6 sm:p-12 rounded-xl text-[#1f1b18] shadow-2xl border-2 border-[#1f1b18]/40 overflow-hidden space-y-6">
+            <div className="relative retro-gazette-paper p-6 sm:p-12 rounded-xl text-[#1f1b18] shadow-xl border-2 border-[#1f1b18]/40 overflow-hidden space-y-6">
               
               {/* 상단 공문 헤더 박스 (초대장.png) */}
               <div className="border-2 border-[#1f1b18] grid grid-cols-4 sm:grid-cols-5 text-center text-xs font-serif">
-                <div className="col-span-1 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex flex-col items-center justify-center bg-white/40">
-                  <span className="font-mono text-base sm:text-xl font-black text-[#1f1b18]">PLANET</span>
-                  <span className="text-[10px] font-mono text-[#555]">since 2017</span>
+                <div className="col-span-1 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex items-center justify-center bg-white/70">
+                  <img src="./planet-logo.png" alt="PLANET" className="w-20 sm:w-24 h-auto object-contain" />
                 </div>
                 <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex items-center justify-center">
                   <h1 className="font-serif text-xl sm:text-3xl font-black tracking-[0.3em] text-[#111]">
@@ -371,10 +366,10 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
           <div className="space-y-6 animate-fadeIn">
             
             <div className="text-center space-y-1 mb-4">
-              <h2 className="font-serif text-2xl font-bold text-[#f7f5ed]">
+              <h2 className="font-serif text-2xl font-bold text-[#1f1b18]">
                 2026 플래닛 연말모임 일과표
               </h2>
-              <p className="text-xs font-serif text-[#a8b8ae]">
+              <p className="text-xs font-serif text-[#666]">
                 낮의 「플래닛의 새학기」와 밤의 「플래닛의 수학여행」 세부 시간표입니다.
               </p>
             </div>
@@ -382,45 +377,45 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               {/* 1부 새학기 */}
-              <div className="p-5 rounded-xl border border-[#ffffff]/20 bg-[#1a2e22] shadow space-y-4">
-                <div className="border-b border-[#ffffff]/15 pb-3">
+              <div className="p-5 rounded-xl border border-[#e0dad0] bg-white shadow-md space-y-4">
+                <div className="border-b border-[#eee] pb-3">
                   <span className="px-2 py-0.5 rounded bg-[#b82828] text-white text-[11px] font-bold font-serif">
                     1부 메인 모임
                   </span>
-                  <h3 className="font-serif text-lg font-bold text-[#f7f5ed] mt-2">
+                  <h3 className="font-serif text-lg font-bold text-[#1f1b18] mt-2">
                     플래닛의 새학기 (The New Semester)
                   </h3>
-                  <div className="text-xs text-[#a8b8ae] flex items-center space-x-1 mt-1">
+                  <div className="text-xs text-[#666] flex items-center space-x-1 mt-1">
                     <Clock className="w-3.5 h-3.5" />
                     <span>12:00 ~ 18:00 (공간나인 강남점)</span>
                   </div>
                 </div>
 
                 <div className="space-y-3 text-xs font-serif">
-                  <div className="p-3 bg-[#132219] rounded border border-[#ffffff]/10">
-                    <div className="font-bold text-[#dfc27d]">1교시 (12:00 ~ 12:30) • 등교 및 자리배치</div>
-                    <p className="text-[#a8b8ae] text-[11px] mt-0.5">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
+                    <div className="font-bold text-[#b82828]">1교시 (12:00 ~ 12:30) • 등교 및 자리배치</div>
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       명찰 및 웰컴 북마크 수령, 추억의 교실 자리뽑기 프로그램으로 조별 책상 착석
                     </p>
                   </div>
 
-                  <div className="p-3 bg-[#132219] rounded border border-[#ffffff]/10">
-                    <div className="font-bold text-[#dfc27d]">2교시 (12:30 ~ 14:00) • 아카이브 회고 & 북 스피치</div>
-                    <p className="text-[#a8b8ae] text-[11px] mt-0.5">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
+                    <div className="font-bold text-[#1f1b18]">2교시 (12:30 ~ 14:00) • 아카이브 회고 & 북 스피치</div>
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       올 한 해 함께 읽은 도서 회고, 학우별 '올해의 인생 문장' 1분 릴레이 스피치
                     </p>
                   </div>
 
-                  <div className="p-3 bg-[#132219] rounded border border-[#ffffff]/10">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
                     <div className="font-bold text-[#b82828]">3교시 (14:00 ~ 16:30) • 블라인드 책 선물 교환회</div>
-                    <p className="text-[#a8b8ae] text-[11px] mt-0.5">
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       포장된 책과 정성 담긴 추천 편지를 무작위로 교환하는 플래닛 연말 시그니처 행사
                     </p>
                   </div>
 
-                  <div className="p-3 bg-[#132219] rounded border border-[#ffffff]/10">
-                    <div className="font-bold text-[#dfc27d]">4교시 (16:30 ~ 18:00) • 2026 명예의 전당 어워즈</div>
-                    <p className="text-[#a8b8ae] text-[11px] mt-0.5">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
+                    <div className="font-bold text-[#1f1b18]">4교시 (16:30 ~ 18:00) • 2026 명예의 전당 어워즈</div>
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       다독상, 토론상, 다정한 어른이상 시상 및 1부 단체 기념 촬영
                     </p>
                   </div>
@@ -428,45 +423,45 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
               </div>
 
               {/* 2부 수학여행 */}
-              <div className="p-5 rounded-xl border border-[#ffffff]/20 bg-[#2b241d] shadow space-y-4">
-                <div className="border-b border-[#ffffff]/15 pb-3">
-                  <span className="px-2 py-0.5 rounded bg-[#35533e] text-[#dfc27d] text-[11px] font-bold font-serif">
+              <div className="p-5 rounded-xl border border-[#e0dad0] bg-white shadow-md space-y-4">
+                <div className="border-b border-[#eee] pb-3">
+                  <span className="px-2 py-0.5 rounded bg-[#2e5238] text-white text-[11px] font-bold font-serif">
                     2부 애프터 모임
                   </span>
-                  <h3 className="font-serif text-lg font-bold text-[#f7f5ed] mt-2">
+                  <h3 className="font-serif text-lg font-bold text-[#1f1b18] mt-2">
                     플래닛의 수학여행 (School Trip)
                   </h3>
-                  <div className="text-xs text-[#cfc5b2] flex items-center space-x-1 mt-1">
+                  <div className="text-xs text-[#666] flex items-center space-x-1 mt-1">
                     <Clock className="w-3.5 h-3.5" />
                     <span>18:00 ~ LATE (강남 프라이빗 파티룸)</span>
                   </div>
                 </div>
 
                 <div className="space-y-3 text-xs font-serif">
-                  <div className="p-3 bg-[#1c1712] rounded border border-[#ffffff]/10">
-                    <div className="font-bold text-[#dfc27d]">18:00 ~ 19:00 • 숙소 체크인 & 웰컴 드링크</div>
-                    <p className="text-[#cfc5b2] text-[11px] mt-0.5">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
+                    <div className="font-bold text-[#2e5238]">18:00 ~ 19:00 • 숙소 체크인 & 웰컴 드링크</div>
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       파티룸 이동 및 체크인, 웰컴 음료와 함께하는 수학여행 분위기 환담
                     </p>
                   </div>
 
-                  <div className="p-3 bg-[#1c1712] rounded border border-[#ffffff]/10">
-                    <div className="font-bold text-[#dfc27d]">19:00 ~ 20:30 • 추억의 야간 살롱 토크</div>
-                    <p className="text-[#cfc5b2] text-[11px] mt-0.5">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
+                    <div className="font-bold text-[#1f1b18]">19:00 ~ 20:30 • 추억의 야간 살롱 토크</div>
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       핑거푸드와 간식을 나누며 편안한 옷(파자마/이지웨어)으로 이어지는 깊은 대화
                     </p>
                   </div>
 
-                  <div className="p-3 bg-[#1c1712] rounded border border-[#ffffff]/10">
-                    <div className="font-bold text-[#dfc27d]">20:30 ~ 21:30 • 베스트 학우 룩 선출식</div>
-                    <p className="text-[#cfc5b2] text-[11px] mt-0.5">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
+                    <div className="font-bold text-[#2e5238]">20:30 ~ 21:30 • 베스트 학우 룩 선출식</div>
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       가장 멋진 스쿨룩/프레피 룩을 선보인 학우에게 특별 기념품 증정
                     </p>
                   </div>
 
-                  <div className="p-3 bg-[#1c1712] rounded border border-[#ffffff]/10">
-                    <div className="font-bold text-[#dfc27d]">21:30 ~ LATE • 심야 북토크 & 보드게임</div>
-                    <p className="text-[#cfc5b2] text-[11px] mt-0.5">
+                  <div className="p-3 bg-[#f8f6f0] rounded-lg border border-[#e8e4dc]">
+                    <div className="font-bold text-[#1f1b18]">21:30 ~ LATE • 심야 북토크 & 보드게임</div>
+                    <p className="text-[#666] text-[11px] mt-0.5">
                       밤새 도란도란 이어지는 자유로운 친교와 심야 책 이야기
                     </p>
                   </div>
@@ -495,49 +490,49 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
           <div className="space-y-6 animate-fadeIn">
             
             <div className="text-center space-y-1 mb-4">
-              <h2 className="font-serif text-2xl font-bold text-[#f7f5ed]">
+              <h2 className="font-serif text-2xl font-bold text-[#1f1b18]">
                 용의복장 안내: 프레피 룩에 긱 시크 한 방울
               </h2>
-              <p className="text-xs font-serif text-[#a8b8ae]">
+              <p className="text-xs font-serif text-[#666]">
                 교복을 연상시키는 단정한 프레피 스타일에 긱 시크 안경을 더한 추천 코디입니다.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               
-              <div className="p-4 rounded-xl border border-[#ffffff]/20 bg-[#16231b] space-y-3">
-                <div className="w-10 h-10 rounded-full border border-[#ffffff]/25 bg-[#121c15] flex items-center justify-center text-[#dfc27d]">
+              <div className="p-4 rounded-xl border border-[#e0dad0] bg-white shadow-md space-y-3">
+                <div className="w-10 h-10 rounded-full border border-[#d8d3c7] bg-[#f0ece1] flex items-center justify-center text-[#b82828]">
                   <Bookmark className="w-5 h-5" />
                 </div>
-                <h4 className="font-serif font-bold text-sm text-[#f7f5ed]">1. 교복 감성 블레이저 & 니트</h4>
-                <p className="text-xs text-[#a8b8ae] font-serif leading-relaxed">
+                <h4 className="font-serif font-bold text-sm text-[#1f1b18]">1. 교복 감성 블레이저 & 니트</h4>
+                <p className="text-xs text-[#555] font-serif leading-relaxed">
                   네이비/차콜/베이지 블레이저, 케이블 니트 베스트, 단정한 화이트 셔츠와 플리츠 스커트 또는 치노 팬츠.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#ffffff]/20 bg-[#16231b] space-y-3">
-                <div className="w-10 h-10 rounded-full border border-[#ffffff]/25 bg-[#121c15] flex items-center justify-center text-[#dfc27d]">
+              <div className="p-4 rounded-xl border border-[#e0dad0] bg-white shadow-md space-y-3">
+                <div className="w-10 h-10 rounded-full border border-[#d8d3c7] bg-[#f0ece1] flex items-center justify-center text-[#b82828]">
                   <Glasses className="w-5 h-5" />
                 </div>
-                <h4 className="font-serif font-bold text-sm text-[#f7f5ed]">2. 긱 시크 뿔테 & 만년필</h4>
-                <p className="text-xs text-[#a8b8ae] font-serif leading-relaxed">
+                <h4 className="font-serif font-bold text-sm text-[#1f1b18]">2. 긱 시크 뿔테 & 만년필</h4>
+                <p className="text-xs text-[#555] font-serif leading-relaxed">
                   볼드한 블랙/브라운 뿔테 안경 또는 클래식 오벌 메탈 안경, 상의 포켓에 꽂힌 만년필 한 자루.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[#ffffff]/20 bg-[#16231b] space-y-3">
-                <div className="w-10 h-10 rounded-full border border-[#ffffff]/25 bg-[#121c15] flex items-center justify-center text-[#dfc27d]">
+              <div className="p-4 rounded-xl border border-[#e0dad0] bg-white shadow-md space-y-3">
+                <div className="w-10 h-10 rounded-full border border-[#d8d3c7] bg-[#f0ece1] flex items-center justify-center text-[#b82828]">
                   <BookOpen className="w-5 h-5" />
                 </div>
-                <h4 className="font-serif font-bold text-sm text-[#f7f5ed]">3. 선물할 도서 1권 이상</h4>
-                <p className="text-xs text-[#a8b8ae] font-serif leading-relaxed">
+                <h4 className="font-serif font-bold text-sm text-[#1f1b18]">3. 선물할 도서 1권 이상</h4>
+                <p className="text-xs text-[#555] font-serif leading-relaxed">
                   학우에게 선물할 정성스런 도서 1권(추천사 카드 동봉)과 꺾이지 않는 텐션!
                 </p>
               </div>
 
             </div>
 
-            <div className="p-4 rounded-lg bg-[#16231b] border border-[#ffffff]/20 text-xs font-serif text-[#a8b8ae]">
+            <div className="p-4 rounded-lg bg-[#f8f6f0] border border-[#e0dad0] text-xs font-serif text-[#666]">
               * 용의복장은 필수가 아닌 <strong>선택 참여</strong>입니다. 소장하고 계신 편안한 셔츠나 니트만 입고 오셔도 대환영입니다!
             </div>
 
@@ -561,10 +556,10 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
           <div className="space-y-6 animate-fadeIn max-w-2xl mx-auto">
             
             <div className="text-center space-y-1 mb-4">
-              <h2 className="font-serif text-2xl font-bold text-[#f7f5ed]">
+              <h2 className="font-serif text-2xl font-bold text-[#1f1b18]">
                 가정통신문 회신서 (참가 신청서)
               </h2>
-              <p className="text-xs font-serif text-[#a8b8ae]">
+              <p className="text-xs font-serif text-[#666]">
                 2026년도 플래닛 연말모임 「플래닛의 새학기」 참석 여부를 체크해 주세요.
               </p>
             </div>
@@ -787,7 +782,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       {/* 신청 완료: 플래닛 독서학교 공식 모바일 학생증 모달 (컨셉제안4) */}
       {/* ========================================================= */}
       {confirmedStudentId && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl border-4 border-[#17241b] animate-scaleUp">
             
             {/* 학생증 상단 띠 */}
@@ -853,7 +848,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
                 </div>
               </div>
 
-              {/* 닫기 및 서재 메인 이동 버튼 */}
+              {/* 닫기 및 칠판 메인 이동 버튼 */}
               <div className="pt-2 flex gap-2">
                 <button
                   onClick={() => setConfirmedStudentId(null)}
@@ -876,9 +871,9 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       )}
 
       {/* 푸터 */}
-      <footer className="mt-12 py-6 border-t border-[#ffffff]/15 text-center text-xs text-[#a8b8ae] font-serif space-y-1">
+      <footer className="mt-12 py-6 border-t border-[#e8e4dc] text-center text-xs text-[#777] font-serif space-y-1">
         <p>© 2026 플래닛 독서학교 (PLANET since 2017). All Rights Reserved.</p>
-        <p className="text-[10px] text-[#7d9185]">
+        <p className="text-[10px] text-[#999]">
           가정통신문 제2026-1호 • 어른이들을 위한 설레는 새학기와 추억의 수학여행
         </p>
       </footer>

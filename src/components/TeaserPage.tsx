@@ -59,7 +59,6 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const ctx = new AudioCtx();
       
-      // 학교 차임벨 4음 (미 - 도 - 레 - 솔 / 또는 맑은 종소리 2타)
       const notes = [659.25, 523.25, 587.33, 392.00]; // E5, C5, D5, G4
       notes.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
@@ -122,7 +121,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       particleCount: 70,
       spread: 70,
       origin: { y: 0.7 },
-      colors: ['#ffffff', '#872033', '#c29b38']
+      colors: ['#b82828', '#2e5238', '#dfc27d']
     });
 
     setTimeout(() => {
@@ -132,7 +131,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
     }, 2200);
   };
 
-  // 비밀 초대 코드 검증
+  // 비밀 분필 코드 검증
   const handleSecretSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = secretCode.trim().toUpperCase();
@@ -146,7 +145,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
         particleCount: 80,
         spread: 80,
         origin: { y: 0.5 },
-        colors: ['#ffffff', '#b82828', '#c29b38']
+        colors: ['#b82828', '#2e5238', '#dfc27d']
       });
     } else {
       setSecretError(true);
@@ -155,27 +154,26 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   };
 
   return (
-    <div className="relative min-h-screen bg-[#242b26] text-[#f7f5ed] flex flex-col items-center justify-between p-4 sm:p-6 md:p-8 overflow-x-hidden selection:bg-[#b82828]/30 selection:text-[#f7f5ed]">
+    <div className="relative min-h-screen bg-[#fcfbf9] text-[#1f1b18] flex flex-col items-center justify-between p-4 sm:p-6 md:p-8 overflow-x-hidden selection:bg-[#b82828]/20 selection:text-[#b82828]">
       
-      {/* 교실 벽면 감성 은은한 상단 조명 */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-[#ffffff]/5 rounded-full blur-[140px] pointer-events-none"></div>
-
       {/* 상단 헤더: 학교 로고 & 종소리 버튼 */}
-      <header className="w-full max-w-4xl flex items-center justify-between py-3 border-b border-[#ffffff]/10 z-20">
+      <header className="w-full max-w-4xl flex items-center justify-between py-3 border-b border-[#e8e4dc] z-20">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded border border-[#ffffff]/30 bg-[#16231b] flex items-center justify-center text-[#f7f5ed] font-serif font-bold text-sm shadow">
-            PLANET
-          </div>
+          <img 
+            src="./planet-logo.png" 
+            alt="플래닛 로고" 
+            className="w-10 h-10 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
+          />
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-serif text-sm tracking-wide text-[#f7f5ed] font-bold">
+              <span className="font-serif text-sm tracking-wide text-[#1f1b18] font-bold">
                 플래닛 독서학교
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono text-[#cfc5b2] border border-[#ffffff]/20 bg-[#17241b]">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono text-[#555] border border-[#d8d3c7] bg-[#f0ece1]">
                 since 2017
               </span>
             </div>
-            <p className="text-[11px] text-[#a8b8ae] font-serif tracking-wide mt-0.5">
+            <p className="text-[11px] text-[#666] font-serif tracking-wide mt-0.5">
               어른이들을 위한 설레는 새학기와 추억의 수학여행
             </p>
           </div>
@@ -186,15 +184,15 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
             setIsMuted(!isMuted);
             if (isMuted) playSchoolBellSound();
           }}
-          className="p-2 rounded-lg border border-[#ffffff]/20 hover:border-[#ffffff]/50 bg-[#17241b] text-[#f7f5ed] transition-all text-xs flex items-center space-x-1.5"
+          className="p-2 rounded-lg border border-[#d8d3c7] hover:border-[#999] bg-white text-[#1f1b18] transition-all text-xs flex items-center space-x-1.5 shadow-sm"
           title={isMuted ? "학교 종소리 켜기" : "음소거"}
         >
           {isMuted ? (
-            <BellOff className="w-4 h-4 text-[#8a9990]" />
+            <BellOff className="w-4 h-4 text-[#888]" />
           ) : (
             <>
-              <Bell className="w-4 h-4 text-[#f7f5ed]" />
-              <span className="hidden sm:inline text-[11px]">종소리</span>
+              <Bell className="w-4 h-4 text-[#b82828]" />
+              <span className="hidden sm:inline text-[11px] font-serif">종소리</span>
             </>
           )}
         </button>
@@ -205,16 +203,16 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
         
         {/* 상단 안내 태그 */}
         <div className="text-center mb-5 space-y-1">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-[#ffffff]/20 bg-[#17241b] text-[#f7f5ed] text-[11px] font-serif">
-            <Sparkles className="w-3.5 h-3.5 text-[#dfc27d]" />
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-[#d8d3c7] bg-[#f0ece1] text-[#333] text-[11px] font-serif shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-[#b82828]" />
             <span>2026 연말모임 특별 개교 안내</span>
           </div>
-          <div className="text-xs font-serif text-[#a8b8ae]">
+          <div className="text-xs font-serif text-[#666]">
             2026년 12월 19일 (토요일) 낮 12:00 개학식
           </div>
         </div>
 
-        {/* 대형 나무 액자 칠판 컨테이너 */}
+        {/* 대형 나무 액자 칠판 컨테이너 (흰 배경 위에서 선명하게 돋보임) */}
         <div className="relative w-full max-w-2xl">
           
           <div 
@@ -230,7 +228,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               {/* 칠판 분필 메인 타이틀 (컨셉제안1 재현) */}
               <div className="space-y-4 py-4 sm:py-6">
                 <div className="inline-block border-b-2 border-dashed border-[#ffffff]/30 pb-2">
-                  <h1 className="chalk-text font-serif text-3xl sm:text-5xl font-extrabold tracking-tight">
+                  <h1 className="chalk-text font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-[#f7f5ed]">
                     〈 플래닛의 새학기 〉
                   </h1>
                 </div>
@@ -252,7 +250,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                 <div className="flex items-center space-x-2">
                   <span className="w-5 h-2 bg-[#f7f5ed] rounded-sm inline-block shadow-sm"></span>
                   <span className="w-4 h-2 bg-[#dfc27d] rounded-sm inline-block shadow-sm rotate-12"></span>
-                  <span className="text-[11px]">하얀 분필</span>
+                  <span className="text-[11px] text-[#cfc5b2]">하얀 분필</span>
                 </div>
 
                 <div className="text-[11px] text-[#f7f5ed] bg-[#16231b] px-3 py-1 rounded border border-[#ffffff]/30 animate-pulse">
@@ -271,13 +269,12 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                 : 'max-h-0 opacity-0'
             }`}
           >
-            <div className="retro-gazette-paper rounded-lg p-5 sm:p-8 text-[#1f1b18] shadow-2xl border-2 border-[#3d271d]/30 space-y-5">
+            <div className="retro-gazette-paper rounded-lg p-5 sm:p-8 text-[#1f1b18] shadow-2xl border-2 border-[#1f1b18]/40 space-y-5">
               
               {/* 가정통신문 헤더 박스 (초대장.png와 100% 동일한 격자 서식) */}
               <div className="border-2 border-[#1f1b18] grid grid-cols-4 sm:grid-cols-5 text-center text-xs font-serif">
-                <div className="col-span-1 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex flex-col items-center justify-center bg-white/50">
-                  <span className="font-mono text-sm sm:text-base font-extrabold text-[#1f1b18]">PLANET</span>
-                  <span className="text-[9px] font-mono text-[#555]">since 2017</span>
+                <div className="col-span-1 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex items-center justify-center bg-white/70">
+                  <img src="./planet-logo.png" alt="PLANET" className="w-16 sm:w-20 h-auto object-contain" />
                 </div>
                 <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex items-center justify-center">
                   <h2 className="font-serif text-lg sm:text-2xl font-black tracking-[0.25em] text-[#111]">
@@ -391,29 +388,29 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
 
         </div>
 
-        {/* 칠판 D-Day 분필 카운트다운 타이머 */}
-        <div className="w-full max-w-xl mt-6 p-4 rounded-lg border border-[#ffffff]/20 bg-[#16231b] text-center shadow-lg">
-          <div className="flex items-center justify-center space-x-1.5 text-[#dfc27d] text-xs font-serif mb-2">
-            <Clock className="w-3.5 h-3.5" />
-            <span>개학식 D-Day 카운트다운 • 2026. 12. 19. (토) 낮 12:00</span>
+        {/* 칠판 D-Day 분필 카운트다운 타이머 (깔끔한 화이트 카드) */}
+        <div className="w-full max-w-xl mt-6 p-4 rounded-xl border border-[#e0dad0] bg-white text-center shadow-md">
+          <div className="flex items-center justify-center space-x-1.5 text-[#1f1b18] text-xs font-serif mb-2.5">
+            <Clock className="w-3.5 h-3.5 text-[#b82828]" />
+            <span className="font-bold">개학식 D-Day 카운트다운 • 2026. 12. 19. (토) 낮 12:00</span>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 text-[#f7f5ed]">
-            <div className="bg-[#1a2e22] p-2 rounded border border-[#ffffff]/15">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-[#f7f5ed] block">{timeLeft.days}</span>
-              <span className="text-[10px] text-[#a8b8ae] font-serif">일 (Days)</span>
+          <div className="grid grid-cols-4 gap-2 text-[#1f1b18]">
+            <div className="bg-[#f8f6f0] p-2.5 rounded-lg border border-[#e8e4dc]">
+              <span className="font-mono text-xl sm:text-2xl font-black text-[#b82828] block">{timeLeft.days}</span>
+              <span className="text-[10px] text-[#777] font-serif">일 (Days)</span>
             </div>
-            <div className="bg-[#1a2e22] p-2 rounded border border-[#ffffff]/15">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-[#f7f5ed] block">{timeLeft.hours}</span>
-              <span className="text-[10px] text-[#a8b8ae] font-serif">시간 (Hours)</span>
+            <div className="bg-[#f8f6f0] p-2.5 rounded-lg border border-[#e8e4dc]">
+              <span className="font-mono text-xl sm:text-2xl font-black text-[#b82828] block">{timeLeft.hours}</span>
+              <span className="text-[10px] text-[#777] font-serif">시간 (Hours)</span>
             </div>
-            <div className="bg-[#1a2e22] p-2 rounded border border-[#ffffff]/15">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-[#f7f5ed] block">{timeLeft.minutes}</span>
-              <span className="text-[10px] text-[#a8b8ae] font-serif">분 (Minutes)</span>
+            <div className="bg-[#f8f6f0] p-2.5 rounded-lg border border-[#e8e4dc]">
+              <span className="font-mono text-xl sm:text-2xl font-black text-[#b82828] block">{timeLeft.minutes}</span>
+              <span className="text-[10px] text-[#777] font-serif">분 (Minutes)</span>
             </div>
-            <div className="bg-[#1a2e22] p-2 rounded border border-[#ffffff]/15">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-[#f7f5ed] block">{timeLeft.seconds}</span>
-              <span className="text-[10px] text-[#a8b8ae] font-serif">초 (Seconds)</span>
+            <div className="bg-[#f8f6f0] p-2.5 rounded-lg border border-[#e8e4dc]">
+              <span className="font-mono text-xl sm:text-2xl font-black text-[#b82828] block">{timeLeft.seconds}</span>
+              <span className="text-[10px] text-[#777] font-serif">초 (Seconds)</span>
             </div>
           </div>
         </div>
@@ -428,23 +425,23 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                   value={secretCode}
                   onChange={(e) => setSecretCode(e.target.value)}
                   placeholder="비밀 코드 입력 (새학기 / 수학여행 / 어른이)"
-                  className="w-full bg-[#16231b] border border-[#ffffff]/25 rounded-lg py-2 px-3 text-xs text-[#f7f5ed] placeholder:text-[#7d9185] font-serif focus:outline-none focus:border-[#dfc27d] text-center"
+                  className="w-full bg-white border border-[#d5cfc4] rounded-lg py-2 px-3 text-xs text-[#1f1b18] placeholder:text-[#999] font-serif focus:outline-none focus:border-[#b82828] text-center shadow-sm"
                 />
-                <Key className="w-3.5 h-3.5 text-[#ffffff]/30 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Key className="w-3.5 h-3.5 text-[#999] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
               <button
                 type="submit"
-                className="px-3.5 py-2 rounded-lg border border-[#ffffff]/30 bg-[#243d2c] hover:bg-[#2f503a] text-[#f7f5ed] text-xs font-serif transition-all"
+                className="px-3.5 py-2 rounded-lg border border-[#1f1b18] bg-[#1f1b18] hover:bg-[#333] text-white text-xs font-serif transition-all shadow-sm"
               >
                 확인
               </button>
             </form>
           ) : (
-            <div className="p-3.5 rounded-lg border border-[#dfc27d]/40 bg-[#1a2e22] text-[#f7f5ed] text-xs space-y-1 shadow">
-              <div className="font-serif font-bold text-[#dfc27d]">
+            <div className="p-3.5 rounded-lg border border-[#e0dad0] bg-[#f8f6f0] text-[#1f1b18] text-xs space-y-1 shadow-sm">
+              <div className="font-serif font-bold text-[#b82828]">
                 🎒 어른이들을 위한 수학여행 비밀 힌트!
               </div>
-              <p className="text-[11px] text-[#ede8dc] font-serif">
+              <p className="text-[11px] text-[#555] font-serif">
                 "2부 수학여행에서는 가장 따뜻한 추천사를 써온 학우에게 특별한 반장 임명장과 선물이 수여됩니다."
               </p>
             </div>
@@ -459,39 +456,39 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       </main>
 
       {/* 하단 푸터 */}
-      <footer className="w-full max-w-4xl py-4 border-t border-[#ffffff]/10 text-center text-[11px] text-[#8a9990] font-serif space-y-1 z-20">
+      <footer className="w-full max-w-4xl py-4 border-t border-[#e8e4dc] text-center text-[11px] text-[#777] font-serif space-y-1 z-20">
         <p>© 2026 플래닛 독서학교 (PLANET since 2017). All Rights Reserved.</p>
-        <p className="text-[10px] text-[#6b7c72]">책과 대화로 따뜻해지는 2026 플래닛 연말모임</p>
+        <p className="text-[10px] text-[#999]">책과 대화로 따뜻해지는 2026 플래닛 연말모임</p>
       </footer>
 
       {/* 사전 알림 등록 모달 */}
       {isNotifyModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-md bg-[#18261e] border-2 border-[#ffffff]/30 rounded-xl p-6 text-[#f7f5ed] shadow-2xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md bg-white border border-[#d8d3c7] rounded-xl p-6 text-[#1f1b18] shadow-2xl">
             <button
               onClick={() => setIsNotifyModalOpen(false)}
-              className="absolute top-3.5 right-3.5 text-[#8a9990] hover:text-[#f7f5ed] p-1 transition-colors"
+              className="absolute top-3.5 right-3.5 text-[#888] hover:text-[#111] p-1 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="text-center space-y-1.5 mb-5">
-              <div className="w-10 h-10 rounded-full border border-[#ffffff]/30 bg-[#121c15] mx-auto flex items-center justify-center text-[#dfc27d]">
-                <Bell className="w-5 h-5 text-[#dfc27d]" />
+              <div className="w-10 h-10 rounded-full border border-[#d8d3c7] bg-[#f8f6f0] mx-auto flex items-center justify-center text-[#b82828]">
+                <Bell className="w-5 h-5 text-[#b82828]" />
               </div>
-              <h3 className="font-serif text-base font-bold text-[#f7f5ed]">
+              <h3 className="font-serif text-base font-bold text-[#1f1b18]">
                 개학식 사전 알림 예약
               </h3>
-              <p className="text-xs text-[#a8b8ae] font-serif">
+              <p className="text-xs text-[#666] font-serif">
                 정식 가정통신문 접수가 시작되는 즉시 문자로 링크를 전송해 드립니다.
               </p>
             </div>
 
             {isSubmitted ? (
               <div className="py-6 text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-[#dfc27d] mx-auto" />
-                <p className="font-bold text-sm text-[#f7f5ed] font-serif">사전 알림 예약이 완료되었습니다!</p>
-                <p className="text-xs text-[#a8b8ae]">접수 오픈 당일 연락처로 가장 먼저 안내드립니다.</p>
+                <CheckCircle2 className="w-10 h-10 text-[#2e5238] mx-auto" />
+                <p className="font-bold text-sm text-[#1f1b18] font-serif">사전 알림 예약이 완료되었습니다!</p>
+                <p className="text-xs text-[#666]">접수 오픈 당일 연락처로 가장 먼저 안내드립니다.</p>
               </div>
             ) : (
               <form onSubmit={handleNotifySubmit} className="space-y-4">
@@ -506,7 +503,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                 />
 
                 <div>
-                  <label className="block text-xs font-serif text-[#f7f5ed] mb-1">
+                  <label className="block text-xs font-serif text-[#1f1b18] mb-1 font-bold">
                     연락처 또는 이메일 주소
                   </label>
                   <input
@@ -518,7 +515,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                       if (validationError) setValidationError('');
                     }}
                     placeholder="010-0000-0000 또는 fellow@planet.org"
-                    className="w-full bg-[#121c15] border border-[#ffffff]/25 rounded p-2.5 text-sm text-[#f7f5ed] placeholder:text-[#55695e] focus:outline-none focus:border-[#dfc27d] font-serif"
+                    className="w-full bg-[#fcfbf9] border border-[#d5cfc4] rounded p-2.5 text-sm text-[#111] placeholder:text-[#888] focus:outline-none focus:border-[#b82828] font-serif"
                   />
                   {validationError && (
                     <p className="text-[11px] text-[#e06c75] mt-1 font-serif">
@@ -527,7 +524,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                   )}
                 </div>
 
-                <div className="text-[10px] text-[#8a9990] font-serif leading-tight">
+                <div className="text-[10px] text-[#777] font-serif leading-tight">
                   * [개인정보 보호] 입력하신 연락처는 2026 플래닛 연말모임 알림 발송용으로만 사용되며, 행사 종료 후 7일 이내 안전하게 파기됩니다.
                 </div>
 
