@@ -166,7 +166,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       return;
     }
 
-    const validCodes = ['새학기', '수학여행', '플래닛', '어른이', '2026', 'PLANET', 'SCHOOL'];
+    const validCodes = ['새학기', '수학여행', '플래닛', '어른이', '여러분', '2026', 'PLANET', 'SCHOOL'];
 
     if (validCodes.includes(clean)) {
       setSecretRevealed(true);
@@ -205,7 +205,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               </span>
             </div>
             <p className="text-[10px] sm:text-[11px] text-[#666] font-serif tracking-wide mt-0.5 truncate max-w-[190px] xs:max-w-xs sm:max-w-none">
-              어른이들을 위한 설레는 새학기와 추억의 수학여행
+              플래닛 여러분을 위한 설레는 새학기와 추억의 수학여행
             </p>
           </div>
         </div>
@@ -340,13 +340,13 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               {/* 본문 안내문 (초대장.png 원문 인용) */}
               <div className="font-serif text-xs sm:text-sm leading-relaxed text-[#2c2621] space-y-2 bg-white/60 p-3 sm:p-4 rounded border border-[#1f1b18]/20">
                 <p>
-                  <strong>플래닛 어른이님, 안녕하십니까?</strong> 날씨가 부쩍 추워지고, 2026년의 마무리가 다가오고 있습니다.
-                  책을 사랑하는 마음으로 플래닛 활동에 관심을 갖고 모임 발전에 협조해주시는 플래닛 어른이님들께 진심으로 감사드리며, 
+                  <strong>플래닛 여러분, 안녕하십니까?</strong> 날씨가 부쩍 추워지고, 2026년의 마무리가 다가오고 있습니다.
+                  책을 사랑하는 마음으로 플래닛 활동에 관심을 갖고 모임 발전에 협조해주시는 플래닛 여러분께 진심으로 감사드리며, 
                   2026년 플래닛 연말 모임을 아래와 같이 개최하고자 합니다.
                 </p>
                 <p>
                   잘 지나온 플래닛의 올해를 축하하며, 앞으로도 신선한 마음으로 만나길 바라는 자리니 
-                  가능한 어른이분들은 꼭 참석해주시길 바랍니다.
+                  가능한 많은 분들이 꼭 참석해주시길 바랍니다.
                 </p>
               </div>
 
@@ -370,7 +370,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                         플래닛 연말모임<br />「플래닛의 새학기」
                       </td>
                       <td className="border border-[#1f1b18] p-2">공간나인 강남점</td>
-                      <td className="border border-[#1f1b18] p-2">플래닛의<br />어른이님들</td>
+                      <td className="border border-[#1f1b18] p-2">플래닛<br />여러분</td>
                     </tr>
                     <tr className="bg-white/80">
                       <td className="border border-[#1f1b18] p-2 font-mono text-[11px]">
@@ -481,7 +481,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
           ) : (
             <div className="p-3.5 rounded-lg border border-[#e0dad0] bg-[#f8f6f0] text-[#1f1b18] text-xs space-y-1 shadow-sm">
               <div className="font-serif font-bold text-[#b82828]">
-                🎒 어른이들을 위한 수학여행 비밀 힌트!
+                🎒 플래닛 여러분을 위한 수학여행 비밀 힌트!
               </div>
               <p className="text-[11px] text-[#555] font-serif">
                 "2부 수학여행에서는 가장 따뜻한 추천사를 써온 학우에게 특별한 반장 임명장과 선물이 수여됩니다."
@@ -490,7 +490,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
           )}
           {secretError && (
             <p className="text-[11px] text-[#e06c75] mt-1 font-serif">
-              올바른 코드를 입력해 주세요. (힌트: 새학기, 수학여행, 어른이, 플래닛)
+              올바른 코드를 입력해 주세요. (힌트: 새학기, 수학여행, 플래닛, 여러분)
             </p>
           )}
         </div>

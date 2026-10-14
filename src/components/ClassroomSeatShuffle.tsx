@@ -15,7 +15,7 @@ interface Participant {
   seatIndex?: number;
 }
 
-// 기본 샘플 어른이 명단 (24인 - 기존여6, 기존남6, 신규여6, 신규남6 황금비율 구성)
+// 기본 샘플 참가자 명단 (24인 - 기존여6, 기존남6, 신규여6, 신규남6 황금비율 구성)
 const DEFAULT_PARTICIPANTS: Participant[] = [
   // 1분단 배정 후보군
   { id: 'p1', name: '김하늘', gender: 'F', type: 'senior' },
@@ -370,7 +370,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
                 2026 플래닛 독서학교 「새학기 교실」
               </h2>
               <div className="text-[10px] sm:text-[11px] text-[#dfc27d]/90 font-serif mt-0.5">
-                * 책을 사랑하는 어른이들의 다정한 첫 만남
+                * 책을 사랑하는 플래닛 여러분의 다정한 첫 만남
               </div>
             </div>
 
@@ -489,7 +489,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
             
             <div className="flex items-center justify-between pb-2 border-b border-[#e2ddd3]">
               <h3 className="font-serif font-bold text-base text-[#1f1b18]">
-                참가 어른이 명단 관리 ({participants.length}명)
+                참가자 명단 관리 ({participants.length}명)
               </h3>
               <button 
                 onClick={() => setShowManageModal(false)}
@@ -499,11 +499,11 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
               </button>
             </div>
 
-            {/* 신규 어른이 추가 폼 (이름만 입력) */}
+            {/* 신규 참가자 추가 폼 (이름만 입력) */}
             <form onSubmit={handleAddParticipant} className="flex gap-2 p-3 bg-white border border-[#e2ddd3] rounded-lg">
               <input 
                 type="text" 
-                placeholder="추가할 어른이 성함 (예: 홍길동)" 
+                placeholder="추가할 참가자 성함 (예: 홍길동)" 
                 value={newName} 
                 onChange={e => setNewName(e.target.value)} 
                 className="flex-1 border border-[#ccc] rounded px-3 py-1.5 text-xs font-serif focus:outline-none focus:border-[#b82828]"

@@ -43,7 +43,7 @@ export const EVENT_CONFIG: EventConfig = {
   establishedYear: 2017,
   eventDate: "2026년 12월 19일 (토요일)",
   targetDateTime: "2026-12-19T10:00:00+09:00",
-  recipientTitle: "플래닛 어른이님 귀하",
+  recipientTitle: "플래닛 여러분 귀하",
   
   session1: {
     name: "플래닛 연말모임 「플래닛의 새학기」",
@@ -73,7 +73,7 @@ export const EVENT_CONFIG: EventConfig = {
   },
   
   requirements: [
-    "동료 학우(어른이)에게 선물할 엄선된 도서 1권 이상 (정성 담긴 추천 손편지 동봉)",
+    "동료 학우에게 선물할 엄선된 도서 1권 이상 (정성 담긴 추천 손편지 동봉)",
     "만년필 또는 아날로그 필기구",
     "꺾이지 않는 텐션과 열린 마음",
   ],

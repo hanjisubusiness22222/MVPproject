@@ -96,7 +96,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onGoToSe
 
   // 신청 기록 삭제
   const handleDeleteRecord = (idx: number) => {
-    if (window.confirm(`${records[idx].name} 어른이의 신청 기록을 삭제하시겠습니까?`)) {
+    if (window.confirm(`${records[idx].name} 님의 신청 기록을 삭제하시겠습니까?`)) {
       const updated = records.filter((_, i) => i !== idx);
       saveRecords(updated);
     }

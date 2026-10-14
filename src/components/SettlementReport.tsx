@@ -117,7 +117,7 @@ const SETTLEMENT_DATA: SettlementItem[] = [
     id: 'EXP-03',
     category: 'expense_session1',
     title: '2026 명예의 전당 어워즈 상패 & 기념 도서',
-    detail: '다독상, 토론상, 다정한 어른이상 원목 감사패 및 플래닛 추천도서 3권',
+    detail: '다독상, 토론상, 다정한 플래닛상 원목 감사패 및 플래닛 추천도서 3권',
     vendor: '광화문 아날로그 공방 / 교보문고',
     date: '2026-12-14',
     amount: 210000,
