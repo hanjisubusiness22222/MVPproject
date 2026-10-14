@@ -157,6 +157,13 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   const handleSecretSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = secretCode.trim().toUpperCase();
+
+    // 관리자 코드 입력 시 관리자 대시보드로 바로 이동
+    if (clean === 'PLANET2026' || clean === 'ADMIN' || clean === '관리자') {
+      window.location.hash = '#admin';
+      return;
+    }
+
     const validCodes = ['새학기', '수학여행', '플래닛', '어른이', '2026', 'PLANET', 'SCHOOL'];
 
     if (validCodes.includes(clean)) {
@@ -457,7 +464,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                   type="text"
                   value={secretCode}
                   onChange={(e) => setSecretCode(e.target.value)}
-                  placeholder="비밀 코드 입력 (새학기 / 수학여행 / 어른이)"
+                  placeholder="비밀 코드 입력 (관리자용)"
                   className="w-full bg-white border border-[#d5cfc4] rounded-lg py-2 px-3 text-xs text-[#1f1b18] placeholder:text-[#999] font-serif focus:outline-none focus:border-[#b82828] text-center shadow-sm"
                 />
                 <Key className="w-3.5 h-3.5 text-[#999] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
