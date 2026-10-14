@@ -15,11 +15,15 @@ import qrCodeImg from '../assets/qrcode.png';
 
 interface OfficialInvitationProps {
   onBackToTeaser: () => void;
+  onGoToSettlement?: () => void;
 }
 
 type TabType = 'letter' | 'timeline' | 'lookbook' | 'rsvp';
 
-export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackToTeaser }) => {
+export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ 
+  onBackToTeaser,
+  onGoToSettlement
+}) => {
   const [activeTab, setActiveTab] = useState<TabType>('letter');
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -1039,11 +1043,21 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       )}
 
       {/* 푸터 */}
-      <footer className="mt-12 py-6 border-t border-[#e8e4dc] text-center text-xs text-[#777] font-serif space-y-1">
+      <footer className="mt-12 py-6 border-t border-[#e8e4dc] text-center text-xs text-[#777] font-serif space-y-2">
         <p>© 2026 플래닛 독서학교 (PLANET since 2017). All Rights Reserved.</p>
         <p className="text-[10px] text-[#999]">
           가정통신문 제2026-1호 • 어른이들을 위한 설레는 새학기와 추억의 수학여행
         </p>
+        {onGoToSettlement && (
+          <div className="pt-2">
+            <button
+              onClick={onGoToSettlement}
+              className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#d8d3c7] bg-white hover:bg-[#ede8dc] text-[11px] text-[#444] transition-all shadow-xs"
+            >
+              <span>🧾 학생회비 투명 정산 보고서 열람</span>
+            </button>
+          </div>
+        )}
       </footer>
 
     </div>
