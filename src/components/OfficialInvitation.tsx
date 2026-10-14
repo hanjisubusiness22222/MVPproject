@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   BookOpen, Calendar, Clock, MapPin, Sparkles, Glasses, 
   CheckCircle2, ArrowLeft, Send, ShieldCheck, Award, 
   Wine, HelpCircle, Heart, Tag, Bookmark, Check,
-  ChevronRight, AlertCircle, Info, User, QrCode
+  ChevronRight, AlertCircle, Info, User, QrCode, Download, Copy
 } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import { EVENT_CONFIG } from '../constants/eventConfig';
 import { sanitizeText, validatePhone, formatPhone } from '../utils/validation';
 import { maskPhone } from '../utils/masking';
@@ -22,6 +23,9 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
   const [activeTab, setActiveTab] = useState<TabType>('letter');
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
+  const [isDownloadingId, setIsDownloadingId] = useState(false);
+  const studentIdCardRef = useRef<HTMLDivElement>(null);
 
   // RSVP Form States (성별, 신구구분, 프롬신청곡 제외)
   const [name, setName] = useState('');
@@ -91,14 +95,12 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       action: 'register',
       hp_check: hpCheck,
       name: cleanName,
-      phone: phone.replace(/[^0-9]/g, ''),
-      session1: s1,
-      session2: s2,
-      bookHint: sanitizeText(bookHint, 100),
-      note: '',
-      gender: '',
-      fellowType: '',
-      promSong: ''
+      phone: phone,
+      session: sessionLabel,
+      bookTitle: sanitizeText(bookHint, 100) || '(선물 책 준비 중)',
+      fee: totalFee,
+      paymentStatus: '입금 대기',
+      studentNumber: studentNumber
     };
 
     try {
@@ -113,7 +115,6 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
 
       const existingRsvps = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
       existingRsvps.push({
-        studentNumber,
         ...payload,
         submittedAt: new Date().toISOString()
       });
@@ -144,6 +145,28 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       setErrorMessage('접수 처리 중 일시적인 오류가 발생했습니다. 다시 시도해 주세요.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // 학생증 이미지(PNG) 다운로드 함수
+  const handleDownloadStudentId = async () => {
+    if (!studentIdCardRef.current) return;
+    try {
+      setIsDownloadingId(true);
+      const dataUrl = await toPng(studentIdCardRef.current, { 
+        cacheBust: true, 
+        pixelRatio: 2,
+        backgroundColor: '#ffffff'
+      });
+      const link = document.createElement('a');
+      link.download = `플래닛_학생증_${confirmedStudentId?.name || '어른이'}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to download student id', err);
+      alert('학생증 이미지 저장 중 오류가 발생했습니다. 화면을 캡처해 주세요.');
+    } finally {
+      setIsDownloadingId(false);
     }
   };
 
@@ -837,89 +860,116 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       {/* 신청 완료: 플래닛 독서학교 공식 모바일 학생증 모달 (컨셉제안4) */}
       {/* ========================================================= */}
       {confirmedStudentId && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl border-4 border-[#17241b] animate-scaleUp">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="relative w-full max-w-sm space-y-3 animate-scaleUp my-auto">
             
-            {/* 학생증 상단 띠 */}
-            <div className="bg-[#17241b] text-white p-3.5 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <img src={planetLogo} alt="플래닛 로고" className="w-7 h-7 object-contain bg-white rounded p-0.5" />
-                <span className="text-xs font-serif font-bold text-[#dfc27d]">플래닛 독서학교</span>
+            {/* 캡처 대상 학생증 실물 카드 */}
+            <div 
+              ref={studentIdCardRef}
+              className="bg-white rounded-2xl overflow-hidden shadow-2xl border-4 border-[#17241b]"
+            >
+              {/* 학생증 상단 띠 */}
+              <div className="bg-[#17241b] text-white p-3.5 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <img src={planetLogo} alt="플래닛 로고" className="w-7 h-7 object-contain bg-white rounded p-0.5" />
+                  <span className="text-xs font-serif font-bold text-[#dfc27d]">플래닛 독서학교</span>
+                </div>
+                <h3 className="font-serif text-sm font-black tracking-wider text-white">
+                  학 생 증 (STUDENT ID)
+                </h3>
               </div>
-              <h3 className="font-serif text-sm font-black tracking-wider text-white">
-                학 생 증 (STUDENT ID)
-              </h3>
+
+              {/* 학생증 본문 (컨셉제안4 배부하는 명찰 양식) */}
+              <div className="p-6 text-[#1f1b18] space-y-4">
+                
+                <div className="flex items-center space-x-4">
+                  {/* 사진 프레임 */}
+                  <div className="w-20 h-24 rounded-lg border-2 border-[#1f1b18]/30 bg-[#f6f3eb] flex flex-col items-center justify-center text-[#555] shadow-inner">
+                    <User className="w-10 h-10 text-[#888] mb-1" />
+                    <span className="text-[9px] font-serif">어른이 사진</span>
+                  </div>
+
+                  {/* 인적 사항 */}
+                  <div className="space-y-1 text-xs font-serif flex-1">
+                    <div>
+                      <span className="text-[10px] text-[#666] block">성명</span>
+                      <span className="font-bold text-base text-[#111]">{confirmedStudentId.name}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-[#666] block">학번</span>
+                      <span className="font-mono font-bold text-[#b82828]">{confirmedStudentId.studentNumber}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-[#666] block">참석 세션</span>
+                      <span className="font-bold text-[11px] text-[#2e5238]">{confirmedStudentId.sessionName}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 회비 및 발급 안내 */}
+                <div className="p-2.5 rounded bg-[#f6f3eb] border border-[#1f1b18]/20 text-[11px] font-serif space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-[#666]">회비 내역:</span>
+                    <span className="font-mono font-bold text-[#b82828]">{confirmedStudentId.fee.toLocaleString()}원 (입금 대기)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#666]">연락처:</span>
+                    <span className="font-mono">{confirmedStudentId.phone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#666]">발급일자:</span>
+                    <span className="font-mono">{confirmedStudentId.submittedAt}</span>
+                  </div>
+                </div>
+
+                {/* 바코드 그래픽 */}
+                <div className="text-center pt-2 border-t border-[#1f1b18]/20">
+                  <div className="font-mono text-xl tracking-[0.3em] font-black select-none text-[#111]">
+                    ||| | |||| | ||| |||||
+                  </div>
+                  <div className="text-[9px] font-mono text-[#888] mt-0.5">
+                    플래닛 독서학교 운영위원회 직인 생략
+                  </div>
+                </div>
+
+              </div>
             </div>
 
-            {/* 학생증 본문 (컨셉제안4 배부하는 명찰 양식) */}
-            <div className="p-6 text-[#1f1b18] space-y-4">
-              
-              <div className="flex items-center space-x-4">
-                {/* 사진 프레임 */}
-                <div className="w-20 h-24 rounded-lg border-2 border-[#1f1b18]/30 bg-[#f6f3eb] flex flex-col items-center justify-center text-[#555] shadow-inner">
-                  <User className="w-10 h-10 text-[#888] mb-1" />
-                  <span className="text-[9px] font-serif">어른이 사진</span>
-                </div>
-
-                {/* 인적 사항 */}
-                <div className="space-y-1 text-xs font-serif flex-1">
-                  <div>
-                    <span className="text-[10px] text-[#666] block">성명</span>
-                    <span className="font-bold text-base text-[#111]">{confirmedStudentId.name}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#666] block">학번</span>
-                    <span className="font-mono font-bold text-[#b82828]">{confirmedStudentId.studentNumber}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#666] block">참석 세션</span>
-                    <span className="font-bold text-[11px] text-[#2e5238]">{confirmedStudentId.sessionName}</span>
-                  </div>
-                </div>
+            {/* 입금 계좌 안내 및 원클릭 복사 바 */}
+            <div className="bg-[#fcfbf9] border border-[#d5cfc4] rounded-xl p-3 text-center space-y-1.5 shadow-md">
+              <div className="text-[11px] font-serif text-[#555]">
+                입금 계좌: <strong className="text-[#111]">{EVENT_CONFIG.contact.accountInfo}</strong>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(EVENT_CONFIG.contact.accountInfo);
+                  setCopiedAccount(true);
+                  setTimeout(() => setCopiedAccount(false), 2000);
+                }}
+                className="w-full py-1.5 text-xs font-serif rounded bg-white hover:bg-[#ede8dc] border border-[#bbb] text-[#1f1b18] flex items-center justify-center space-x-1 transition-colors"
+              >
+                <Copy className="w-3.5 h-3.5 text-[#2e5238]" />
+                <span>{copiedAccount ? '계좌번호 복사 완료!' : '계좌번호 복사하기'}</span>
+              </button>
+            </div>
 
-              {/* 회비 및 발급 안내 */}
-              <div className="p-2.5 rounded bg-[#f6f3eb] border border-[#1f1b18]/20 text-[11px] font-serif space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-[#666]">회비 내역:</span>
-                  <span className="font-mono font-bold text-[#b82828]">{confirmedStudentId.fee.toLocaleString()}원 (입금 대기)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#666]">연락처:</span>
-                  <span className="font-mono">{confirmedStudentId.phone}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#666]">발급일자:</span>
-                  <span className="font-mono">{confirmedStudentId.submittedAt}</span>
-                </div>
-              </div>
-
-              {/* 바코드 그래픽 */}
-              <div className="text-center pt-2 border-t border-[#1f1b18]/20">
-                <div className="font-mono text-xl tracking-[0.3em] font-black select-none text-[#111]">
-                  ||| | |||| | ||| |||||
-                </div>
-                <div className="text-[9px] font-mono text-[#888] mt-0.5">
-                  플래닛 독서학교 운영위원회 직인 생략
-                </div>
-              </div>
-
-              {/* 닫기 및 칠판 메인 이동 버튼 */}
-              <div className="pt-2 flex gap-2">
-                <button
-                  onClick={() => setConfirmedStudentId(null)}
-                  className="w-full py-2.5 rounded bg-[#17241b] hover:bg-[#203325] text-white font-serif font-bold text-xs transition-all shadow"
-                >
-                  학생증 닫기
-                </button>
-                <button
-                  onClick={onBackToTeaser}
-                  className="w-full py-2.5 rounded border border-[#17241b] bg-white hover:bg-[#f6f3eb] text-[#17241b] font-serif font-bold text-xs transition-all shadow"
-                >
-                  칠판 메인으로
-                </button>
-              </div>
-
+            {/* 모바일 저장 / 닫기 액션 버튼 */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleDownloadStudentId}
+                disabled={isDownloadingId}
+                className="flex-1 py-3 rounded-xl bg-[#2e5238] hover:bg-[#23402c] text-white font-serif font-bold text-xs transition-all shadow flex items-center justify-center space-x-1.5 disabled:opacity-50"
+              >
+                <Download className="w-4 h-4" />
+                <span>{isDownloadingId ? '저장 중...' : '학생증 이미지(PNG) 저장'}</span>
+              </button>
+              <button
+                onClick={() => setConfirmedStudentId(null)}
+                className="px-4 py-3 rounded-xl bg-white hover:bg-[#ede8dc] border border-[#17241b] text-[#17241b] font-serif font-bold text-xs transition-all shadow"
+              >
+                닫기
+              </button>
             </div>
 
           </div>
