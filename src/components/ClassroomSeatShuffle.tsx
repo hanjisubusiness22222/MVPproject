@@ -121,7 +121,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
     } catch {}
   };
 
-  // 각 분단별 성비 균형 & 신·구 조화 자동 계산 함수
+  // 각 분단별 성비 균형(1:1) & 신·구 조화(1:1) 자동 배정 (짝꿍은 분단 내에서 자연스럽게 랜덤 믹스)
   const calculateBalancedSeats = (list: Participant[]) => {
     const finalSeats: (Participant | null)[] = new Array(24).fill(null);
 
@@ -134,26 +134,29 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
     // 잔여 인원 보충용 풀
     const fallbackPool = [...list].sort(() => Math.random() - 0.5);
 
-    // 3개 분단(1분단, 2분단, 3분단) 각각에 성비 1:1, 신구 1:1, 남녀+선후배 짝꿍 배합
+    // 3개 분단(1분단, 2분단, 3분단) 각각에 성비 1:1, 신구 1:1 보장
     for (let bunday = 0; bunday < 3; bunday++) {
       const base = bunday * 8;
 
-      // 4개 책상 (2인 1조)
-      // 책상 1: 기존여 + 신규남
-      // 책상 2: 기존남 + 신규여
-      // 책상 3: 기존여 + 신규남
-      // 책상 4: 기존남 + 신규여
-      finalSeats[base + 0] = seniorF.pop() || fallbackPool.pop() || null;
-      finalSeats[base + 1] = newM.pop() || fallbackPool.pop() || null;
+      // 해당 분단에 배정될 8명 선출 (기존여2, 기존남2, 신규여2, 신규남2 = 성비 1:1, 신구 1:1)
+      const divisionMembers: (Participant | null)[] = [
+        seniorF.pop() || fallbackPool.pop() || null,
+        seniorF.pop() || fallbackPool.pop() || null,
+        seniorM.pop() || fallbackPool.pop() || null,
+        seniorM.pop() || fallbackPool.pop() || null,
+        newF.pop() || fallbackPool.pop() || null,
+        newF.pop() || fallbackPool.pop() || null,
+        newM.pop() || fallbackPool.pop() || null,
+        newM.pop() || fallbackPool.pop() || null,
+      ];
 
-      finalSeats[base + 2] = seniorM.pop() || fallbackPool.pop() || null;
-      finalSeats[base + 3] = newF.pop() || fallbackPool.pop() || null;
+      // 분단 내에서는 8명을 완전히 무작위로 섞어서 4개 책상(8개 좌석)에 자유롭게 배치
+      // (짝꿍끼리는 인위적인 제약 없이 자연스럽게 매칭)
+      const shuffledDivision = divisionMembers.sort(() => Math.random() - 0.5);
 
-      finalSeats[base + 4] = seniorF.pop() || fallbackPool.pop() || null;
-      finalSeats[base + 5] = newM.pop() || fallbackPool.pop() || null;
-
-      finalSeats[base + 6] = seniorM.pop() || fallbackPool.pop() || null;
-      finalSeats[base + 7] = newF.pop() || fallbackPool.pop() || null;
+      shuffledDivision.forEach((member, i) => {
+        finalSeats[base + i] = member;
+      });
     }
 
     return finalSeats;
@@ -339,7 +342,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
       <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-serif border-b border-[#e8e4dc]">
         <div className="flex items-center space-x-2 text-[#2e5238] font-bold">
           <Sparkles className="w-4 h-4 text-[#b82828]" />
-          <span>✨ 각 분단별 성비 균형(1:1)과 신·구 조화가 자동으로 맞춰져 2인 1조 짝꿍으로 배정됩니다.</span>
+          <span>✨ 각 분단(1·2·3분단)별 성비 균형(1:1)과 신·구 조화가 보장되며, 짝꿍은 분단 내에서 자연스럽게 랜덤 매칭됩니다.</span>
         </div>
 
         <div className="text-[11px] text-[#777] font-mono">
