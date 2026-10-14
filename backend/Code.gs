@@ -145,16 +145,17 @@ function doPost(e) {
       }
 
       // 행 추가
+      // 행 추가 (성별/구분/신청곡 생략 시 기본값 대입)
       sheet.appendRow([
         new Date().toLocaleString("ko-KR"),
         sanitize(postData.name),
-        postData.gender === "female" ? "여성" : "남성",
-        postData.fellowType === "senior" ? "기존" : "신규",
+        postData.gender ? (postData.gender === "female" ? "여성" : "남성") : "-",
+        postData.fellowType ? (postData.fellowType === "senior" ? "기존" : "신규") : "-",
         cleanPhone,
         postData.session1 ? "O" : "X",
         postData.session2 ? "O" : "X",
-        sanitize(postData.bookHint),
-        sanitize(postData.promSong),
+        sanitize(postData.bookHint || "-"),
+        sanitize(postData.promSong || "-"),
         0, // 초기 조 미배정
         "입금대기",
         sanitize(postData.note || "")
@@ -162,7 +163,7 @@ function doPost(e) {
 
       return createJsonResponse({ 
         success: true, 
-        message: "2026 플래닛 연말 갈라 참가 신청이 완료되었습니다." 
+        message: "2026 플래닛 연말 모임 참가 신청이 완료되었습니다." 
       });
     }
 
