@@ -28,7 +28,6 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
   const [phone, setPhone] = useState('');
   const [selectedSession, setSelectedSession] = useState<'both' | 'session1' | 'session2'>('both');
   const [bookHint, setBookHint] = useState('');
-  const [note, setNote] = useState('');
   const [privacyAgreed, setPrivacyAgreed] = useState(true);
   const [hpCheck, setHpCheck] = useState(''); // 허니팟 봇 차단
 
@@ -96,7 +95,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
       session1: s1,
       session2: s2,
       bookHint: sanitizeText(bookHint, 100),
-      note: sanitizeText(note, 200),
+      note: '',
       gender: '',
       fellowType: '',
       promSong: ''
@@ -783,21 +782,6 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
                     onChange={(e) => setBookHint(e.target.value)}
                     placeholder="예: 위로가 필요한 날 읽기 좋은 에세이 1권"
                     className="w-full bg-white border border-[#1f1b18]/40 rounded p-2.5 text-sm text-[#111] placeholder:text-[#888] font-serif focus:outline-none focus:border-[#b82828]"
-                  />
-                </div>
-
-                {/* 5. 어른이의 메모 (선택) */}
-                <div>
-                  <label className="block text-xs font-serif font-bold text-[#1f1b18] mb-1">
-                    어른이의 메모 / 알레르기 안내 <span className="text-[#888] font-normal">(선택)</span>
-                  </label>
-                  <textarea
-                    rows={2}
-                    maxLength={100}
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    placeholder="못 드시는 음식이나 운영진에게 전하고 싶은 말을 적어주세요."
-                    className="w-full bg-white border border-[#1f1b18]/40 rounded p-2.5 text-sm text-[#111] placeholder:text-[#888] font-serif focus:outline-none focus:border-[#b82828] resize-none"
                   />
                 </div>
 
