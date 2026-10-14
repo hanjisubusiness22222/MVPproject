@@ -38,7 +38,7 @@ export const App: React.FC = () => {
             THE OFFICIAL INVITATION GAZETTE
           </h2>
           <p className="font-display italic text-cream-300 max-w-md">
-            "2026 플래닛 연말 갈라 정식 안내장 및 신청 폼은 Day 2 스프린트에서 본격적으로 완성됩니다."
+            "2026 플래닛 연말 모임 정식 안내장 및 신청 폼은 Day 2 스프린트에서 본격적으로 완성됩니다."
           </p>
           <button
             onClick={() => setViewMode('teaser')}

@@ -1,5 +1,5 @@
-# 🏛️ The 2026 Annual Planet Gala : Semester of Planet
-> **"플래닛 북 아카데미 2026 연말 갈라 — 정통 아이비리그와 지적인 긱 시크의 만남"**
+# 🏛️ The 2026 Annual Planet Gathering : Semester of Planet
+> **"플래닛 북 아카데미 2026 연말 모임 — 정통 아이비리그와 지적인 긱 시크의 만남"**
 
 [![Deploy to GitHub Pages](https://github.com/hanjisubusiness22222/MVPproject/actions/workflows/deploy.yml/badge.svg)](https://github.com/hanjisubusiness22222/MVPproject/actions)
 
@@ -9,7 +9,7 @@
 
 - **주최**: 플래닛 북 아카데미 (**PLANET Book Academy** / since 2017)
 - **일시**: **2026년 12월 19일 (토)**
-  - **1부 (Main Session)**: `12:00 ~ 18:00` | 플래닛 연말 갈라 **「플래닛의 새학기」** @ 공간나인 강남점
+  - **1부 (Main Session)**: `12:00 ~ 18:00` | 플래닛 연말 모임 **「플래닛의 새학기」** @ 공간나인 강남점
   - **2부 (After Session)**: `18:00 ~ LATE` | 애프터 나이트 프롬 **「플래닛의 윈터 프롬 (The Winter Prom)」** @ 강남 파티룸
 - **드레스코드**: **Classic Preppy with a Twist of Geek Chic**
   - 블레이저, 케이블 니트/베스트, 넥타이, 플리츠 스커트/치노 팬츠, 긱 시크 뿔테·무테 안경

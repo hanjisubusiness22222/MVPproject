@@ -199,7 +199,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   const handleSecretSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = secretCode.trim().toUpperCase();
-    const validCodes = ['PROM', 'IVY', 'PLANET', '프롬', '새학기', '2026', '갈라', '도서관'];
+    const validCodes = ['PROM', 'IVY', 'PLANET', '프롬', '새학기', '2026', '모임', '도서관'];
 
     if (validCodes.includes(clean)) {
       setSecretRevealed(true);
@@ -274,11 +274,11 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
         <div className="text-center mb-6 space-y-2.5">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded border border-[#c29b38]/30 bg-[#161310] text-[#dfc27d] text-[11px] font-mono tracking-widest shadow-sm">
             <Tag className="w-3 h-3 text-[#c29b38]" />
-            <span>청구기호 : 813.5-플2026-갈라 (열람제한 : 회원전용)</span>
+            <span>청구기호 : 813.5-플2026-모임 (열람제한 : 회원전용)</span>
           </div>
           
           <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-[#f7f3eb] drop-shadow-sm">
-            2026 플래닛 연말 갈라
+            2026 플래닛 연말 모임
           </h1>
           
           <p className="font-serif italic text-base sm:text-lg text-[#bfb29e] max-w-xl mx-auto">
@@ -369,7 +369,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                   </div>
 
                   <p className="font-serif text-xs sm:text-sm text-[#473c33] leading-relaxed">
-                    한 해 동안 책을 통해 다정한 우정을 나누어 온 학우 여러분을 위해, 2026년을 기념하는 특별한 연말 갈라의 장을 엽니다.
+                    한 해 동안 책을 통해 다정한 우정을 나누어 온 학우 여러분을 위해, 2026년을 기념하는 특별한 연말 모임의 장을 엽니다.
                   </p>
 
                   {/* 1부 & 2부 세션 안내 (도서관 인덱스 카드 서식) */}
@@ -447,7 +447,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
         <div className="w-full max-w-xl mt-8 p-4 rounded-xl border border-[#c29b38]/20 bg-[#16120e]/80 text-center shadow-md">
           <div className="flex items-center justify-center space-x-1.5 text-[#dfc27d] text-xs font-mono mb-3">
             <Clock className="w-3.5 h-3.5 text-[#c29b38]" />
-            <span>갈라 개막 카운트다운 • 2026.12.19 (토) 12:00</span>
+            <span>모임 개막 카운트다운 • 2026.12.19 (토) 12:00</span>
           </div>
           
           <div className="grid grid-cols-4 gap-2 text-[#f7f3eb]">
@@ -503,7 +503,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
           )}
           {secretError && (
             <p className="text-[11px] text-[#e06c75] mt-1 font-serif">
-              올바른 코드를 입력해 주세요. (힌트: 프롬, 새학기, 도서관, 갈라)
+              올바른 코드를 입력해 주세요. (힌트: 프롬, 새학기, 도서관, 모임)
             </p>
           )}
         </div>
@@ -513,7 +513,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       {/* 하단 푸터 */}
       <footer className="w-full max-w-4xl py-4 border-t border-[#c29b38]/20 text-center text-[11px] text-[#857766] font-serif space-y-1 z-20">
         <p>© 2026 플래닛 독서학교 아카이브. All Rights Reserved.</p>
-        <p className="text-[#a89980] text-[10px]">책과 지성, 다정한 대화가 머무는 연말 갈라</p>
+        <p className="text-[#a89980] text-[10px]">책과 지성, 다정한 대화가 머무는 연말 모임</p>
       </footer>
 
       {/* 사전 알림 등록 모달 */}
@@ -580,7 +580,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                 </div>
 
                 <div className="text-[10px] text-[#857766] font-serif">
-                  * [개인정보 보호] 입력하신 연락처는 2026 플래닛 연말 갈라 안내 발송용으로만 사용되며, 행사 종료 후 7일 이내 안전하게 파기됩니다.
+                  * [개인정보 보호] 입력하신 연락처는 2026 플래닛 연말 모임 안내 발송용으로만 사용되며, 행사 종료 후 7일 이내 안전하게 파기됩니다.
                 </div>
 
                 <button

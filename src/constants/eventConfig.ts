@@ -47,8 +47,8 @@ export interface EventConfig {
 
 export const EVENT_CONFIG: EventConfig = {
   isTeaserMode: true, // true: 티저 모드 우선 노출, false: 정식 오픈
-  eventTitle: "2026 플래닛 연말 갈라",
-  subTitle: "The Annual Planet Gala : The New Semester & The Winter Prom",
+  eventTitle: "2026 플래닛 연말 모임",
+  subTitle: "The Annual Planet Gathering : The New Semester & The Winter Prom",
   themeTagline: "Where Classic Ivy Meets Modern Geek Chic & Romantic Prom Night",
   organization: "플래닛 북 아카데미 (PLANET Book Academy)",
   establishedYear: 2017,
@@ -67,7 +67,7 @@ export const EVENT_CONFIG: EventConfig = {
   
   session2: {
     name: "플래닛의 윈터 프롬",
-    englishName: "The Winter Prom (Night Gala & Prom)",
+    englishName: "The Winter Prom (Night Gathering & Prom)",
     time: "18:00 ~ LATE",
     location: "Secret Prom Lounge (강남 프라이빗 파티룸)",
     description: "샴페인 토스트, 프롬 포토월 촬영, 실시간 베스트 드레서(Prom King & Queen) 투표 및 미드나잇 재즈 살롱",

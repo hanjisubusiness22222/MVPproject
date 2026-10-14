@@ -1,5 +1,5 @@
-# 🏛️ 2026 플래닛 연말 갈라 「플래닛의 새학기 & 윈터 프롬」 개발 계획서
-### *The 2026 Annual Planet Gala: The New Semester & The Winter Prom*
+# 🏛️ 2026 플래닛 연말 모임 「플래닛의 새학기 & 윈터 프롬」 개발 계획서
+### *The 2026 Annual Planet Gathering: The New Semester & The Winter Prom*
 *(Ivy League & Geek Chic Edition)*
 
 > **"A Heritage Tradition of Planet Book Academy since 2017 — Where Classic Ivy Meets Modern Geek Chic & Romantic Prom Night."**
@@ -10,7 +10,7 @@
 
 - **주최/소속**: **플래닛 북 아카데미 (PLANET Book Academy / since 2017)**
 - **행사 공식 구성**: 
-  - **1부 (Day Main Session)**: 2026 플래닛 연말 갈라 **「플래닛의 새학기 (The New Semester)」**
+  - **1부 (Day Main Session)**: 2026 플래닛 연말 모임 **「플래닛의 새학기 (The New Semester)」**
     - 아카데미 학술 세미나, 블라인드 북 익스체인지, 2026 명예의 전당 어워즈
   - **2부 (Night After Session)**: 애프터 나이트 프롬 **「플래닛의 윈터 프롬 (The Winter Prom)」**
     - 웰컴 샴페인 토스트, 프롬 포토월, **베스트 드레서 (Prom King & Queen) 모바일 투표**, 미드나잇 재즈 살롱
@@ -117,7 +117,7 @@
 1. **칼리지 헤더 & 크레스트 (Academy Crest Header)**:
    - 플래닛 아카데미 엠블럼 (학사모, 책, 깃펜, 2017 리본 모티프)
    - `PLANET BOOK ACADEMY BULLETIN | ISSUE NO. 2026-1`
-   - `THE ANNUAL WINTER GALA : SEMESTER & PROM`
+   - `THE ANNUAL WINTER GATHERING : SEMESTER & PROM`
 2. **학장 서간문 (The Dean's Welcome Letter)**:
    - "친애하는 플래닛 펠로우(Fellow) 여러분께..." (공식 안내문)
    - 올 한 해 플래닛이 함께 일궈낸 지적 여정을 기념하고, 밤의 윈터 프롬으로 이어지는 축제 초청 메시지
