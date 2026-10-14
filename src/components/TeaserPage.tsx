@@ -239,7 +239,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               </span>
             </div>
             <p className="text-[10px] text-cream-400/70 font-classic italic tracking-wider">
-              Litterae, Veritas et Amicitia • Classic Ivy & Romantic Prom
+              Litterae, Veritas et Amicitia
             </p>
           </div>
         </div>
