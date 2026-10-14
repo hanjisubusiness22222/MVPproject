@@ -324,7 +324,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                     <div className="w-full h-full rounded-full border border-dashed border-[#dfc27d]/30 flex flex-col items-center justify-center text-center p-2">
                       <BookOpen className="w-5 h-5 text-[#dfc27d] mb-1" />
                       <span className="font-serif text-[#f7f3eb] font-bold text-sm tracking-widest">
-                        藏書
+                        장서
                       </span>
                       <span className="text-[8px] font-mono text-[#dfc27d]/80 tracking-wider">
                         EX LIBRIS
