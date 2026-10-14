@@ -7,6 +7,7 @@ import {
 import confetti from 'canvas-confetti';
 import { EVENT_CONFIG } from '../constants/eventConfig';
 import { sanitizeText, validatePhone, validateEmail } from '../utils/validation';
+import planetLogo from '../assets/planet-logo.png';
 
 interface TeaserPageProps {
   onExploreFullPage?: () => void;
@@ -160,9 +161,9 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       <header className="w-full max-w-4xl flex items-center justify-between py-3 border-b border-[#e8e4dc] z-20">
         <div className="flex items-center space-x-3">
           <img 
-            src="./planet-logo.png" 
+            src={planetLogo} 
             alt="플래닛 로고" 
-            className="w-10 h-10 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
+            className="w-11 h-11 object-contain rounded-xl bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
           />
           <div>
             <div className="flex items-center space-x-2">
@@ -273,8 +274,8 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               
               {/* 가정통신문 헤더 박스 (초대장.png와 100% 동일한 격자 서식) */}
               <div className="border-2 border-[#1f1b18] grid grid-cols-4 sm:grid-cols-5 text-center text-xs font-serif">
-                <div className="col-span-1 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex items-center justify-center bg-white/70">
-                  <img src="./planet-logo.png" alt="PLANET" className="w-16 sm:w-20 h-auto object-contain" />
+                <div className="col-span-1 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex items-center justify-center bg-white">
+                  <img src={planetLogo} alt="PLANET" className="w-16 sm:w-20 h-auto object-contain" />
                 </div>
                 <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex items-center justify-center">
                   <h2 className="font-serif text-lg sm:text-2xl font-black tracking-[0.25em] text-[#111]">

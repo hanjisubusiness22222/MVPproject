@@ -9,6 +9,7 @@ import { EVENT_CONFIG } from '../constants/eventConfig';
 import { sanitizeText, validatePhone, formatPhone } from '../utils/validation';
 import { maskPhone } from '../utils/masking';
 import confetti from 'canvas-confetti';
+import planetLogo from '../assets/planet-logo.png';
 
 interface OfficialInvitationProps {
   onBackToTeaser: () => void;
@@ -164,7 +165,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
             
             <div className="flex items-center space-x-2">
               <img 
-                src="./planet-logo.png" 
+                src={planetLogo} 
                 alt="플래닛 로고" 
                 className="w-8 h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
               />
@@ -217,8 +218,8 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
               
               {/* 상단 공문 헤더 박스 (초대장.png) */}
               <div className="border-2 border-[#1f1b18] grid grid-cols-4 sm:grid-cols-5 text-center text-xs font-serif">
-                <div className="col-span-1 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex items-center justify-center bg-white/70">
-                  <img src="./planet-logo.png" alt="PLANET" className="w-20 sm:w-24 h-auto object-contain" />
+                <div className="col-span-1 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex items-center justify-center bg-white">
+                  <img src={planetLogo} alt="PLANET" className="w-20 sm:w-24 h-auto object-contain" />
                 </div>
                 <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex items-center justify-center">
                   <h1 className="font-serif text-xl sm:text-3xl font-black tracking-[0.3em] text-[#111]">
@@ -786,11 +787,12 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
           <div className="relative w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl border-4 border-[#17241b] animate-scaleUp">
             
             {/* 학생증 상단 띠 */}
-            <div className="bg-[#17241b] text-white p-4 text-center space-y-1">
-              <div className="text-[10px] font-mono tracking-widest text-[#dfc27d]">
-                PLANET READING SCHOOL
+            <div className="bg-[#17241b] text-white p-3.5 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <img src={planetLogo} alt="플래닛 로고" className="w-7 h-7 object-contain bg-white rounded p-0.5" />
+                <span className="text-xs font-serif font-bold text-[#dfc27d]">플래닛 독서학교</span>
               </div>
-              <h3 className="font-serif text-lg font-black tracking-wider">
+              <h3 className="font-serif text-sm font-black tracking-wider text-white">
                 학 생 증 (STUDENT ID)
               </h3>
             </div>
