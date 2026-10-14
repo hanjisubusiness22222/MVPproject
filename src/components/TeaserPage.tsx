@@ -18,6 +18,7 @@ import {
   Crown
 } from 'lucide-react';
 import { EVENT_CONFIG } from '../constants/eventConfig';
+import { sanitizeText, validatePhone, validateEmail } from '../utils/validation';
 
 interface TeaserPageProps {
   onExploreFullPage?: () => void;
@@ -39,6 +40,8 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   // 사전 알림 모달 상태
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
   const [contactInput, setContactInput] = useState('');
+  const [hpCheck, setHpCheck] = useState(''); // 보안 봇 방지 허니팟 필드
+  const [validationError, setValidationError] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // 시크릿 패스코드 상태
@@ -119,17 +122,54 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
     }
   };
 
-  // 사전 알림 제출
-  const handleNotifySubmit = (e: React.FormEvent) => {
+  // 사전 알림 제출 (보안 검증 및 봇 허니팟 차단)
+  const handleNotifySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contactInput.trim()) return;
+    setValidationError('');
 
-    // 로컬 스토리지에 임시 저장
+    // 1. [보안] 봇 감지: 숨겨진 허니팟 필드가 채워져 있으면 스팸 봇으로 간주
+    if (hpCheck.trim() !== '') {
+      setIsSubmitted(true);
+      setTimeout(() => { setIsNotifyModalOpen(false); setIsSubmitted(false); }, 1500);
+      return;
+    }
+
+    // 2. [보안] 입력값 정제(Sanitization)
+    const sanitizedContact = sanitizeText(contactInput, 100);
+    if (!sanitizedContact) {
+      setValidationError('연락처 또는 이메일을 입력해 주세요.');
+      return;
+    }
+
+    // 3. [보안] 형식 유효성 검사 (휴대폰 또는 이메일)
+    const isPhone = validatePhone(sanitizedContact);
+    const isEmail = validateEmail(sanitizedContact);
+    if (!isPhone && !isEmail) {
+      setValidationError('올바른 휴대폰 번호(010-0000-0000) 또는 이메일 형식을 입력해 주세요.');
+      return;
+    }
+
+    // 4. 구글 시트 연동 및 로컬 스토리지 안전 저장
     try {
+      if (EVENT_CONFIG.googleScriptUrl) {
+        await fetch(EVENT_CONFIG.googleScriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'early_notify',
+            contact: sanitizedContact,
+            hp_check: hpCheck
+          })
+        });
+      }
+      
       const existing = JSON.parse(localStorage.getItem('planet_subscribers') || '[]');
-      existing.push({ contact: contactInput, date: new Date().toISOString() });
+      existing.push({ contact: sanitizedContact, date: new Date().toISOString() });
       localStorage.setItem('planet_subscribers', JSON.stringify(existing));
-    } catch (err) {}
+    } catch (err) {
+      console.log('Notification submit error:', err);
+    }
 
     setIsSubmitted(true);
     confetti({
@@ -142,6 +182,8 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       setIsNotifyModalOpen(false);
       setIsSubmitted(false);
       setContactInput('');
+      setHpCheck('');
+      setValidationError('');
     }, 2200);
   };
 
@@ -472,6 +514,17 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               </div>
             ) : (
               <form onSubmit={handleNotifySubmit} className="space-y-4">
+                {/* [보안] 봇 방지 허니팟 필드 (사람의 눈에는 보이지 않음) */}
+                <input
+                  type="text"
+                  name="hp_check"
+                  value={hpCheck}
+                  onChange={(e) => setHpCheck(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  style={{ display: 'none', position: 'absolute', left: '-9999px' }}
+                />
+
                 <div>
                   <label className="block text-xs font-semibold text-gold-400 mb-1">
                     연락처 또는 이메일 주소
@@ -480,14 +533,22 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                     type="text"
                     required
                     value={contactInput}
-                    onChange={(e) => setContactInput(e.target.value)}
+                    onChange={(e) => {
+                      setContactInput(e.target.value);
+                      if (validationError) setValidationError('');
+                    }}
                     placeholder="010-0000-0000 또는 email@domain.com"
                     className="w-full bg-ivy-950 border border-gold-500/40 rounded-lg p-2.5 text-sm text-cream-100 placeholder:text-cream-400/40 focus:outline-none focus:border-gold-400 font-sans"
                   />
+                  {validationError && (
+                    <p className="text-[11px] text-red-400 mt-1 font-typewriter">
+                      ⚠️ {validationError}
+                    </p>
+                  )}
                 </div>
 
                 <div className="text-[11px] text-cream-400/70">
-                  * 수집된 연락처는 2026 플래닛 연말 갈라 안내 발송 목적으로만 사용되며 모임 종료 후 파기됩니다.
+                  * [개인정보 처리방침] 수집된 연락처는 2026 플래닛 연말 갈라 안내 발송 목적으로만 사용되며, 행사 종료 후 7일 이내 안전하게 영구 파기됩니다.
                 </div>
 
                 <button
