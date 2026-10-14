@@ -361,15 +361,15 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
           {/* 상단: 칠판 및 교탁 (선생님 / 운영진) */}
           <div className="text-center space-y-3">
             
-            {/* 레트로 칠판 헤더 */}
-            <div className="chalkboard-bg text-white max-w-xl mx-auto py-3 px-6 rounded-lg border-4 border-[#8B4513] shadow-lg relative">
+            {/* 레트로 우드 현판 헤더 (교탁과 일치하는 따뜻한 갈색) */}
+            <div className="bg-[#5c4033] text-[#f7f5ed] max-w-xl mx-auto py-3 px-6 rounded-lg border-4 border-[#3e2723] shadow-lg relative">
               <div className="text-[10px] font-mono text-[#dfc27d] tracking-widest uppercase">
-                CLASSROOM BLACKBOARD
+                CLASSROOM SIGNBOARD
               </div>
               <h2 className="text-lg sm:text-xl font-serif font-black tracking-widest text-[#f7f5ed]">
                 2026 플래닛 독서학교 「새학기 교실」
               </h2>
-              <div className="text-[11px] text-[#a8b8ae] font-serif mt-0.5">
+              <div className="text-[11px] text-[#dfc27d]/90 font-serif mt-0.5">
                 * 책을 사랑하는 어른이들의 다정한 첫 만남
               </div>
             </div>
