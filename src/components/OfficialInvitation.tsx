@@ -10,6 +10,7 @@ import { sanitizeText, validatePhone, formatPhone } from '../utils/validation';
 import { maskPhone } from '../utils/masking';
 import confetti from 'canvas-confetti';
 import planetLogo from '../assets/planet-logo.png';
+import qrCodeImg from '../assets/qrcode.png';
 
 interface OfficialInvitationProps {
   onBackToTeaser: () => void;
@@ -19,6 +20,8 @@ type TabType = 'letter' | 'timeline' | 'lookbook' | 'rsvp';
 
 export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackToTeaser }) => {
   const [activeTab, setActiveTab] = useState<TabType>('letter');
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // RSVP Form States (성별, 신구구분, 프롬신청곡 제외)
   const [name, setName] = useState('');
@@ -180,27 +183,38 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
             </div>
           </div>
 
-          {/* 우측: 탭 네비게이션 */}
-          <nav className="flex items-center space-x-1 sm:space-x-2">
-            {[
-              { id: 'letter', label: '가정통신문' },
-              { id: 'timeline', label: '일과표 안내' },
-              { id: 'lookbook', label: '용의복장 룩북' },
-              { id: 'rsvp', label: '참가 신청(회신서)' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-2.5 py-1.5 rounded text-xs font-serif transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-[#b82828] text-white font-bold shadow-sm'
-                    : 'text-[#555] hover:text-[#111] hover:bg-[#f0ece1]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+          {/* 우측: 탭 네비게이션 & QR코드 버튼 */}
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <nav className="flex items-center space-x-1 sm:space-x-2">
+              {[
+                { id: 'letter', label: '가정통신문' },
+                { id: 'timeline', label: '일과표 안내' },
+                { id: 'lookbook', label: '용의복장 룩북' },
+                { id: 'rsvp', label: '참가 신청(회신서)' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as TabType)}
+                  className={`px-2.5 py-1.5 rounded text-xs font-serif transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-[#b82828] text-white font-bold shadow-sm'
+                      : 'text-[#555] hover:text-[#111] hover:bg-[#f0ece1]'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+
+            <button
+              onClick={() => setIsQrModalOpen(true)}
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 shadow-sm"
+              title="모바일 접속 QR코드"
+            >
+              <QrCode className="w-3.5 h-3.5 text-[#2e5238]" />
+              <span className="hidden sm:inline font-bold">QR코드</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -334,11 +348,67 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
               </div>
 
               {/* 절취선 및 회신서 작성 바로가기 버튼 */}
-              <div className="pt-4 border-t-2 border-dashed border-[#1f1b18]/40 text-center space-y-3">
+              <div className="pt-4 border-t-2 border-dashed border-[#1f1b18]/40 text-center space-y-4">
                 <div className="text-xs font-serif text-[#666]">
                   ---------------------- (절  취  선) ----------------------
                 </div>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+
+                {/* QR 코드 접속 및 신청 안내 (초대장.png 양식) */}
+                <div className="p-4 border border-[#1f1b18]/20 rounded-lg bg-[#f8f6f0] flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left shadow-inner">
+                  <div 
+                    onClick={() => setIsQrModalOpen(true)}
+                    className="cursor-pointer group relative bg-white p-2 border border-[#1f1b18]/30 rounded shadow-sm hover:shadow transition-shadow flex-shrink-0"
+                    title="클릭하여 QR 코드 크게 보기"
+                  >
+                    <img 
+                      src={qrCodeImg} 
+                      alt="플래닛 모바일 접속 QR코드" 
+                      className="w-24 h-24 sm:w-28 sm:h-28 object-contain"
+                    />
+                    <div className="absolute inset-0 bg-black/60 text-white text-[10px] font-sans rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      🔍 확대 보기
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 font-serif">
+                    <div className="text-xs sm:text-sm font-bold text-[#1f1b18] leading-snug">
+                      ※ 참여할 어른이는, 위의 QR 코드를 인식해서 신청해주시길 바랍니다.
+                    </div>
+                    <div className="text-[11px] text-[#666] font-mono break-all select-all">
+                      https://hanjisubusiness22222.github.io/MVPproject/
+                    </div>
+                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                      <a
+                        href={qrCodeImg}
+                        download="플래닛_연말모임_QR코드.png"
+                        className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 bg-[#2e5238] hover:bg-[#23402c] text-white rounded transition-colors"
+                      >
+                        <span>QR 다운로드</span>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setIsQrModalOpen(true)}
+                        className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 border border-[#1f1b18]/30 bg-white text-[#1f1b18] rounded hover:bg-[#ede8dc] transition-colors"
+                      >
+                        <QrCode className="w-3 h-3" />
+                        <span>크게 보기</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText('https://hanjisubusiness22222.github.io/MVPproject/');
+                          setCopiedLink(true);
+                          setTimeout(() => setCopiedLink(false), 2000);
+                        }}
+                        className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 border border-[#1f1b18]/30 bg-white text-[#1f1b18] rounded hover:bg-[#ede8dc] transition-colors"
+                      >
+                        <span>{copiedLink ? '✓ 복사됨!' : '주소 복사'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
                   <button
                     onClick={() => setActiveTab('rsvp')}
                     className="w-full sm:w-auto px-6 py-3 rounded bg-[#b82828] hover:bg-[#961e1e] text-white font-serif font-bold text-sm shadow flex items-center justify-center space-x-2"
@@ -866,6 +936,68 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ onBackTo
                 </button>
               </div>
 
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* QR 코드 확대 모달 */}
+      {isQrModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-[#fcfbf9] border-2 border-[#1f1b18] rounded-xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
+            
+            <button
+              onClick={() => setIsQrModalOpen(false)}
+              className="absolute top-3 right-3 text-[#777] hover:text-[#111] p-1.5 rounded-full hover:bg-[#ede8dc] transition-colors"
+              title="닫기"
+            >
+              ✕
+            </button>
+
+            <div className="space-y-1">
+              <div className="text-[10px] font-mono text-[#b82828] font-bold tracking-wider uppercase">
+                Mobile Access QR Code
+              </div>
+              <h3 className="text-lg font-serif font-bold text-[#1f1b18]">
+                플래닛 독서학교 가정통신문
+              </h3>
+              <p className="text-xs text-[#666] font-serif">
+                스마트폰 카메라로 비추면 바로 접속하실 수 있습니다.
+              </p>
+            </div>
+
+            <div className="bg-white p-4 border border-[#e2ddd3] rounded-lg inline-block shadow-inner">
+              <img 
+                src={qrCodeImg} 
+                alt="플래닛 모바일 QR 코드" 
+                className="w-52 h-52 sm:w-60 sm:h-60 object-contain mx-auto"
+              />
+            </div>
+
+            <div className="text-xs font-mono text-[#555] bg-white p-2.5 rounded border border-[#e2ddd3] break-all select-all">
+              https://hanjisubusiness22222.github.io/MVPproject/
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <a
+                href={qrCodeImg}
+                download="플래닛_연말모임_QR코드.png"
+                className="flex-1 py-2.5 rounded bg-[#2e5238] hover:bg-[#23402c] text-white font-serif font-bold text-xs transition-all shadow text-center inline-block"
+              >
+                이미지 저장
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText('https://hanjisubusiness22222.github.io/MVPproject/');
+                  setCopiedLink(true);
+                  setTimeout(() => setCopiedLink(false), 2000);
+                }}
+                className="flex-1 py-2.5 rounded border border-[#1f1b18] bg-white hover:bg-[#f6f3eb] text-[#1f1b18] font-serif font-bold text-xs transition-all shadow"
+              >
+                {copiedLink ? '복사 완료!' : 'URL 복사'}
+              </button>
             </div>
 
           </div>
