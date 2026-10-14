@@ -3,78 +3,72 @@
 @tailwind utilities;
 
 @layer utilities {
-  /* 아카데미 도서관 서재 배경: 딥 월넛 우드 & 아늑한 서가 톤 */
-  .bg-library-study {
-    background-color: #120f0d;
+  /* 교실 칠판 표면 질감 (초록 칠판 + 분필 가루 감성) */
+  .chalkboard-surface {
+    background-color: #17241b;
     background-image: 
-      radial-gradient(ellipse at 50% 0%, rgba(38, 54, 42, 0.45) 0%, transparent 70%),
-      radial-gradient(rgba(194, 155, 56, 0.04) 1px, transparent 1px),
-      linear-gradient(180deg, #16120f 0%, #0d0b09 100%);
-    background-size: 100% 100%, 24px 24px, 100% 100%;
+      radial-gradient(ellipse at 50% 30%, rgba(35, 56, 42, 0.7) 0%, rgba(18, 30, 22, 0.95) 100%),
+      radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 16px 16px;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
   }
 
-  /* 아카데믹 격자 (서가/도서관 인덱스 그리드) */
-  .bg-library-grid {
-    background-image: 
-      linear-gradient(rgba(194, 155, 56, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(194, 155, 56, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  /* 도서관 대출 카드 및 양장본 고서 내지 질감 (Library Card Paper) */
-  .library-card-paper {
-    background-color: #f7f3eb;
-    background-image: 
-      radial-gradient(#cfc5b2 0.75px, transparent 0.75px),
-      linear-gradient(180deg, rgba(194, 155, 56, 0.02) 0%, transparent 100%);
-    background-size: 8px 8px, 100% 100%;
-  }
-
-  /* 도서관 양장본 커버 질감 (Cloth Bound Hardcover) */
-  .book-cloth-cover {
-    background-color: #1a2920;
-    background-image: 
-      radial-gradient(circle at 50% 50%, rgba(26, 54, 40, 0.6), rgba(14, 28, 20, 0.95)),
-      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 100% 100%, 3px 3px, 3px 3px;
+  /* 나무 액자 칠판 프레임 (컨셉제안1 실물 우드 몰딩) */
+  .chalkboard-frame {
+    border: 14px solid #946944;
+    border-image: linear-gradient(135deg, #a77c55 0%, #7d5433 50%, #5e3c22 100%) 14;
     box-shadow: 
-      0 20px 40px -10px rgba(0, 0, 0, 0.8),
-      inset 0 0 0 1px rgba(194, 155, 56, 0.25),
-      inset 4px 0 10px rgba(0, 0, 0, 0.5); /* 책등 접힘 음영 */
+      0 20px 50px rgba(0, 0, 0, 0.7),
+      inset 0 2px 6px rgba(0, 0, 0, 0.6);
   }
 
-  /* 앤틱 브라스/황동 타이포그래피 (과한 카지노 골드 제거) */
-  .text-antique-brass {
-    color: #dfc27d;
+  /* 칠판 분필 글씨 효과 */
+  .chalk-text {
+    color: #f7f5ed;
+    text-shadow: 
+      0 0 1px rgba(255, 255, 255, 0.8),
+      0 0 3px rgba(247, 245, 237, 0.4);
+    letter-spacing: -0.02em;
   }
 
-  /* 장서인 도장 (Ex Libris Stamp) */
-  .ex-libris-border {
-    border: 2px dashed rgba(166, 43, 43, 0.6);
+  /* 갱지 / 모조지 가정통신문 공문서 배경 질감 (초대장.png) */
+  .retro-gazette-paper {
+    background-color: #f6f3eb;
+    background-image: 
+      radial-gradient(#cfc5b2 0.8px, transparent 0.8px),
+      linear-gradient(180deg, rgba(200, 190, 170, 0.08) 0%, transparent 100%);
+    background-size: 10px 10px, 100% 100%;
+    color: #1f1b18;
   }
 
-  /* 차분한 왁스 인장 (과한 번쩍임 배제, 고서 밀랍 느낌) */
-  .library-seal {
-    background: radial-gradient(circle at 35% 30%, #872033, #57121f 70%, #3d0c15 100%);
-    box-shadow: 
-      0 6px 16px rgba(0, 0, 0, 0.6),
-      inset 0 2px 3px rgba(255, 255, 255, 0.25),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+  /* 학교 결재 도장 및 직인 테두리 */
+  .retro-red-seal {
+    border: 2px solid #b82828;
+    color: #b82828;
+  }
+
+  /* 교실 책상/교탁 우드 톤 */
+  .bg-school-desk {
+    background: linear-gradient(180deg, #42291d 0%, #2e1a11 100%);
+  }
+
+  /* 절취선 (Dotted Coupon Line) */
+  .tear-line {
+    border-top: 2px dashed #6b5c4f;
   }
 }
 
-/* 커스텀 차분한 서재 스크롤바 */
+/* 커스텀 아날로그 스크롤바 */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #120f0d;
+  background: #121c15;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3a4a3e;
+  background: #35533e;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #5a7360;
+  background: #497255;
 }

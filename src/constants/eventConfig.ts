@@ -1,97 +1,88 @@
+export interface SessionConfig {
+  name: string;
+  subName?: string;
+  time: string;
+  location: string;
+  description: string;
+  capacity: number;
+  fee: number;
+}
+
 export interface EventConfig {
   isTeaserMode: boolean;
   eventTitle: string;
   subTitle: string;
-  themeTagline: string;
+  noticeNumber: string;
   organization: string;
   establishedYear: number;
-  eventDate: string; // ISO or human readable
-  targetDateTime: string; // for Countdown
-  
-  session1: {
-    name: string;
-    englishName: string;
-    time: string;
-    location: string;
-    description: string;
-    capacity: number;
-    fee: number;
-  };
-  
-  session2: {
-    name: string;
-    englishName: string;
-    time: string;
-    location: string;
-    description: string;
-    capacity: number;
-    fee: number;
-  };
-  
+  eventDate: string;
+  targetDateTime: string;
+  recipientTitle: string;
+  session1: SessionConfig;
+  session2: SessionConfig;
   dressCode: {
     title: string;
     dayStyle: string;
     nightStyle: string;
-    geekChicItems: string[];
+    items: string[];
   };
-  
   requirements: string[];
-  
   contact: {
     accountInfo: string;
     inquiryEmail: string;
   };
-  
   googleScriptUrl: string;
 }
 
 export const EVENT_CONFIG: EventConfig = {
-  isTeaserMode: true, // true: 티저 모드 우선 노출, false: 정식 오픈
-  eventTitle: "2026 플래닛 연말 모임",
-  subTitle: "The Annual Planet Gathering : The New Semester & The Winter Prom",
-  themeTagline: "Where Classic Ivy Meets Modern Geek Chic & Romantic Prom Night",
-  organization: "플래닛 북 아카데미 (PLANET Book Academy)",
+  isTeaserMode: true, // true: 칠판 티저 모드, false: 가정통신문 정식 오픈
+  eventTitle: "2026 플래닛 독서학교 연말모임",
+  subTitle: "플래닛의 새학기 & 수학여행",
+  noticeNumber: "제2026-1호",
+  organization: "플래닛 독서학교 (PLANET since 2017)",
   establishedYear: 2017,
   eventDate: "2026년 12월 19일 (토요일)",
   targetDateTime: "2026-12-19T12:00:00+09:00",
+  recipientTitle: "플래닛 어른이님 귀하",
   
   session1: {
-    name: "플래닛의 새학기",
-    englishName: "The New Semester (Academic Session)",
+    name: "플래닛 연말모임 「플래닛의 새학기」",
+    subName: "1부 메인 모임",
     time: "12:00 ~ 18:00",
-    location: "공간나인 강남점 (서울 강남구 테헤란로)",
-    description: "올해의 플래닛 아카이브 회고, 블라인드 북 익스체인지(책 선물 교환) 및 2026 명예의 전당 어워즈",
+    location: "공간나인 강남점 (서울 강남구)",
+    description: "올해의 플래닛 아카이브 회고, 블라인드 책 선물 교환회 및 2026 명예의 전당 어워즈",
     capacity: 35,
     fee: 45000,
   },
   
   session2: {
-    name: "플래닛의 윈터 프롬",
-    englishName: "The Winter Prom (Night Gathering & Prom)",
+    name: "연말모임 뒷풀이 「플래닛의 수학여행」",
+    subName: "2부 애프터 모임",
     time: "18:00 ~ LATE",
-    location: "Secret Prom Lounge (강남 프라이빗 파티룸)",
-    description: "샴페인 토스트, 프롬 포토월 촬영, 실시간 베스트 드레서(Prom King & Queen) 투표 및 미드나잇 재즈 살롱",
+    location: "강남 프라이빗 파티룸 (추후 안내)",
+    description: "추억의 수학여행 밤, 파자마/프라이빗 야간 토크, 심야 책이야기 및 자유 네트워킹",
     capacity: 25,
     fee: 35000,
   },
   
   dressCode: {
-    title: "Classic Preppy with a Twist of Geek Chic",
-    dayStyle: "네이비 금장 블레이저, 케이블 니트 베스트, 옥스포드 셔츠, 플리츠 스커트 / 치노 팬츠, 타이",
-    nightStyle: "주간 프레피 룩에 보타이, 벨벳 리본, 코사지/부토니에 등 이브닝 프롬 액센트 추가",
-    geekChicItems: ["클래식 뿔테 / 오벌 안경", "포켓치프", "로퍼 / 옥스포드 슈즈", "만년필 & 가죽 노트"],
+    title: "학생다운 스쿨룩 & 클래식 프레피 (Geek Chic 한 방울)",
+    dayStyle: "교복을 연상시키는 단정한 블레이저, 케이블 니트/베스트, 옥스포드 셔츠, 플리츠 스커트 / 치노 팬츠",
+    nightStyle: "수학여행 분위기의 편안한 파자마 또는 이지웨어 지참 가능",
+    items: ["클래식 뿔테 / 오벌 안경", "단정한 타이 / 리본", "로퍼 / 스니커즈", "만년필 & 필기구"],
   },
   
   requirements: [
-    "동료 학우(Fellow)에게 선물할 엄선된 도서 1권 (정성 담긴 추천사 카드 동봉)",
-    "만년필 또는 아날로그 필기구 1자루",
-    "지적 호기심과 밤새 꺾이지 않는 프롬 텐션",
+    "동료 학우(어른이)에게 선물할 엄선된 도서 1권 이상 (정성 담긴 추천 손편지 동봉)",
+    "만년필 또는 아날로그 필기구",
+    "꺾이지 않는 텐션과 열린 마음",
   ],
   
   contact: {
-    accountInfo: "카카오뱅크 3333-01-XXXXXXX (예금주: 플래닛운영위)",
-    inquiryEmail: "fellows@planet-academy.org",
+    accountInfo: "카카오뱅크 3333-01-XXXXXXX (예금주: 플래닛준비위)",
+    inquiryEmail: "contact@planet-school.org",
   },
   
-  googleScriptUrl: import.meta.env.VITE_GOOGLE_SCRIPT_URL || "",
+  // 배포된 Google Apps Script Web App URL
+  googleScriptUrl: "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
 };

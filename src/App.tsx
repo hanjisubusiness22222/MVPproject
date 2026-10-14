@@ -14,15 +14,15 @@ export const App: React.FC = () => {
       {/* 개발자 및 시연용 모드 스위처 배너 */}
       <aside 
         aria-label="화면 모드 전환"
-        className="fixed bottom-3 right-3 z-50 bg-[#16120e]/90 border border-[#c29b38]/40 rounded-full py-1.5 px-3 text-[11px] text-[#dfc27d] font-mono flex items-center space-x-2 shadow-2xl backdrop-blur-md"
+        className="fixed bottom-3 right-3 z-50 bg-[#16231b]/95 border border-[#ffffff]/30 rounded-full py-1.5 px-3 text-[11px] text-[#f7f5ed] font-serif flex items-center space-x-2 shadow-2xl backdrop-blur-md"
       >
-        <Compass className="w-3.5 h-3.5 text-[#c29b38]" />
+        <Compass className="w-3.5 h-3.5 text-[#dfc27d]" />
         <span>화면:</span>
         <button
           onClick={() => setViewMode(viewMode === 'teaser' ? 'main' : 'teaser')}
-          className="px-2 py-0.5 rounded bg-[#c29b38]/20 hover:bg-[#c29b38]/40 text-[#dfc27d] font-bold underline transition-colors"
+          className="px-2 py-0.5 rounded bg-[#b82828] hover:bg-[#961e1e] text-white font-bold transition-colors"
         >
-          {viewMode === 'teaser' ? '서재 티저 (Teaser)' : '공식 안내장 (Invitation)'}
+          {viewMode === 'teaser' ? '교실 칠판 (티저)' : '가정통신문 (본 안내장)'}
         </button>
       </aside>
 
