@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* 아가일 & 타탄 체크 은은한 패턴 */
+  .bg-ivy-pattern {
+    background-color: #081a14;
+    background-image: radial-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 1px), radial-gradient(rgba(27, 42, 74, 0.4) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: 0 0, 14px 14px;
+  }
+
+  .bg-tartan-overlay {
+    background-image: 
+      linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* 종이 질감 오버레이 */
+  .paper-grain {
+    background-color: #f9f6f0;
+    background-image: radial-gradient(#d9cfbe 0.75px, transparent 0.75px);
+    background-size: 12px 12px;
+  }
+}
+
+/* 커스텀 골드 스크롤바 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d281e;
+}
+::-webkit-scrollbar-thumb {
+  background: #a8823b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
