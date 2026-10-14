@@ -341,7 +341,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               <div className="font-serif text-xs sm:text-sm leading-relaxed text-[#2c2621] space-y-2 bg-white/60 p-3 sm:p-4 rounded border border-[#1f1b18]/20">
                 <p>
                   <strong>플래닛 여러분, 안녕하십니까?</strong> 날씨가 부쩍 추워지고, 2026년의 마무리가 다가오고 있습니다.
-                  책을 사랑하는 마음으로 플래닛 활동에 관심을 갖고 모임 발전에 협조해주시는 플래닛 여러분께 진심으로 감사드리며, 
+                  책을 사랑하는 마음으로 플래닛 활동에 관심을 갖고 모임 발전에 협조해주시는 회원 여러분께 진심으로 감사드리며, 
                   2026년 플래닛 연말 모임을 아래와 같이 개최하고자 합니다.
                 </p>
                 <p>
@@ -370,7 +370,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                         플래닛 연말모임<br />「플래닛의 새학기」
                       </td>
                       <td className="border border-[#1f1b18] p-2">공간나인 강남점</td>
-                      <td className="border border-[#1f1b18] p-2">플래닛<br />여러분</td>
+                      <td className="border border-[#1f1b18] p-2">플래닛 멤버<br />누구나</td>
                     </tr>
                     <tr className="bg-white/80">
                       <td className="border border-[#1f1b18] p-2 font-mono text-[11px]">
