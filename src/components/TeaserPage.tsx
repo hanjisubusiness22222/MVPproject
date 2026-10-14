@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { 
-  Sparkles, 
-  Volume2, 
-  VolumeX, 
   Clock, 
   Glasses, 
   Wine, 
@@ -12,9 +9,12 @@ import {
   Send, 
   CheckCircle2, 
   X,
-  Crown,
   Scroll,
-  GraduationCap
+  Bookmark,
+  Library,
+  Volume2,
+  VolumeX,
+  Tag
 } from 'lucide-react';
 import { EVENT_CONFIG } from '../constants/eventConfig';
 import { sanitizeText, validatePhone, validateEmail } from '../utils/validation';
@@ -43,7 +43,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   const [validationError, setValidationError] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // 시크릿 패스코드 상태
+  // 초대 코드 상태
   const [secretCode, setSecretCode] = useState('');
   const [secretRevealed, setSecretRevealed] = useState(false);
   const [secretError, setSecretError] = useState(false);
@@ -73,56 +73,65 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
     return () => clearInterval(interval);
   }, []);
 
-  // Web Audio 효과음: 클래식 샴페인 글라스 챙 소리 & 홀리데이 왈츠 아르페지오
-  const playClassicChime = () => {
+  // Web Audio 효과음: 서재 책 넘기는 사운드 & 앤틱 오르골 차임
+  const playLibrarySound = () => {
     if (isMuted) return;
     try {
       const ctx = audioContext || new (window.AudioContext || (window as any).webkitAudioContext)();
       if (!audioContext) setAudioContext(ctx);
 
-      const notes = [
-        { freq: 523.25, time: 0.0, dur: 0.4 },  // C5
-        { freq: 659.25, time: 0.2, dur: 0.4 },  // E5
-        { freq: 783.99, time: 0.4, dur: 0.4 },  // G5
-        { freq: 1046.50, time: 0.6, dur: 0.8 }, // C6 (영롱한 샴페인 토스트 벨)
-      ];
+      const now = ctx.currentTime;
+      // 책장 펄럭이는 부드러운 화이트 노이즈 버스트
+      const bufferSize = ctx.sampleRate * 0.15;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+      }
 
-      const startAt = ctx.currentTime + 0.05;
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, now);
 
-      notes.forEach((note) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.2, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(note.freq, startAt + note.time);
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(now);
 
-        const noteStart = startAt + note.time;
-        gain.gain.setValueAtTime(0.001, noteStart);
-        gain.gain.exponentialRampToValueAtTime(0.2, noteStart + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + note.dur);
+      // 은은한 도서관 앤틱 벨 차임
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, now + 0.1); // D5
+      oscGain.gain.setValueAtTime(0.12, now + 0.1);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(noteStart);
-        osc.stop(noteStart + note.dur);
-      });
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
+      osc.start(now + 0.1);
+      osc.stop(now + 0.8);
 
     } catch (e) {
       console.log('Audio error:', e);
     }
   };
 
-  // 실링 왁스 클릭 핸들러
-  const handleWaxClick = () => {
+  // 장서 인장/표지 클릭 핸들러
+  const handleOpenClick = () => {
     if (!isOpened) {
-      playClassicChime();
+      playLibrarySound();
       setIsOpened(true);
       confetti({
-        particleCount: 85,
-        spread: 85,
+        particleCount: 50,
+        spread: 70,
         origin: { y: 0.55 },
-        colors: ['#D4AF37', '#E8CB85', '#741B2D', '#FAF2DE', '#16382C']
+        colors: ['#DFC27D', '#C29B38', '#872033', '#F7F3EB', '#2B4234']
       });
     }
   };
@@ -172,9 +181,9 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
 
     setIsSubmitted(true);
     confetti({
-      particleCount: 90,
-      spread: 80,
-      colors: ['#D4AF37', '#E8CB85', '#16382C', '#741B2D']
+      particleCount: 60,
+      spread: 70,
+      colors: ['#DFC27D', '#2B4234', '#872033']
     });
 
     setTimeout(() => {
@@ -186,21 +195,21 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
     }, 2200);
   };
 
-  // 초대 코드 및 비밀 암호 검증
+  // 초대 코드 검증
   const handleSecretSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = secretCode.trim().toUpperCase();
-    const validCodes = ['PROM', 'IVY', 'PLANET', '프롬', '새학기', '2026', '갈라'];
+    const validCodes = ['PROM', 'IVY', 'PLANET', '프롬', '새학기', '2026', '갈라', '도서관'];
 
     if (validCodes.includes(clean)) {
       setSecretRevealed(true);
       setSecretError(false);
-      playClassicChime();
+      playLibrarySound();
       confetti({
-        particleCount: 130,
-        spread: 100,
+        particleCount: 80,
+        spread: 90,
         origin: { y: 0.65 },
-        colors: ['#D4AF37', '#C5A059', '#741B2D', '#FAF2DE', '#FFFFFF']
+        colors: ['#DFC27D', '#F7F3EB', '#872033', '#2B4234']
       });
     } else {
       setSecretError(true);
@@ -209,32 +218,30 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   };
 
   return (
-    <div className="relative min-h-screen bg-ivy-pattern bg-tartan-overlay text-cream-100 flex flex-col items-center justify-between p-4 sm:p-6 md:p-10 overflow-x-hidden selection:bg-gold-500/30 selection:text-gold-200">
+    <div className="relative min-h-screen bg-library-study bg-library-grid text-[#e6ded1] flex flex-col items-center justify-between p-4 sm:p-6 md:p-10 overflow-x-hidden selection:bg-[#c29b38]/30 selection:text-[#dfc27d]">
       
-      {/* 클래식 앰비언트 글로우 */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-ivy-800/20 rounded-full blur-[150px] pointer-events-none"></div>
-      <div className="absolute top-2/3 left-1/4 w-[480px] h-[480px] bg-bordeaux-900/15 rounded-full blur-[130px] pointer-events-none"></div>
+      {/* 도서관 서가 뱅커스 램프 조명 느낌의 아늑한 상단 글로우 */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#1e3d2c]/20 rounded-full blur-[140px] pointer-events-none"></div>
 
-      {/* 상단 헤더 바 */}
-      <header className="w-full max-w-4xl flex items-center justify-between py-4 border-b border-gold-500/30 z-20">
+      {/* 상단 도서관 아카이브 헤더 */}
+      <header className="w-full max-w-4xl flex items-center justify-between py-4 border-b border-[#c29b38]/20 z-20">
         <div className="flex items-center space-x-3.5">
-          {/* 아카데미 학술 엠블럼 */}
-          <div className="w-11 h-11 rounded-full border-2 border-gold-400/70 bg-gradient-to-br from-ivy-900 via-bordeaux-950 to-navy-950 flex items-center justify-center text-gold-300 font-crest text-xs shadow-crest ring-1 ring-gold-500/20">
-            <GraduationCap className="w-5 h-5 text-gold-300" />
+          <div className="w-10 h-10 rounded-lg border border-[#c29b38]/40 bg-[#16231b] flex items-center justify-center text-[#dfc27d] shadow-sm">
+            <Library className="w-5 h-5 text-[#dfc27d]" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-crest tracking-[0.15em] text-sm uppercase text-gold-300 font-bold">
-                플래닛 독서학교
+              <span className="font-serif text-sm tracking-wider text-[#dfc27d] font-bold">
+                플래닛 독서학교 아카이브
               </span>
-              <span className="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-sans text-gold-400/90 border border-gold-500/40 bg-gold-500/10">
-                2017년 창립
+              <span className="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-mono text-[#a89980] border border-[#c29b38]/30 bg-[#1e1914]">
+                EST. 2017
               </span>
             </div>
-            <p className="text-[11px] text-cream-400/80 font-classic tracking-wider flex items-center space-x-1.5 mt-0.5">
-              <span>배움과 진리, 그리고 다정한 우정</span>
-              <span className="text-gold-400/60">•</span>
-              <span className="text-gold-300/90">회원 전용 공식 초청장</span>
+            <p className="text-[11px] text-[#9c8e7a] font-serif tracking-wide mt-0.5 flex items-center space-x-1.5">
+              <span>장서 열람 및 연말 공식 회합</span>
+              <span className="text-[#c29b38]/50">•</span>
+              <span className="text-[#a89980]">보존서고 특별 발간</span>
             </p>
           </div>
         </div>
@@ -243,221 +250,188 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
           <button
             onClick={() => {
               setIsMuted(!isMuted);
-              if (isMuted) playClassicChime();
+              if (isMuted) playLibrarySound();
             }}
-            className="p-2.5 rounded-full border border-gold-500/40 hover:border-gold-300 bg-ivy-900/80 text-gold-300 hover:text-gold-200 transition-all shadow-md flex items-center space-x-1.5 text-xs font-sans"
-            title={isMuted ? "효과음 켜기" : "음소거"}
+            className="p-2.5 rounded-lg border border-[#c29b38]/30 hover:border-[#dfc27d] bg-[#1a1613] text-[#dfc27d] hover:text-[#f7f3eb] transition-all text-xs flex items-center space-x-1.5"
+            title={isMuted ? "서재 사운드 켜기" : "음소거"}
           >
             {isMuted ? (
-              <VolumeX className="w-4 h-4 text-cream-400/60" />
+              <VolumeX className="w-4 h-4 text-[#756a5c]" />
             ) : (
               <>
-                <Volume2 className="w-4 h-4 text-gold-300 animate-pulse" />
-                <span className="hidden sm:inline text-[11px] text-gold-300">홀리데이 벨</span>
+                <Volume2 className="w-4 h-4 text-[#dfc27d]" />
+                <span className="hidden sm:inline text-[11px] text-[#dfc27d]">서재 사운드</span>
               </>
             )}
           </button>
         </div>
       </header>
 
-      {/* 중앙 메인: 클래식 봉투 & 실링 왁스 인터랙션 */}
-      <main className="w-full max-w-3xl my-auto py-8 sm:py-12 flex flex-col items-center justify-center z-10">
+      {/* 중앙 메인: 양장본 도서 / 도서관 카드 포켓 모티프 */}
+      <main className="w-full max-w-3xl my-auto py-8 sm:py-10 flex flex-col items-center justify-center z-10">
         
-        {/* 상단 타이틀 */}
-        <div className="text-center mb-8 space-y-3">
-          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border border-gold-400/40 bg-ivy-950/90 text-gold-300 text-[11px] font-sans tracking-wide shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-gold-400" />
-            <span>2026 연말 공식 초청장 • 사전 공개</span>
+        {/* 상단 도서관 청구기호 라벨 */}
+        <div className="text-center mb-6 space-y-2.5">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded border border-[#c29b38]/30 bg-[#161310] text-[#dfc27d] text-[11px] font-mono tracking-widest shadow-sm">
+            <Tag className="w-3 h-3 text-[#c29b38]" />
+            <span>청구기호 : 813.5-플2026-갈라 (열람제한 : 회원전용)</span>
           </div>
           
-          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-black tracking-wide text-gold-metallic drop-shadow-lg">
+          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-[#f7f3eb] drop-shadow-sm">
             2026 플래닛 연말 갈라
           </h1>
           
-          <p className="font-classic italic text-base sm:text-xl text-cream-200/95 max-w-xl mx-auto font-medium">
-            "새학기의 설렘과 낭만적인 윈터 프롬 무도회"
+          <p className="font-serif italic text-base sm:text-lg text-[#bfb29e] max-w-xl mx-auto">
+            「새학기의 설렘과 낭만적인 윈터 프롬 살롱」
           </p>
 
-          <div className="flex items-center justify-center space-x-3 pt-1">
-            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-gold-500/60 to-transparent"></div>
-            <span className="text-[12px] font-sans text-gold-300/90 tracking-widest font-semibold">
-              2026년 12월 19일 토요일
-            </span>
-            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-gold-500/60 to-transparent"></div>
+          <div className="text-xs font-mono text-[#a89980] tracking-widest pt-1">
+            2026년 12월 19일 토요일 • 낮 12:00 개관
           </div>
         </div>
 
-        {/* 봉투 컨테이너: 클래식 포레스트 그린 레더 봉투 */}
+        {/* 양장본 북 커버 / 도서관 대출 포켓 컨테이너 */}
         <div className="relative w-full max-w-xl">
           
+          {/* 책등 책갈피 리본 효과 */}
+          <div className="absolute -top-3 right-10 w-7 h-10 bg-[#872033] rounded-t-sm shadow-md flex items-end justify-center pb-1 z-30 pointer-events-none">
+            <Bookmark className="w-3.5 h-3.5 text-[#f7f3eb]" />
+          </div>
+
           <div 
-            onClick={handleWaxClick}
-            className={`relative mx-auto w-full transition-all duration-700 select-none ${
-              isOpened ? 'cursor-default' : 'cursor-pointer hover:scale-[1.018]'
+            onClick={handleOpenClick}
+            className={`relative mx-auto w-full transition-all duration-500 select-none ${
+              isOpened ? 'cursor-default' : 'cursor-pointer hover:translate-y-[-2px]'
             }`}
           >
-            {/* 봉투 본체 */}
-            <div className="relative bg-gradient-to-b from-[#0c241c] via-[#081b14] to-[#05120d] rounded-2xl border-2 border-gold-500/50 p-6 sm:p-9 envelope-shadow overflow-hidden">
+            {/* 고서 양장본 클로스 커버 (다크 에메랄드 북 바인딩) */}
+            <div className="relative book-cloth-cover rounded-xl p-6 sm:p-9 overflow-hidden">
               
-              {/* 타탄 오버레이 & 빛 반사 */}
-              <div className="absolute inset-0 bg-tartan-overlay opacity-25 pointer-events-none"></div>
-              <div className="absolute -top-24 -left-24 w-52 h-52 bg-gold-400/10 rounded-full blur-3xl pointer-events-none"></div>
-              <div className="absolute -bottom-24 -right-24 w-52 h-52 bg-bordeaux-600/10 rounded-full blur-3xl pointer-events-none"></div>
-              
-              {/* 4개 코너 금박 브라켓 */}
-              <svg className="absolute top-2.5 left-2.5 w-6 h-6 text-gold-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M2 12V4C2 2.89543 2.89543 2 4 2H12" />
-                <path d="M5 9V5H9" />
-                <circle cx="5" cy="5" r="1" fill="currentColor" />
-              </svg>
-              <svg className="absolute top-2.5 right-2.5 w-6 h-6 text-gold-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M22 12V4C22 2.89543 21.1046 2 20 2H12" />
-                <path d="M19 9V5H15" />
-                <circle cx="19" cy="5" r="1" fill="currentColor" />
-              </svg>
-              <svg className="absolute bottom-2.5 left-2.5 w-6 h-6 text-gold-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M2 12V20C2 21.1046 2.89543 22 4 22H12" />
-                <path d="M5 15V19H9" />
-                <circle cx="5" cy="19" r="1" fill="currentColor" />
-              </svg>
-              <svg className="absolute bottom-2.5 right-2.5 w-6 h-6 text-gold-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M22 12V20C22 21.1046 21.1046 22 20 22H12" />
-                <path d="M19 15V19H15" />
-                <circle cx="19" cy="19" r="1" fill="currentColor" />
-              </svg>
+              {/* 책등(Spine) 왼쪽 주름 음영 라인 */}
+              <div className="absolute top-0 left-0 w-8 h-full bg-gradient-to-r from-black/40 via-black/15 to-transparent pointer-events-none border-r border-[#c29b38]/20"></div>
 
-              {/* 이중 골드 이너 프레임 라인 */}
-              <div className="absolute inset-2 border border-gold-500/25 rounded-xl pointer-events-none"></div>
+              {/* 양장본 표지 금박 프레임 라인 */}
+              <div className="absolute inset-3 border border-[#c29b38]/30 rounded-lg pointer-events-none"></div>
 
-              {/* 중앙 3D 실링 왁스 스탬프 */}
-              <div className="relative flex flex-col items-center justify-center py-6 sm:py-8 z-20">
+              {/* 중앙 장서인 직인 (Ex Libris Seal) */}
+              <div className="relative flex flex-col items-center justify-center py-7 sm:py-9 z-20">
                 <div 
-                  className={`group relative transition-all duration-500 ${
-                    isOpened ? 'scale-75 opacity-90' : 'hover:scale-105'
+                  className={`group relative transition-all duration-300 ${
+                    isOpened ? 'scale-80 opacity-80' : 'hover:scale-105'
                   }`}
                 >
-                  <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
-                    
-                    {/* 왁스 외곽 글로우 */}
-                    <div className="absolute inset-0 rounded-full bg-gold-500/30 blur-md pointer-events-none animate-shimmer"></div>
-
-                    {/* 버건디 3D 실링 왁스 */}
-                    <div className="relative w-full h-full rounded-full bg-gradient-to-br from-bordeaux-700 via-bordeaux-800 to-bordeaux-950 p-2 wax-seal-shadow border border-gold-400/70 flex items-center justify-center">
-                      
-                      {/* 음각 엠보싱 링 */}
-                      <div className="w-full h-full rounded-full border-2 border-dashed border-gold-500/50 bg-gradient-to-b from-bordeaux-900/90 to-bordeaux-950/90 flex flex-col items-center justify-center text-center p-2 shadow-inner">
-                        <GraduationCap className="w-5 h-5 text-gold-300 drop-shadow-sm mb-0.5" />
-                        <span className="font-crest text-gold-metallic font-black text-lg sm:text-xl tracking-tighter">
-                          PLANET
-                        </span>
-                        <span className="text-[9px] font-sans text-gold-300/90 tracking-widest mt-0.5">
-                          플래닛
-                        </span>
-                      </div>
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full library-seal p-1 flex items-center justify-center border border-[#dfc27d]/40">
+                    <div className="w-full h-full rounded-full border border-dashed border-[#dfc27d]/30 flex flex-col items-center justify-center text-center p-2">
+                      <BookOpen className="w-5 h-5 text-[#dfc27d] mb-1" />
+                      <span className="font-serif text-[#f7f3eb] font-bold text-sm tracking-widest">
+                        藏書
+                      </span>
+                      <span className="text-[8px] font-mono text-[#dfc27d]/80 tracking-wider">
+                        EX LIBRIS
+                      </span>
                     </div>
-
-                    {/* 금박 펄 파우더 */}
-                    <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-gold-300/30 blur-sm pointer-events-none"></div>
                   </div>
 
-                  {/* 미개봉 상태 클릭 툴팁 */}
                   {!isOpened && (
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-sans text-gold-200 font-semibold bg-ivy-950/95 px-4 py-1.5 rounded-full border border-gold-500/50 shadow-xl flex items-center space-x-1.5 animate-bounce">
-                      <Sparkles className="w-3.5 h-3.5 text-gold-400" />
-                      <span>인장을 눌러 초대장을 열어보세요</span>
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-serif text-[#dfc27d] bg-[#14100d] px-3.5 py-1 rounded border border-[#c29b38]/40 shadow-md">
+                      표지를 눌러 안내장을 펼쳐보세요
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* 개봉 시 나타나는 공식 서간문 */}
+              {/* 펼쳐졌을 때: 도서관 대출 카드(Library Checkout Card) 형태의 초대장 */}
               <div 
                 className={`transition-all duration-700 overflow-hidden ${
                   isOpened 
-                    ? 'max-h-[1100px] opacity-100 mt-4 pt-6 border-t border-gold-500/30' 
+                    ? 'max-h-[1100px] opacity-100 mt-4 pt-6 border-t border-[#c29b38]/30' 
                     : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="paper-grain rounded-xl p-6 sm:p-8 text-ivy-950 shadow-2xl border border-gold-600/40 space-y-6 relative overflow-hidden">
+                <div className="library-card-paper rounded-lg p-6 sm:p-8 text-[#26201a] shadow-md border border-[#c29b38]/40 space-y-5 relative">
                   
-                  {/* 배경 연한 워터마크 */}
-                  <div className="absolute right-4 bottom-4 font-crest text-8xl font-black text-ivy-900/[0.04] select-none pointer-events-none">
-                    PA
+                  {/* 도서관 대출카드 헤더 & 스탬프 */}
+                  <div className="border-b-2 border-[#26201a]/15 pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <div>
+                      <div className="font-mono text-[10px] tracking-widest text-[#7a6a57] uppercase">
+                        PLANET BOOK ACADEMY • BORROWER'S INVITATION
+                      </div>
+                      <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#1a1511] mt-0.5">
+                        친애하는 플래닛 학우 여러분께
+                      </h2>
+                    </div>
+
+                    {/* 도서관 날짜 스탬프 */}
+                    <div className="ex-libris-border px-3 py-1 text-center bg-[#872033]/5 rounded">
+                      <div className="text-[9px] font-mono text-[#872033] font-bold">DATE DUE (회합 일자)</div>
+                      <div className="font-mono text-sm text-[#872033] font-extrabold tracking-wider">2026. 12. 19</div>
+                    </div>
                   </div>
 
-                  {/* 서간문 헤더 */}
-                  <div className="text-center border-b-2 border-ivy-900/15 pb-5">
-                    <div className="font-sans text-xs tracking-wider text-ivy-800 font-bold uppercase flex items-center justify-center space-x-1.5">
-                      <GraduationCap className="w-4 h-4 text-gold-700" />
-                      <span>2026학년도 공식 초청 및 모임 안내장</span>
+                  <p className="font-serif text-xs sm:text-sm text-[#473c33] leading-relaxed">
+                    한 해 동안 책을 통해 다정한 우정을 나누어 온 학우 여러분을 위해, 2026년을 기념하는 특별한 연말 갈라의 장을 엽니다.
+                  </p>
+
+                  {/* 1부 & 2부 세션 안내 (도서관 인덱스 카드 서식) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    {/* 1부 */}
+                    <div className="bg-white/90 p-3.5 rounded border border-[#c29b38]/30 shadow-sm space-y-1.5">
+                      <div className="flex items-center space-x-1.5 text-[#872033] font-bold font-serif">
+                        <BookOpen className="w-4 h-4 text-[#872033]" />
+                        <span>1부 • 플래닛의 새학기</span>
+                      </div>
+                      <div className="font-mono text-[11px] text-[#5c4f42]">
+                        12:00 ~ 18:00 @ 공간나인 강남점
+                      </div>
+                      <p className="text-[11px] text-[#6b5d4f] leading-normal font-serif">
+                        하우스 조배치, 블라인드 책 선물 교환식, 2026 명예의 전당 어워즈
+                      </p>
                     </div>
-                    <h2 className="font-display font-bold text-2xl sm:text-3xl text-ivy-950 mt-1.5">
-                      친애하는 플래닛 학우 여러분께
-                    </h2>
-                    <p className="font-classic text-sm sm:text-base text-ivy-900/85 mt-1">
-                      "책을 사랑하고 지적인 우정을 함께해 온 모든 학우를 2026 연말 갈라에 정식 초청합니다."
+
+                    {/* 2부 */}
+                    <div className="bg-white/90 p-3.5 rounded border border-[#c29b38]/30 shadow-sm space-y-1.5">
+                      <div className="flex items-center space-x-1.5 text-[#1e3d2c] font-bold font-serif">
+                        <Wine className="w-4 h-4 text-[#1e3d2c]" />
+                        <span>2부 • 플래닛의 윈터 프롬</span>
+                      </div>
+                      <div className="font-mono text-[11px] text-[#5c4f42]">
+                        18:00 ~ LATE @ 강남 프라이빗 파티룸
+                      </div>
+                      <p className="text-[11px] text-[#6b5d4f] leading-normal font-serif">
+                        샴페인 토스트, 베스트 드레서 현장 모바일 투표, 미드나잇 재즈 살롱
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 도서관 안내 사항 (드레스코드 & 도서 1권) */}
+                  <div className="p-3 bg-[#e8e2d5]/60 rounded border border-[#c29b38]/20 text-[11px] text-[#473c33] space-y-1">
+                    <div className="flex items-center space-x-1.5 font-bold text-[#1a1511]">
+                      <Glasses className="w-3.5 h-3.5 text-[#5c4f42]" />
+                      <span>용의복장 및 필수 지참물:</span>
+                    </div>
+                    <p className="font-serif leading-relaxed">
+                      • <strong>용의복장</strong>: 클래식 프레피 & 긱 시크 (블레이저, 셔츠/니트, 클래식 안경 / 야간 보타이·리본)<br />
+                      • <strong>준비물</strong>: 동료 학우에게 선물할 <strong>책 1권</strong> (추천 엽서 동봉), 필기구
                     </p>
                   </div>
 
-                  {/* 1부 & 2부 안내 카드 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs sm:text-sm">
-                    {/* 1부 새학기 세미나 */}
-                    <div className="bg-white/90 p-4 rounded-lg border border-gold-500/40 shadow-sm space-y-2">
-                      <div className="flex items-center space-x-2 text-bordeaux-800 font-bold">
-                        <BookOpen className="w-4 h-4 text-bordeaux-700" />
-                        <span className="text-sm font-sans">1부 • 플래닛의 새학기 (주간 세미나)</span>
-                      </div>
-                      <div className="text-ivy-900 font-semibold text-xs font-sans">
-                        낮 12:00 ~ 오후 6:00 @ 공간나인 강남점
-                      </div>
-                      <p className="text-[12px] text-ivy-800/85 leading-relaxed font-classic">
-                        하우스 조배치 세레모니 & 블라인드 책 선물 교환식, 2026 플래닛 명예의 전당 어워즈
-                      </p>
-                    </div>
-
-                    {/* 2부 윈터 프롬 무도회 */}
-                    <div className="bg-white/90 p-4 rounded-lg border border-gold-500/40 shadow-sm space-y-2">
-                      <div className="flex items-center space-x-2 text-ivy-900 font-bold">
-                        <Wine className="w-4 h-4 text-gold-600" />
-                        <span className="text-sm font-sans">2부 • 플래닛의 윈터 프롬 (애프터 파티)</span>
-                      </div>
-                      <div className="text-ivy-900 font-semibold text-xs font-sans">
-                        오후 6:00 ~ 밤늦게까지 @ 강남 프라이빗 파티룸
-                      </div>
-                      <p className="text-[12px] text-ivy-800/85 leading-relaxed font-classic">
-                        샴페인 토스트, 베스트 드레서(Prom King & Queen) 현장 모바일 투표 & 미드나잇 재즈 살롱
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 드레스코드 박스 */}
-                  <div className="p-3.5 bg-ivy-900/5 rounded-lg border border-ivy-900/15 flex items-start space-x-3 text-xs text-ivy-900">
-                    <Glasses className="w-4 h-4 text-ivy-800 mt-0.5 shrink-0" />
-                    <div className="space-y-0.5">
-                      <span className="font-bold text-ivy-950 font-sans">용의복장 (드레스코드): </span>
-                      <span className="font-classic text-[13px]">
-                        정통 프레피 & 긱 시크 (블레이저, 아가일 니트, 클래식 뿔테/오벌 안경, 야간 프롬용 벨벳 리본 & 코사지)
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 인터랙션 버튼 */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+                  {/* CTA 버튼 */}
+                  <div className="pt-2 flex flex-col sm:flex-row items-center gap-2">
                     <button
                       onClick={() => setIsNotifyModalOpen(true)}
-                      className="w-full sm:flex-1 py-3 px-5 rounded-lg bg-gradient-to-r from-bordeaux-800 to-bordeaux-900 hover:from-bordeaux-700 hover:to-bordeaux-800 text-gold-200 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all shadow-lg hover:shadow-gold-500/10 border border-gold-400/40 font-sans"
+                      className="w-full sm:flex-1 py-2.5 px-4 rounded bg-[#872033] hover:bg-[#6e1828] text-[#f7f3eb] font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition-all shadow-sm"
                     >
-                      <Sparkles className="w-4 h-4 text-gold-400" />
+                      <Bookmark className="w-3.5 h-3.5 text-[#dfc27d]" />
                       <span>신청 오픈 시 사전 알림 예약</span>
                     </button>
 
                     {onExploreFullPage && (
                       <button
                         onClick={onExploreFullPage}
-                        className="w-full sm:w-auto py-3 px-5 rounded-lg border border-ivy-900/30 hover:bg-ivy-900/10 text-ivy-950 font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-1.5 font-sans"
+                        className="w-full sm:w-auto py-2.5 px-4 rounded border border-[#26201a]/30 hover:bg-[#26201a]/5 text-[#26201a] font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-1"
                       >
-                        <Scroll className="w-4 h-4 text-ivy-800" />
-                        <span>공식 초대장 전문 보기</span>
+                        <Scroll className="w-3.5 h-3.5 text-[#5c4f42]" />
+                        <span>안내장 전문 보기</span>
                       </button>
                     )}
                   </div>
@@ -469,35 +443,35 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
           </div>
         </div>
 
-        {/* 카운트다운 타이머 */}
-        <div className="w-full max-w-xl mt-9 p-5 rounded-2xl border border-gold-500/30 bg-ivy-950/80 backdrop-blur-md text-center shadow-2xl">
-          <div className="flex items-center justify-center space-x-2 text-gold-400 text-xs font-sans font-semibold tracking-wider mb-4">
-            <Clock className="w-3.5 h-3.5 text-gold-400" />
-            <span>갈라 개막까지 남은 시간 • 2026년 12월 19일 낮 12:00</span>
+        {/* 카운트다운 타이머 (도서관 서가 인덱스 스타일) */}
+        <div className="w-full max-w-xl mt-8 p-4 rounded-xl border border-[#c29b38]/20 bg-[#16120e]/80 text-center shadow-md">
+          <div className="flex items-center justify-center space-x-1.5 text-[#dfc27d] text-xs font-mono mb-3">
+            <Clock className="w-3.5 h-3.5 text-[#c29b38]" />
+            <span>갈라 개막 카운트다운 • 2026.12.19 (토) 12:00</span>
           </div>
           
-          <div className="grid grid-cols-4 gap-2.5 sm:gap-3 text-cream-100">
-            <div className="bg-ivy-900/90 p-3 rounded-xl border border-gold-500/30 shadow-inner">
-              <span className="font-crest text-2xl sm:text-4xl font-extrabold text-gold-metallic block">{timeLeft.days}</span>
-              <span className="text-[11px] text-cream-400/90 font-sans font-semibold mt-0.5 block">일</span>
+          <div className="grid grid-cols-4 gap-2 text-[#f7f3eb]">
+            <div className="bg-[#1e1914] p-2.5 rounded border border-[#c29b38]/20">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-[#dfc27d] block">{timeLeft.days}</span>
+              <span className="text-[10px] text-[#9c8e7a] font-serif">일 (Days)</span>
             </div>
-            <div className="bg-ivy-900/90 p-3 rounded-xl border border-gold-500/30 shadow-inner">
-              <span className="font-crest text-2xl sm:text-4xl font-extrabold text-gold-metallic block">{timeLeft.hours}</span>
-              <span className="text-[11px] text-cream-400/90 font-sans font-semibold mt-0.5 block">시간</span>
+            <div className="bg-[#1e1914] p-2.5 rounded border border-[#c29b38]/20">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-[#dfc27d] block">{timeLeft.hours}</span>
+              <span className="text-[10px] text-[#9c8e7a] font-serif">시간 (Hrs)</span>
             </div>
-            <div className="bg-ivy-900/90 p-3 rounded-xl border border-gold-500/30 shadow-inner">
-              <span className="font-crest text-2xl sm:text-4xl font-extrabold text-gold-metallic block">{timeLeft.minutes}</span>
-              <span className="text-[11px] text-cream-400/90 font-sans font-semibold mt-0.5 block">분</span>
+            <div className="bg-[#1e1914] p-2.5 rounded border border-[#c29b38]/20">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-[#dfc27d] block">{timeLeft.minutes}</span>
+              <span className="text-[10px] text-[#9c8e7a] font-serif">분 (Mins)</span>
             </div>
-            <div className="bg-ivy-900/90 p-3 rounded-xl border border-gold-500/30 shadow-inner">
-              <span className="font-crest text-2xl sm:text-4xl font-extrabold text-gold-metallic block">{timeLeft.seconds}</span>
-              <span className="text-[11px] text-cream-400/90 font-sans font-semibold mt-0.5 block">초</span>
+            <div className="bg-[#1e1914] p-2.5 rounded border border-[#c29b38]/20">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-[#dfc27d] block">{timeLeft.seconds}</span>
+              <span className="text-[10px] text-[#9c8e7a] font-serif">초 (Secs)</span>
             </div>
           </div>
         </div>
 
-        {/* 시크릿 코드 입력창 */}
-        <div className="w-full max-w-md mt-7 text-center">
+        {/* 초대 코드 입력창 */}
+        <div className="w-full max-w-md mt-6 text-center">
           {!secretRevealed ? (
             <form onSubmit={handleSecretSubmit} className="flex items-center justify-center space-x-2">
               <div className="relative flex-1">
@@ -505,32 +479,31 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                   type="text"
                   value={secretCode}
                   onChange={(e) => setSecretCode(e.target.value)}
-                  placeholder="비밀 초대 코드 입력 (프롬 / 새학기)"
-                  className="w-full bg-ivy-950/90 border border-gold-500/30 rounded-xl py-2 px-3 text-xs text-gold-300 placeholder:text-cream-400/40 font-sans focus:outline-none focus:border-gold-400 text-center tracking-wider shadow-inner"
+                  placeholder="비밀 초대 코드 입력 (프롬 / 새학기 / 도서관)"
+                  className="w-full bg-[#16120e] border border-[#c29b38]/30 rounded-lg py-2 px-3 text-xs text-[#dfc27d] placeholder:text-[#756a5c] font-serif focus:outline-none focus:border-[#dfc27d] text-center"
                 />
-                <Key className="w-3.5 h-3.5 text-gold-500/40 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Key className="w-3.5 h-3.5 text-[#c29b38]/40 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl border border-gold-400/50 bg-gradient-to-r from-gold-600/30 to-gold-500/20 hover:bg-gold-600/40 text-gold-300 text-xs font-sans font-semibold tracking-wider transition-all shadow-md"
+                className="px-3.5 py-2 rounded-lg border border-[#c29b38]/40 bg-[#2b2219] hover:bg-[#3d3023] text-[#dfc27d] text-xs font-serif transition-all"
               >
                 확인
               </button>
             </form>
           ) : (
-            <div className="p-4 rounded-xl border border-gold-500/60 bg-gradient-to-br from-bordeaux-950/90 to-ivy-950/90 text-gold-200 text-xs space-y-1.5 shadow-2xl animate-fade-in">
-              <div className="flex items-center justify-center space-x-1.5 text-gold-300 font-bold font-sans">
-                <Crown className="w-4 h-4 text-gold-400" />
-                <span>윈터 프롬 무도회 힌트 안내</span>
+            <div className="p-3.5 rounded-lg border border-[#c29b38]/40 bg-[#1e1713] text-[#dfc27d] text-xs space-y-1 shadow-sm">
+              <div className="font-serif font-bold text-[#f7f3eb]">
+                📖 윈터 프롬 살롱 특별 안내
               </div>
-              <p className="text-[12px] text-cream-200/90 font-classic">
-                "밤의 윈터 프롬 파티에서는 가장 멋진 프레피 룩을 선보인 학우에게 <strong>Prom King & Queen 티아라</strong>와 특별한 선물이 수여됩니다."
+              <p className="text-[11px] text-[#bfb29e] font-serif">
+                "2부 윈터 프롬 파티에서는 가장 멋진 프레피 룩을 선보인 학우에게 특별한 기념 티아라와 선물이 수여됩니다."
               </p>
             </div>
           )}
           {secretError && (
-            <p className="text-[11px] text-red-400 mt-1.5 font-sans">
-              올바른 코드를 입력해 주세요. (힌트: 프롬, 새학기, 갈라, 2026)
+            <p className="text-[11px] text-[#e06c75] mt-1 font-serif">
+              올바른 코드를 입력해 주세요. (힌트: 프롬, 새학기, 도서관, 갈라)
             </p>
           )}
         </div>
@@ -538,39 +511,39 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       </main>
 
       {/* 하단 푸터 */}
-      <footer className="w-full max-w-4xl py-5 border-t border-gold-500/30 text-center text-[11px] text-cream-400/80 font-sans space-y-1 z-20">
-        <p>© 2026 플래닛 독서학교. 모든 권리 보유.</p>
-        <p className="text-gold-400/80 tracking-widest font-classic">지성과 다정한 우정이 머무는 연말 축제</p>
+      <footer className="w-full max-w-4xl py-4 border-t border-[#c29b38]/20 text-center text-[11px] text-[#857766] font-serif space-y-1 z-20">
+        <p>© 2026 플래닛 독서학교 아카이브. All Rights Reserved.</p>
+        <p className="text-[#a89980] text-[10px]">책과 지성, 다정한 대화가 머무는 연말 갈라</p>
       </footer>
 
       {/* 사전 알림 등록 모달 */}
       {isNotifyModalOpen && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-md bg-gradient-to-b from-ivy-900 to-[#081711] border-2 border-gold-500/60 rounded-2xl p-7 text-cream-100 shadow-2xl">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md bg-[#191512] border border-[#c29b38]/40 rounded-xl p-6 text-[#f7f3eb] shadow-xl">
             <button
               onClick={() => setIsNotifyModalOpen(false)}
-              className="absolute top-4 right-4 text-cream-400 hover:text-gold-300 p-1 transition-colors"
+              className="absolute top-3.5 right-3.5 text-[#857766] hover:text-[#f7f3eb] p-1 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="text-center space-y-2 mb-5">
-              <div className="w-12 h-12 rounded-full border border-gold-400/50 bg-ivy-950 mx-auto flex items-center justify-center text-gold-300 shadow-crest">
-                <GraduationCap className="w-5 h-5 text-gold-300" />
+            <div className="text-center space-y-1.5 mb-5">
+              <div className="w-10 h-10 rounded-full border border-[#c29b38]/40 bg-[#120f0d] mx-auto flex items-center justify-center text-[#dfc27d]">
+                <BookOpen className="w-5 h-5 text-[#dfc27d]" />
               </div>
-              <h3 className="font-display text-lg font-bold text-gold-300 tracking-wide">
+              <h3 className="font-serif text-base font-bold text-[#dfc27d]">
                 사전 알림 예약 접수
               </h3>
-              <p className="text-xs text-cream-300/90 font-classic">
-                정식 초대장과 참가 신청 폼이 열리는 즉시 가장 먼저 연락(문자/이메일)을 드립니다.
+              <p className="text-xs text-[#a89980] font-serif">
+                정식 초대장과 참가 신청 폼이 열리는 즉시 가장 먼저 안내를 드립니다.
               </p>
             </div>
 
             {isSubmitted ? (
-              <div className="py-6 text-center space-y-2.5">
-                <CheckCircle2 className="w-12 h-12 text-gold-400 mx-auto animate-bounce" />
-                <p className="font-bold text-sm text-gold-300 font-sans">사전 알림 예약이 정상 접수되었습니다!</p>
-                <p className="text-xs text-cream-300">오픈 당일 신속하게 초대 링크를 보내드립니다.</p>
+              <div className="py-6 text-center space-y-2">
+                <CheckCircle2 className="w-10 h-10 text-[#dfc27d] mx-auto" />
+                <p className="font-bold text-sm text-[#dfc27d] font-serif">사전 알림 예약이 완료되었습니다!</p>
+                <p className="text-xs text-[#a89980]">오픈 당일 문자 또는 이메일로 링크를 보내드립니다.</p>
               </div>
             ) : (
               <form onSubmit={handleNotifySubmit} className="space-y-4">
@@ -585,7 +558,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                 />
 
                 <div>
-                  <label className="block text-xs font-semibold text-gold-300 mb-1 font-sans">
+                  <label className="block text-xs font-serif text-[#dfc27d] mb-1">
                     연락처 또는 이메일 주소
                   </label>
                   <input
@@ -597,24 +570,24 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                       if (validationError) setValidationError('');
                     }}
                     placeholder="010-0000-0000 또는 fellow@planet.org"
-                    className="w-full bg-ivy-950/90 border border-gold-500/40 rounded-xl p-3 text-sm text-cream-100 placeholder:text-cream-400/40 focus:outline-none focus:border-gold-400 font-sans shadow-inner"
+                    className="w-full bg-[#120f0d] border border-[#c29b38]/30 rounded p-2.5 text-sm text-[#f7f3eb] placeholder:text-[#5c4f42] focus:outline-none focus:border-[#dfc27d] font-serif"
                   />
                   {validationError && (
-                    <p className="text-[11px] text-red-400 mt-1.5 font-sans">
+                    <p className="text-[11px] text-[#e06c75] mt-1 font-serif">
                       ⚠️ {validationError}
                     </p>
                   )}
                 </div>
 
-                <div className="text-[11px] text-cream-400/70 font-classic">
-                  * [개인정보 처리방침] 수집된 연락처는 2026 플래닛 연말 갈라 안내 발송 목적으로만 사용되며, 행사 종료 후 7일 이내 안전하게 영구 파기됩니다.
+                <div className="text-[10px] text-[#857766] font-serif">
+                  * [개인정보 보호] 입력하신 연락처는 2026 플래닛 연말 갈라 안내 발송용으로만 사용되며, 행사 종료 후 7일 이내 안전하게 파기됩니다.
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-bordeaux-800 to-bordeaux-900 hover:from-bordeaux-700 hover:to-bordeaux-800 text-gold-200 font-bold text-sm transition-all shadow-lg flex items-center justify-center space-x-2 border border-gold-400/30 font-sans"
+                  className="w-full py-2.5 rounded bg-[#872033] hover:bg-[#6e1828] text-[#f7f3eb] font-bold text-sm transition-all shadow flex items-center justify-center space-x-1.5"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-3.5 h-3.5" />
                   <span>사전 알림 신청하기</span>
                 </button>
               </form>

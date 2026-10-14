@@ -3,89 +3,78 @@
 @tailwind utilities;
 
 @layer utilities {
-  /* 아카데믹 다크 포레스트 & 레더 패턴 */
-  .bg-ivy-pattern {
-    background-color: #071510;
+  /* 아카데미 도서관 서재 배경: 딥 월넛 우드 & 아늑한 서가 톤 */
+  .bg-library-study {
+    background-color: #120f0d;
     background-image: 
-      radial-gradient(ellipse at 50% 20%, rgba(22, 56, 44, 0.7) 0%, transparent 60%),
-      radial-gradient(rgba(212, 175, 55, 0.07) 1px, transparent 1px),
-      radial-gradient(rgba(16, 28, 54, 0.4) 1px, transparent 1px);
-    background-size: 100% 100%, 32px 32px, 16px 16px;
-    background-position: center, 0 0, 16px 16px;
+      radial-gradient(ellipse at 50% 0%, rgba(38, 54, 42, 0.45) 0%, transparent 70%),
+      radial-gradient(rgba(194, 155, 56, 0.04) 1px, transparent 1px),
+      linear-gradient(180deg, #16120f 0%, #0d0b09 100%);
+    background-size: 100% 100%, 24px 24px, 100% 100%;
   }
 
-  /* 타탄체크 & 미세 헤리티지 그리드 */
-  .bg-tartan-overlay {
+  /* 아카데믹 격자 (서가/도서관 인덱스 그리드) */
+  .bg-library-grid {
     background-image: 
-      linear-gradient(rgba(212, 175, 55, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(212, 175, 55, 0.04) 1px, transparent 1px),
-      linear-gradient(rgba(92, 19, 36, 0.03) 2px, transparent 2px),
-      linear-gradient(90deg, rgba(92, 19, 36, 0.03) 2px, transparent 2px);
-    background-size: 48px 48px, 48px 48px, 96px 96px, 96px 96px;
+      linear-gradient(rgba(194, 155, 56, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(194, 155, 56, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
-  /* 최고급 코튼 페이퍼 질감 (Watermark & Grain) */
-  .paper-grain {
-    background-color: #fbf9f5;
+  /* 도서관 대출 카드 및 양장본 고서 내지 질감 (Library Card Paper) */
+  .library-card-paper {
+    background-color: #f7f3eb;
     background-image: 
-      radial-gradient(#cfc5b4 0.65px, transparent 0.65px),
-      linear-gradient(135deg, rgba(212, 175, 55, 0.03) 0%, transparent 50%, rgba(92, 19, 36, 0.02) 100%);
-    background-size: 10px 10px, 100% 100%;
+      radial-gradient(#cfc5b2 0.75px, transparent 0.75px),
+      linear-gradient(180deg, rgba(194, 155, 56, 0.02) 0%, transparent 100%);
+    background-size: 8px 8px, 100% 100%;
   }
 
-  /* 샴페인 골드 메탈릭 텍스트 */
-  .text-gold-metallic {
-    background: linear-gradient(135deg, #f9f2d9 0%, #e8cb85 25%, #d4af37 50%, #f3df9b 75%, #aa8438 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  /* 은은한 금박 테두리 (Gold Foil Border) */
-  .gold-foil-border {
-    border: 1px solid transparent;
-    border-image: linear-gradient(135deg, #f9f2d9, #d4af37, #741b2d, #d4af37, #f9f2d9) 1;
-  }
-
-  /* 3D 실링 왁스 엠보싱 셰도우 */
-  .wax-seal-shadow {
+  /* 도서관 양장본 커버 질감 (Cloth Bound Hardcover) */
+  .book-cloth-cover {
+    background-color: #1a2920;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(26, 54, 40, 0.6), rgba(14, 28, 20, 0.95)),
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 3px 3px, 3px 3px;
     box-shadow: 
-      0 12px 30px -4px rgba(0, 0, 0, 0.9),
-      0 6px 16px -2px rgba(92, 19, 36, 0.8),
-      inset 0 2px 4px rgba(255, 255, 255, 0.3),
-      inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+      0 20px 40px -10px rgba(0, 0, 0, 0.8),
+      inset 0 0 0 1px rgba(194, 155, 56, 0.25),
+      inset 4px 0 10px rgba(0, 0, 0, 0.5); /* 책등 접힘 음영 */
   }
 
-  /* 럭셔리 봉투 입체 그림자 */
-  .envelope-shadow {
+  /* 앤틱 브라스/황동 타이포그래피 (과한 카지노 골드 제거) */
+  .text-antique-brass {
+    color: #dfc27d;
+  }
+
+  /* 장서인 도장 (Ex Libris Stamp) */
+  .ex-libris-border {
+    border: 2px dashed rgba(166, 43, 43, 0.6);
+  }
+
+  /* 차분한 왁스 인장 (과한 번쩍임 배제, 고서 밀랍 느낌) */
+  .library-seal {
+    background: radial-gradient(circle at 35% 30%, #872033, #57121f 70%, #3d0c15 100%);
     box-shadow: 
-      0 25px 60px -12px rgba(0, 0, 0, 0.85),
-      0 0 40px rgba(212, 175, 55, 0.12),
-      inset 0 1px 1px rgba(212, 175, 55, 0.3);
+      0 6px 16px rgba(0, 0, 0, 0.6),
+      inset 0 2px 3px rgba(255, 255, 255, 0.25),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.5);
   }
 }
 
-/* 금빛 은은한 펄 애니메이션 */
-@keyframes shimmer {
-  0% { opacity: 0.3; transform: scale(0.95); }
-  50% { opacity: 0.7; transform: scale(1.05); }
-  100% { opacity: 0.3; transform: scale(0.95); }
-}
-
-.animate-shimmer {
-  animation: shimmer 4s infinite ease-in-out;
-}
-
-/* 커스텀 골드 스크롤바 */
+/* 커스텀 차분한 서재 스크롤바 */
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #071510;
+  background: #120f0d;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #741b2d, #a8823b, #d4af37);
-  border-radius: 4px;
+  background: #3a4a3e;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #f3df9b;
+  background: #5a7360;
 }
