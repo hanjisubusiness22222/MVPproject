@@ -57,45 +57,63 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   }, []);
 
   // 학교 종소리 사운드 (Web Audio API 차임벨)
-  const playSchoolBellSound = () => {
+  const playChimeSequence = (notes: number[]) => {
     if (isMuted) return;
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const ctx = new AudioCtx();
       
-      const notes = [659.25, 523.25, 587.33, 392.00]; // E5, C5, D5, G4
       notes.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.4);
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.38);
 
-        gain.gain.setValueAtTime(0.2, ctx.currentTime + idx * 0.4);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.4 + 1.2);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime + idx * 0.38);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.38 + 1.2);
 
         osc.connect(gain);
         gain.connect(ctx.destination);
 
-        osc.start(ctx.currentTime + idx * 0.4);
-        osc.stop(ctx.currentTime + idx * 0.4 + 1.2);
+        osc.start(ctx.currentTime + idx * 0.38);
+        osc.stop(ctx.currentTime + idx * 0.38 + 1.2);
       });
     } catch {
       // AudioContext unallowed before gesture
     }
   };
 
-  // 칠판 지우개 또는 칠판 클릭 시 분필 가루 효과 & 오픈 토글
-  const handleChalkboardClick = () => {
-    playSchoolBellSound();
-    setIsOpened(!isOpened);
+  // 칠판 펼칠 때 (시작 차임벨: 미 - 도 - 레 - 솔)
+  const playOpenSound = () => {
+    playChimeSequence([659.25, 523.25, 587.33, 392.00]); // E5, C5, D5, G4
+  };
 
+  // 칠판 접을 때 (마침 차임벨: 솔 - 레 - 미 - 도)
+  const playCloseSound = () => {
+    playChimeSequence([392.00, 587.33, 659.25, 523.25]); // G4, D5, E5, C5
+  };
+
+  // 헤더 종소리 버튼 클릭용
+  const playSchoolBellSound = () => {
+    playOpenSound();
+  };
+
+  // 칠판 지우개 또는 칠판 클릭 시 분필 가루 효과 & 오픈/접기 토글
+  const handleChalkboardClick = () => {
     if (!isOpened) {
+      // 칠판 펼칠 때: 미 - 도 - 레 - 솔
+      playOpenSound();
+      setIsOpened(true);
       confetti({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.6 },
         colors: ['#ffffff', '#f7f5ed', '#cfc5b2']
       });
+    } else {
+      // 칠판 접을 때: 솔 - 레 - 미 - 도
+      playCloseSound();
+      setIsOpened(false);
     }
   };
 
