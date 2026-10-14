@@ -220,54 +220,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onGoToSe
     <div className="min-h-screen bg-[#fcfbf9] text-[#1f1b18] font-sans pb-16">
       
       {/* 헤더 */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e4dc] px-4 py-3 sm:px-6 shadow-sm">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e4dc] px-3 sm:px-6 py-2.5 sm:py-3 shadow-sm">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2.5 sm:space-x-3">
             <button
               onClick={onBack}
-              className="p-1.5 rounded-lg border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] text-xs font-serif flex items-center space-x-1 shadow-sm"
+              className="p-1 sm:p-1.5 rounded-lg border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] text-xs font-serif flex items-center space-x-1 shadow-sm flex-shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>메인으로</span>
             </button>
 
-            <div className="flex items-center space-x-2">
-              <img src={planetLogo} alt="플래닛" className="w-8 h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" />
-              <div>
-                <h1 className="text-sm font-serif font-bold text-[#1f1b18] flex items-center space-x-1.5">
-                  <span>운영위원회 행정 대시보드</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#2e5238] text-white">관리자</span>
+            <div className="flex items-center space-x-2 min-w-0">
+              <img src={planetLogo} alt="플래닛" className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-xs sm:text-sm font-serif font-bold text-[#1f1b18] flex items-center space-x-1.5">
+                  <span className="truncate">행정 대시보드</span>
+                  <span className="text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#2e5238] text-white whitespace-nowrap">관리자</span>
                 </h1>
-                <p className="text-[10px] text-[#666] font-serif">2026 플래닛 독서학교 연말모임 통합 행정 시스템</p>
+                <p className="text-[9px] sm:text-[10px] text-[#666] font-serif truncate">2026 플래닛 독서학교 연말모임 통합 행정 시스템</p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 justify-end">
             {onGoToSettlement && (
               <button
                 onClick={onGoToSettlement}
-                className="px-3 py-1.5 rounded text-xs font-serif border border-[#c29b38] bg-[#fbf7ee] text-[#8c6b1b] hover:bg-[#f3ecdb] flex items-center space-x-1 shadow-sm transition-all"
+                className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#c29b38] bg-[#fbf7ee] text-[#8c6b1b] hover:bg-[#f3ecdb] flex items-center space-x-1 shadow-sm transition-all"
               >
-                <span>🧾 학생회비 결산</span>
+                <span>🧾 결산 보고서</span>
               </button>
             )}
 
             <button
               onClick={onGoToSeat}
-              className="px-3 py-1.5 rounded text-xs font-serif border border-[#1f1b18] bg-[#1f1b18] text-white hover:bg-[#333] flex items-center space-x-1 shadow-sm transition-all"
+              className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#1f1b18] bg-[#1f1b18] text-white hover:bg-[#333] flex items-center space-x-1 shadow-sm transition-all"
             >
-              <Users className="w-3.5 h-3.5" />
+              <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span>자리 배치</span>
             </button>
 
             <button
               onClick={handleExportCsv}
-              className="px-3 py-1.5 rounded text-xs font-serif border border-[#2e5238] bg-[#2e5238] text-white hover:bg-[#23402c] flex items-center space-x-1 shadow-sm transition-all"
+              className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#2e5238] bg-[#2e5238] text-white hover:bg-[#23402c] flex items-center space-x-1 shadow-sm transition-all"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>명단 엑셀(CSV) 저장</span>
+              <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>명단 CSV</span>
             </button>
           </div>
 
@@ -275,7 +275,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onGoToSe
       </header>
 
       {/* 메인 통계 & 리스트 */}
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <main className="max-w-6xl mx-auto px-2.5 sm:px-4 py-4 sm:py-8 pb-24 sm:pb-16 space-y-5 sm:space-y-6">
         
         {/* 통계 요약 카드 4종 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -368,7 +368,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onGoToSe
         {/* 신청자 명단 테이블 */}
         <div className="bg-white border-2 border-[#1f1b18] rounded-xl overflow-hidden shadow-lg">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-serif border-collapse">
+            <table className="min-w-[700px] sm:min-w-full text-left text-xs font-serif border-collapse">
               <thead>
                 <tr className="bg-[#1f1b18] text-white">
                   <th className="p-3 font-bold">학번</th>

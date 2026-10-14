@@ -13,13 +13,32 @@
     box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
   }
 
-  /* 나무 액자 칠판 프레임 (컨셉제안1 실물 우드 몰딩) */
+  /* 나무 액자 칠판 프레임 (모바일 8px / 데스크톱 14px) */
   .chalkboard-frame {
-    border: 14px solid #946944;
-    border-image: linear-gradient(135deg, #a77c55 0%, #7d5433 50%, #5e3c22 100%) 14;
+    border: 8px solid #946944;
+    border-image: linear-gradient(135deg, #a77c55 0%, #7d5433 50%, #5e3c22 100%) 8;
     box-shadow: 
-      0 20px 50px rgba(0, 0, 0, 0.7),
+      0 12px 30px rgba(0, 0, 0, 0.6),
       inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  }
+
+  @media (min-width: 640px) {
+    .chalkboard-frame {
+      border-width: 14px;
+      border-image-slice: 14;
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.7),
+        inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  /* 스크롤바 숨김 유틸리티 */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   /* 칠판 분필 글씨 효과 */

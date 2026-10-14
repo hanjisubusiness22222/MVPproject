@@ -178,39 +178,53 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
     <div className="min-h-screen bg-[#fcfbf9] text-[#1f1b18] font-sans selection:bg-[#b82828]/20 selection:text-[#b82828]">
       
       {/* 상단 엠블럼 및 네비게이션 헤더 */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e4dc] px-4 py-3 sm:px-6 shadow-sm">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e4dc] px-3 sm:px-6 py-2.5 sm:py-3 shadow-sm">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2.5">
           
-          {/* 좌측: 티저로 돌아가기 & 학교 로고 */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={onBackToTeaser}
-              className="p-1.5 rounded-lg border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 text-xs font-serif"
-              title="교실 칠판으로 돌아가기"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">교실 칠판</span>
-            </button>
-            
-            <div className="flex items-center space-x-2">
-              <img 
-                src={planetLogo} 
-                alt="플래닛 로고" 
-                className="w-8 h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
-              />
-              <div>
-                <div className="text-xs font-serif font-bold text-[#1f1b18] tracking-wide">
-                  플래닛 독서학교
-                </div>
-                <div className="text-[10px] text-[#666] font-serif">
-                  제2026-1호 가정통신문
+          {/* 상단 1단: 티저로 돌아가기 & 학교 로고 & (모바일일 때 QR버튼) */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <button
+                onClick={onBackToTeaser}
+                className="p-1 sm:p-1.5 rounded-lg border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 text-xs font-serif"
+                title="교실 칠판으로 돌아가기"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">교실 칠판</span>
+              </button>
+              
+              <div className="flex items-center space-x-2">
+                <img 
+                  src={planetLogo} 
+                  alt="플래닛 로고" 
+                  className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
+                />
+                <div>
+                  <div className="text-xs sm:text-sm font-serif font-bold text-[#1f1b18] tracking-wide">
+                    플래닛 독서학교
+                  </div>
+                  <div className="text-[9px] sm:text-[10px] text-[#666] font-serif">
+                    제2026-1호 가정통신문
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* 모바일용 QR코드 버튼 */}
+            <div className="flex items-center md:hidden">
+              <button
+                onClick={() => setIsQrModalOpen(true)}
+                className="p-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 shadow-sm"
+                title="모바일 접속 QR코드"
+              >
+                <QrCode className="w-3.5 h-3.5 text-[#2e5238]" />
+                <span className="text-[10px] font-bold">QR</span>
+              </button>
+            </div>
           </div>
 
-          {/* 우측: 탭 네비게이션 & QR코드 버튼 */}
-          <div className="flex items-center space-x-1 sm:space-x-2">
+          {/* 탭 네비게이션 & (데스크톱일 때 QR버튼) */}
+          <div className="flex items-center justify-between md:justify-end space-x-1 sm:space-x-2 overflow-x-auto scrollbar-none pb-0.5 -mx-1 px-1">
             <nav className="flex items-center space-x-1 sm:space-x-2">
               {[
                 { id: 'letter', label: '가정통신문' },
@@ -221,7 +235,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as TabType)}
-                  className={`px-2.5 py-1.5 rounded text-xs font-serif transition-all ${
+                  className={`px-2 py-1 sm:px-2.5 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif whitespace-nowrap transition-all ${
                     activeTab === tab.id
                       ? 'bg-[#b82828] text-white font-bold shadow-sm'
                       : 'text-[#555] hover:text-[#111] hover:bg-[#f0ece1]'
@@ -234,18 +248,18 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
 
             <button
               onClick={() => setIsQrModalOpen(true)}
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 shadow-sm"
+              className="hidden md:flex p-1.5 sm:px-2.5 sm:py-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors items-center space-x-1 shadow-sm whitespace-nowrap"
               title="모바일 접속 QR코드"
             >
               <QrCode className="w-3.5 h-3.5 text-[#2e5238]" />
-              <span className="hidden sm:inline font-bold">QR코드</span>
+              <span className="font-bold">QR코드</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* 중앙 메인 컨텐츠 영역 */}
-      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-10">
+      <main className="max-w-4xl mx-auto px-2.5 sm:px-6 py-5 sm:py-10 pb-24 sm:pb-12">
         
         {/* ========================================================= */}
         {/* TAB 1: PLANET 가정통신문 (초대장.png 양식 100% 재현)      */}
@@ -254,43 +268,43 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
           <div className="space-y-6 animate-fadeIn">
             
             {/* 갱지 가정통신문 카드 */}
-            <div className="relative retro-gazette-paper p-6 sm:p-12 rounded-xl text-[#1f1b18] shadow-xl border-2 border-[#1f1b18]/40 overflow-hidden space-y-6">
+            <div className="relative retro-gazette-paper p-3.5 sm:p-8 md:p-12 rounded-xl text-[#1f1b18] shadow-xl border-2 border-[#1f1b18]/40 overflow-hidden space-y-4 sm:space-y-6">
               
               {/* 상단 공문 헤더 박스 (초대장.png) */}
               <div className="border-2 border-[#1f1b18] grid grid-cols-4 sm:grid-cols-5 text-center text-xs font-serif">
-                <div className="col-span-1 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex items-center justify-center bg-white">
-                  <img src={planetLogo} alt="PLANET" className="w-20 sm:w-24 h-auto object-contain" />
+                <div className="col-span-1 border-r-2 border-[#1f1b18] p-1.5 sm:p-4 flex items-center justify-center bg-white">
+                  <img src={planetLogo} alt="PLANET" className="w-12 sm:w-20 md:w-24 h-auto object-contain" />
                 </div>
-                <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-3 sm:p-4 flex items-center justify-center">
-                  <h1 className="font-serif text-xl sm:text-3xl font-black tracking-[0.3em] text-[#111]">
+                <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-1.5 sm:p-4 flex items-center justify-center">
+                  <h1 className="font-serif text-sm sm:text-2xl md:text-3xl font-black tracking-[0.15em] sm:tracking-[0.3em] text-[#111]">
                     가 정 통 신 문
                   </h1>
                 </div>
-                <div className="col-span-1 p-2 sm:p-3 flex flex-col justify-center text-[10px] sm:text-xs font-serif text-left leading-tight bg-white/40">
-                  <div className="font-bold">플래닛독서학교</div>
-                  <div>제2026-1호</div>
-                  <div className="font-mono text-[#333]">2026.12.19.</div>
+                <div className="col-span-1 p-1 sm:p-3 flex flex-col justify-center text-[9px] sm:text-xs font-serif text-left leading-tight bg-white/40">
+                  <div className="font-bold truncate">플래닛독서학교</div>
+                  <div className="truncate">제2026-1호</div>
+                  <div className="font-mono text-[#333] text-[8px] sm:text-xs">2026.12.19.</div>
                 </div>
               </div>
 
               {/* 결재란 (담당 - 부장 - 교장) 직인 */}
               <div className="flex justify-end">
-                <div className="border border-[#1f1b18] inline-grid grid-cols-3 text-center text-[10px] font-serif bg-white/60">
-                  <div className="border-r border-[#1f1b18] p-1 px-3">
+                <div className="border border-[#1f1b18] inline-grid grid-cols-3 text-center text-[9px] sm:text-[10px] font-serif bg-white/60">
+                  <div className="border-r border-[#1f1b18] p-1 px-1.5 sm:px-3">
                     <div className="text-[#666] border-b border-[#1f1b18] pb-0.5">담 당</div>
-                    <div className="w-8 h-8 mx-auto mt-1 rounded-full border border-[#b82828] text-[#b82828] flex items-center justify-center font-bold text-[9px] rotate-[-5deg]">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 mx-auto mt-0.5 sm:mt-1 rounded-full border border-[#b82828] text-[#b82828] flex items-center justify-center font-bold text-[8px] sm:text-[9px] rotate-[-5deg]">
                       확인
                     </div>
                   </div>
-                  <div className="border-r border-[#1f1b18] p-1 px-3">
+                  <div className="border-r border-[#1f1b18] p-1 px-1.5 sm:px-3">
                     <div className="text-[#666] border-b border-[#1f1b18] pb-0.5">부 장</div>
-                    <div className="w-8 h-8 mx-auto mt-1 rounded-full border border-[#b82828] text-[#b82828] flex items-center justify-center font-bold text-[9px] rotate-[8deg]">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 mx-auto mt-0.5 sm:mt-1 rounded-full border border-[#b82828] text-[#b82828] flex items-center justify-center font-bold text-[8px] sm:text-[9px] rotate-[8deg]">
                       결재
                     </div>
                   </div>
-                  <div className="p-1 px-3">
+                  <div className="p-1 px-1.5 sm:px-3">
                     <div className="text-[#666] border-b border-[#1f1b18] pb-0.5">교 장</div>
-                    <div className="w-8 h-8 mx-auto mt-1 rounded-full border-2 border-[#b82828] text-[#b82828] flex items-center justify-center font-bold text-[9px] rotate-[-12deg]">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 mx-auto mt-0.5 sm:mt-1 rounded-full border-2 border-[#b82828] text-[#b82828] flex items-center justify-center font-bold text-[8px] sm:text-[9px] rotate-[-12deg]">
                       플래닛
                     </div>
                   </div>
@@ -298,14 +312,14 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
               </div>
 
               {/* 제목 서브 헤더 */}
-              <div className="text-center py-2">
-                <h2 className="font-serif text-base sm:text-xl font-bold text-[#1f1b18]">
+              <div className="text-center py-1 sm:py-2">
+                <h2 className="font-serif text-sm sm:text-xl font-bold text-[#1f1b18]">
                   - 2026 플래닛 연말 파티 「플래닛의 새학기」 안내 -
                 </h2>
               </div>
 
               {/* 본문 안내문 (초대장.png 원문 인용) */}
-              <div className="font-serif text-xs sm:text-sm leading-relaxed text-[#2c2621] space-y-3 bg-white/70 p-4 sm:p-5 rounded border border-[#1f1b18]/20">
+              <div className="font-serif text-xs sm:text-sm leading-relaxed text-[#2c2621] space-y-2.5 sm:space-y-3 bg-white/70 p-3.5 sm:p-5 rounded border border-[#1f1b18]/20">
                 <p>
                   <strong>플래닛 어른이님, 안녕하십니까?</strong> 날씨가 부쩍 추워지고, 2026년의 마무리가 다가오고 있습니다.
                   책을 사랑하는 마음으로 플래닛 활동에 관심을 갖고 모임 발전에 협조해주시는 플래닛 어른이님들께 진심으로 감사드리며, 
@@ -318,36 +332,36 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
               </div>
 
               {/* 표: 일시 / 프로그램 / 장소 / 대상 */}
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border-2 border-[#1f1b18] text-xs sm:text-sm font-serif text-center">
+              <div className="overflow-x-auto -mx-1 sm:mx-0">
+                <table className="min-w-[420px] sm:min-w-full border-collapse border-2 border-[#1f1b18] text-xs sm:text-sm font-serif text-center">
                   <thead>
                     <tr className="bg-[#ede8dc] font-bold">
-                      <th className="border border-[#1f1b18] p-2.5">일시</th>
-                      <th className="border border-[#1f1b18] p-2.5">프로그램</th>
-                      <th className="border border-[#1f1b18] p-2.5">장소</th>
-                      <th className="border border-[#1f1b18] p-2.5">대상</th>
+                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">일시</th>
+                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">프로그램</th>
+                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">장소</th>
+                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">대상</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="bg-white/80">
-                      <td className="border border-[#1f1b18] p-3 font-mono text-xs">
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-mono text-[11px] sm:text-xs">
                         2026. 12. 19. (토)<br />10:00 ~ 17:00
                       </td>
-                      <td className="border border-[#1f1b18] p-3 font-bold text-[#b82828]">
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-bold text-[#b82828]">
                         플래닛 연말파티<br />「플래닛의 새학기」
                       </td>
-                      <td className="border border-[#1f1b18] p-3">공간나인 강남점</td>
-                      <td className="border border-[#1f1b18] p-3">플래닛의<br />어른이님들</td>
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">공간나인 강남점</td>
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">플래닛의<br />어른이님들</td>
                     </tr>
                     <tr className="bg-white/80">
-                      <td className="border border-[#1f1b18] p-3 font-mono text-xs">
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-mono text-[11px] sm:text-xs">
                         2026. 12. 19. (토)<br />18:00 ~ LATE
                       </td>
-                      <td className="border border-[#1f1b18] p-3 font-bold text-[#2e5238]">
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-bold text-[#2e5238]">
                         연말파티 뒷풀이<br />「플래닛의 수학여행」
                       </td>
-                      <td className="border border-[#1f1b18] p-3">강남 프라이빗 파티룸<br /><span className="text-[10px] text-[#777]">(추후 지정)</span></td>
-                      <td className="border border-[#1f1b18] p-3">연말파티 참여자<br />中 희망자</td>
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">강남 프라이빗 파티룸<br /><span className="text-[10px] text-[#777]">(추후 지정)</span></td>
+                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">연말파티 참여자<br />中 희망자</td>
                     </tr>
                   </tbody>
                 </table>
@@ -662,7 +676,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
             </div>
 
             {/* 절취선 회신서 박스 (초대장.png 하단 서식 재현) */}
-            <div className="retro-gazette-paper rounded-xl p-6 sm:p-8 text-[#1f1b18] shadow-2xl border-2 border-[#1f1b18] space-y-6">
+            <div className="retro-gazette-paper rounded-xl p-3.5 sm:p-8 text-[#1f1b18] shadow-2xl border-2 border-[#1f1b18] space-y-4 sm:space-y-6">
               
               <div className="border-b-2 border-dashed border-[#1f1b18] pb-3 text-center">
                 <div className="text-[11px] font-mono text-[#666]">
@@ -864,8 +878,8 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
       {/* 신청 완료: 플래닛 독서학교 공식 모바일 학생증 모달 (컨셉제안4) */}
       {/* ========================================================= */}
       {confirmedStudentId && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="relative w-full max-w-sm space-y-3 animate-scaleUp my-auto">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="relative w-full max-w-sm space-y-3 animate-scaleUp my-auto max-h-[92vh] overflow-y-auto p-0.5 scrollbar-none">
             
             {/* 캡처 대상 학생증 실물 카드 */}
             <div 

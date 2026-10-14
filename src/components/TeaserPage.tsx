@@ -188,35 +188,35 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
     <div className="relative min-h-screen bg-[#fcfbf9] text-[#1f1b18] flex flex-col items-center justify-between p-4 sm:p-6 md:p-8 overflow-x-hidden selection:bg-[#b82828]/20 selection:text-[#b82828]">
       
       {/* 상단 헤더: 학교 로고 & 종소리 버튼 */}
-      <header className="w-full max-w-4xl flex items-center justify-between py-3 border-b border-[#e8e4dc] z-20">
-        <div className="flex items-center space-x-3">
+      <header className="w-full max-w-4xl flex items-center justify-between py-2.5 sm:py-3 border-b border-[#e8e4dc] z-20">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <img 
             src={planetLogo} 
             alt="플래닛 로고" 
-            className="w-11 h-11 object-contain rounded-xl bg-white border border-[#e5e0d8] p-0.5 shadow-sm" 
+            className="w-9 h-9 sm:w-11 sm:h-11 object-contain rounded-xl bg-white border border-[#e5e0d8] p-0.5 shadow-sm flex-shrink-0" 
           />
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="font-serif text-sm tracking-wide text-[#1f1b18] font-bold">
+          <div className="min-w-0">
+            <div className="flex items-center space-x-1.5 sm:space-x-2">
+              <span className="font-serif text-xs sm:text-sm tracking-wide text-[#1f1b18] font-bold truncate">
                 플래닛 독서학교
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono text-[#555] border border-[#d8d3c7] bg-[#f0ece1]">
+              <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono text-[#555] border border-[#d8d3c7] bg-[#f0ece1] whitespace-nowrap">
                 since 2017
               </span>
             </div>
-            <p className="text-[11px] text-[#666] font-serif tracking-wide mt-0.5">
+            <p className="text-[10px] sm:text-[11px] text-[#666] font-serif tracking-wide mt-0.5 truncate max-w-[190px] xs:max-w-xs sm:max-w-none">
               어른이들을 위한 설레는 새학기와 추억의 수학여행
             </p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
           <button
             onClick={() => setIsQrModalOpen(true)}
-            className="p-2 rounded-lg border border-[#d8d3c7] hover:border-[#999] bg-white text-[#1f1b18] transition-all text-xs flex items-center space-x-1.5 shadow-sm"
+            className="p-1.5 sm:p-2 rounded-lg border border-[#d8d3c7] hover:border-[#999] bg-white text-[#1f1b18] transition-all text-xs flex items-center space-x-1 sm:space-x-1.5 shadow-sm"
             title="모바일 접속 QR코드"
           >
-            <QrCode className="w-4 h-4 text-[#2e5238]" />
+            <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#2e5238]" />
             <span className="hidden sm:inline text-[11px] font-serif font-bold">QR코드</span>
           </button>
 
@@ -225,14 +225,14 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               setIsMuted(!isMuted);
               if (isMuted) playSchoolBellSound();
             }}
-            className="p-2 rounded-lg border border-[#d8d3c7] hover:border-[#999] bg-white text-[#1f1b18] transition-all text-xs flex items-center space-x-1.5 shadow-sm"
+            className="p-1.5 sm:p-2 rounded-lg border border-[#d8d3c7] hover:border-[#999] bg-white text-[#1f1b18] transition-all text-xs flex items-center space-x-1 sm:space-x-1.5 shadow-sm"
             title={isMuted ? "학교 종소리 켜기" : "음소거"}
           >
             {isMuted ? (
-              <BellOff className="w-4 h-4 text-[#888]" />
+              <BellOff className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#888]" />
             ) : (
               <>
-                <Bell className="w-4 h-4 text-[#b82828]" />
+                <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#b82828]" />
                 <span className="hidden sm:inline text-[11px] font-serif">종소리</span>
               </>
             )}
@@ -241,15 +241,15 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       </header>
 
       {/* 중앙 메인: 컨셉제안1 실물 나무 액자 초록 칠판 (Chalkboard) */}
-      <main className="w-full max-w-3xl my-auto py-6 sm:py-8 flex flex-col items-center justify-center z-10">
+      <main className="w-full max-w-3xl my-auto py-4 sm:py-8 pb-20 sm:pb-8 flex flex-col items-center justify-center z-10 px-1 sm:px-0">
         
         {/* 상단 안내 태그 */}
-        <div className="text-center mb-5 space-y-1">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-[#d8d3c7] bg-[#f0ece1] text-[#333] text-[11px] font-serif shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-[#b82828]" />
+        <div className="text-center mb-4 sm:mb-5 space-y-1">
+          <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-[#d8d3c7] bg-[#f0ece1] text-[#333] text-[10px] sm:text-[11px] font-serif shadow-sm">
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#b82828]" />
             <span>2026 연말모임 특별 개교 안내</span>
           </div>
-          <div className="text-xs font-serif text-[#666]">
+          <div className="text-[11px] sm:text-xs font-serif text-[#666]">
             2026년 12월 19일 (토요일) 오전 10:00 개학식
           </div>
         </div>
@@ -262,15 +262,15 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
             className="cursor-pointer relative chalkboard-frame rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl"
           >
             {/* 칠판 본체 (Chalkboard Surface) */}
-            <div className="chalkboard-surface p-6 sm:p-10 text-center relative select-none">
+            <div className="chalkboard-surface p-4 sm:p-10 text-center relative select-none">
               
               {/* 분필가루 얼룩 효과 */}
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.06),_transparent_70%)] pointer-events-none"></div>
 
               {/* 칠판 분필 메인 타이틀 (컨셉제안1 재현) */}
-              <div className="space-y-4 py-4 sm:py-6">
+              <div className="space-y-3 sm:space-y-4 py-3 sm:py-6">
                 <div className="inline-block border-b-2 border-dashed border-[#ffffff]/30 pb-2">
-                  <h1 className="chalk-text font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-[#f7f5ed]">
+                  <h1 className="chalk-text font-serif text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#f7f5ed]">
                     〈 플래닛의 새학기 〉
                   </h1>
                 </div>
@@ -311,34 +311,34 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                 : 'max-h-0 opacity-0'
             }`}
           >
-            <div className="retro-gazette-paper rounded-lg p-5 sm:p-8 text-[#1f1b18] shadow-2xl border-2 border-[#1f1b18]/40 space-y-5">
+            <div className="retro-gazette-paper rounded-lg p-3 sm:p-8 text-[#1f1b18] shadow-2xl border-2 border-[#1f1b18]/40 space-y-3.5 sm:space-y-5">
               
               {/* 가정통신문 헤더 박스 (초대장.png와 100% 동일한 격자 서식) */}
               <div className="border-2 border-[#1f1b18] grid grid-cols-4 sm:grid-cols-5 text-center text-xs font-serif">
-                <div className="col-span-1 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex items-center justify-center bg-white">
-                  <img src={planetLogo} alt="PLANET" className="w-16 sm:w-20 h-auto object-contain" />
+                <div className="col-span-1 border-r-2 border-[#1f1b18] p-1.5 sm:p-3 flex items-center justify-center bg-white">
+                  <img src={planetLogo} alt="PLANET" className="w-12 sm:w-20 h-auto object-contain" />
                 </div>
-                <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-2 sm:p-3 flex items-center justify-center">
-                  <h2 className="font-serif text-lg sm:text-2xl font-black tracking-[0.25em] text-[#111]">
+                <div className="col-span-2 sm:col-span-3 border-r-2 border-[#1f1b18] p-1.5 sm:p-3 flex items-center justify-center">
+                  <h2 className="font-serif text-sm sm:text-2xl font-black tracking-[0.15em] sm:tracking-[0.25em] text-[#111]">
                     가 정 통 신 문
                   </h2>
                 </div>
-                <div className="col-span-1 p-2 flex flex-col justify-center text-[10px] sm:text-xs font-serif text-left leading-tight bg-white/50">
-                  <div className="font-bold">플래닛독서학교</div>
-                  <div>제2026-1호</div>
-                  <div className="font-mono">2026.12.19.</div>
+                <div className="col-span-1 p-1 sm:p-2 flex flex-col justify-center text-[9px] sm:text-xs font-serif text-left leading-tight bg-white/50">
+                  <div className="font-bold truncate">플래닛독서학교</div>
+                  <div className="truncate">제2026-1호</div>
+                  <div className="font-mono text-[8px] sm:text-xs">2026.12.19.</div>
                 </div>
               </div>
 
               {/* 제목 서브 헤더 */}
               <div className="text-center py-1">
-                <h3 className="font-serif text-base sm:text-lg font-bold text-[#1f1b18]">
+                <h3 className="font-serif text-sm sm:text-lg font-bold text-[#1f1b18]">
                   - 2026 플래닛 연말 파티 「플래닛의 새학기」 안내 -
                 </h3>
               </div>
 
               {/* 본문 안내문 (초대장.png 원문 인용) */}
-              <div className="font-serif text-xs sm:text-sm leading-relaxed text-[#2c2621] space-y-2 bg-white/60 p-4 rounded border border-[#1f1b18]/20">
+              <div className="font-serif text-xs sm:text-sm leading-relaxed text-[#2c2621] space-y-2 bg-white/60 p-3 sm:p-4 rounded border border-[#1f1b18]/20">
                 <p>
                   <strong>플래닛 어른이님, 안녕하십니까?</strong> 날씨가 부쩍 추워지고, 2026년의 마무리가 다가오고 있습니다.
                   책을 사랑하는 마음으로 플래닛 활동에 관심을 갖고 모임 발전에 협조해주시는 플래닛 어른이님들께 진심으로 감사드리며, 
@@ -351,8 +351,8 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               </div>
 
               {/* 일시 / 프로그램 / 장소 / 대상 표 */}
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border-2 border-[#1f1b18] text-xs font-serif text-center">
+              <div className="overflow-x-auto -mx-1 sm:mx-0">
+                <table className="min-w-[420px] sm:min-w-full border-collapse border-2 border-[#1f1b18] text-xs font-serif text-center">
                   <thead>
                     <tr className="bg-[#e8e4d8] font-bold">
                       <th className="border border-[#1f1b18] p-2">일시</th>

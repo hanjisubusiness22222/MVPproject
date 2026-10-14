@@ -268,68 +268,68 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
     <div className="min-h-screen bg-[#fcfbf9] text-[#1f1b18] font-sans selection:bg-[#b82828]/20 selection:text-[#b82828] pb-16">
       
       {/* 상단 헤더 & 컨트롤 바 */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e4dc] px-4 py-3 sm:px-6 shadow-sm">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e4dc] px-3 sm:px-6 py-2.5 sm:py-3 shadow-sm">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           
           {/* 좌측: 홈으로 & 타이틀 */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2.5 sm:space-x-3">
             <button
               onClick={onBack}
-              className="p-1.5 rounded-lg border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 text-xs font-serif shadow-sm"
+              className="p-1 sm:p-1.5 rounded-lg border border-[#d8d3c7] bg-[#f8f6f0] hover:bg-[#ede8dc] text-[#1f1b18] transition-colors flex items-center space-x-1 text-xs font-serif shadow-sm flex-shrink-0"
               title="뒤로 가기"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>돌아가기</span>
             </button>
 
-            <div className="flex items-center space-x-2">
-              <img src={planetLogo} alt="플래닛" className="w-8 h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" />
-              <div>
-                <h1 className="text-sm font-serif font-bold text-[#1f1b18] flex items-center space-x-1.5">
-                  <span>자리 배치</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#b82828] text-white">현장용</span>
+            <div className="flex items-center space-x-2 min-w-0">
+              <img src={planetLogo} alt="플래닛" className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-xs sm:text-sm font-serif font-bold text-[#1f1b18] flex items-center space-x-1.5">
+                  <span className="truncate">자리 배치</span>
+                  <span className="text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#b82828] text-white whitespace-nowrap">현장용</span>
                 </h1>
-                <p className="text-[10px] text-[#666] font-serif">2026 플래닛 독서학교 1·2·3분단 짝꿍 좌석 배정</p>
+                <p className="text-[9px] sm:text-[10px] text-[#666] font-serif truncate">2026 플래닛 독서학교 1·2·3분단 짝꿍 좌석 배정</p>
               </div>
             </div>
           </div>
 
           {/* 우측: 셔플 및 컨트롤 버튼 */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 justify-end">
             
             <button
               onClick={() => setShowManageModal(true)}
-              className="px-3 py-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-white hover:bg-[#f8f6f0] text-[#1f1b18] flex items-center space-x-1 transition-all shadow-sm"
+              className="px-2 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#d8d3c7] bg-white hover:bg-[#f8f6f0] text-[#1f1b18] flex items-center space-x-1 transition-all shadow-sm"
             >
-              <Users className="w-3.5 h-3.5 text-[#2e5238]" />
-              <span>명단 관리 ({participants.length}명)</span>
+              <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#2e5238]" />
+              <span>명단 ({participants.length}명)</span>
             </button>
 
             <button
               onClick={handleDownloadSeats}
               disabled={isCapturing}
-              className="px-3 py-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-white hover:bg-[#f8f6f0] text-[#1f1b18] flex items-center space-x-1 transition-all shadow-sm"
+              className="px-2 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#d8d3c7] bg-white hover:bg-[#f8f6f0] text-[#1f1b18] flex items-center space-x-1 transition-all shadow-sm"
               title="배치표 이미지 저장"
             >
-              <Download className="w-3.5 h-3.5 text-[#555]" />
-              <span className="hidden sm:inline">배치표 저장</span>
+              <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#555]" />
+              <span className="hidden xs:inline">배치표 저장</span>
             </button>
 
             <button
               onClick={toggleFullscreen}
-              className="p-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-white hover:bg-[#f8f6f0] text-[#1f1b18] transition-all shadow-sm"
+              className="p-1 sm:p-1.5 rounded text-xs font-serif border border-[#d8d3c7] bg-white hover:bg-[#f8f6f0] text-[#1f1b18] transition-all shadow-sm"
               title={isFullscreen ? "전체화면 종료" : "빔프로젝터 전체화면"}
             >
-              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {isFullscreen ? <Minimize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Maximize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             </button>
 
             {/* 메인 셔플 액션 버튼 */}
             <button
               onClick={runSmartShuffle}
               disabled={isShuffling}
-              className="px-4 py-2 rounded-lg bg-[#b82828] hover:bg-[#961e1e] text-white font-serif font-bold text-xs sm:text-sm flex items-center space-x-1.5 shadow-md transition-all disabled:opacity-50 active:scale-95"
+              className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-[#b82828] hover:bg-[#961e1e] text-white font-serif font-bold text-xs sm:text-sm flex items-center space-x-1 sm:space-x-1.5 shadow-md transition-all disabled:opacity-50 active:scale-95 whitespace-nowrap"
             >
-              <Shuffle className={`w-4 h-4 ${isShuffling ? 'animate-spin' : ''}`} />
+              <Shuffle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isShuffling ? 'animate-spin' : ''}`} />
               <span>{isShuffling ? '자리 섞는 중...' : '자리 배치 시작!'}</span>
             </button>
 
@@ -339,43 +339,43 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
       </header>
 
       {/* 안내 바: 자동으로 분단별 성비 균형 & 신구 조화 안내 */}
-      <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-serif border-b border-[#e8e4dc]">
-        <div className="flex items-center space-x-2 text-[#2e5238] font-bold">
-          <Sparkles className="w-4 h-4 text-[#b82828]" />
-          <span>✨ 각 분단(1·2·3분단)별 성비 균형(1:1)과 신·구 조화가 보장되며, 짝꿍은 분단 내에서 자연스럽게 랜덤 매칭됩니다.</span>
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs font-serif border-b border-[#e8e4dc]">
+        <div className="flex items-center space-x-1.5 text-[#2e5238] font-bold">
+          <Sparkles className="w-3.5 h-3.5 text-[#b82828] flex-shrink-0" />
+          <span>각 분단별 성비(1:1)와 신·구 조화가 보장되며, 짝꿍은 랜덤 매칭됩니다.</span>
         </div>
 
-        <div className="text-[11px] text-[#777] font-mono">
-          총 24석 배치 (1분단 8석 • 2분단 8석 • 3분단 8석)
+        <div className="text-[10px] sm:text-[11px] text-[#777] font-mono">
+          총 24석 (1·2·3분단 각 8석)
         </div>
       </div>
 
       {/* 메인 교실 배치도 영역 (캡처 대상) */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8 pb-24 sm:pb-12">
         
         <div 
           ref={classroomRef}
-          className="bg-white border-2 border-[#1f1b18] rounded-2xl p-6 sm:p-10 shadow-xl space-y-8 relative overflow-hidden"
+          className="bg-white border-2 border-[#1f1b18] rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-10 shadow-xl space-y-5 sm:space-y-8 relative overflow-hidden"
         >
           
           {/* 상단: 칠판 및 교탁 (선생님 / 운영진) */}
-          <div className="text-center space-y-3">
+          <div className="text-center space-y-2.5 sm:space-y-3">
             
             {/* 레트로 우드 현판 헤더 (교탁과 일치하는 따뜻한 갈색) */}
-            <div className="bg-[#5c4033] text-[#f7f5ed] max-w-xl mx-auto py-3 px-6 rounded-lg border-4 border-[#3e2723] shadow-lg relative">
-              <div className="text-[10px] font-mono text-[#dfc27d] tracking-widest uppercase">
+            <div className="bg-[#5c4033] text-[#f7f5ed] max-w-xl mx-auto py-2 sm:py-3 px-3 sm:px-6 rounded-lg border-2 sm:border-4 border-[#3e2723] shadow-lg relative">
+              <div className="text-[9px] sm:text-[10px] font-mono text-[#dfc27d] tracking-widest uppercase">
                 CLASSROOM SIGNBOARD
               </div>
-              <h2 className="text-lg sm:text-xl font-serif font-black tracking-widest text-[#f7f5ed]">
+              <h2 className="text-sm sm:text-lg md:text-xl font-serif font-black tracking-normal sm:tracking-widest text-[#f7f5ed]">
                 2026 플래닛 독서학교 「새학기 교실」
               </h2>
-              <div className="text-[11px] text-[#dfc27d]/90 font-serif mt-0.5">
+              <div className="text-[10px] sm:text-[11px] text-[#dfc27d]/90 font-serif mt-0.5">
                 * 책을 사랑하는 어른이들의 다정한 첫 만남
               </div>
             </div>
 
             {/* 교탁 그래픽 */}
-            <div className="inline-block px-8 py-2 rounded-t-lg bg-[#5c4033] text-[#f7f5ed] font-serif font-bold text-xs border-2 border-b-4 border-[#3e2723] shadow-md">
+            <div className="inline-block px-5 sm:px-8 py-1.5 sm:py-2 rounded-t-lg bg-[#5c4033] text-[#f7f5ed] font-serif font-bold text-[11px] sm:text-xs border-2 border-b-4 border-[#3e2723] shadow-md">
               [ 교 탁 (선생님 / 운영진 교무석) ]
             </div>
 

@@ -263,60 +263,61 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f1ea] text-[#1f1b18] py-8 px-4 sm:px-6 font-sans">
+    <div className="min-h-screen bg-[#f4f1ea] text-[#1f1b18] py-4 sm:py-8 px-2.5 sm:px-6 pb-24 sm:pb-12 font-sans">
       
       {/* 상단 네비게이션 바 */}
-      <div className="max-w-4xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
+      <div className="max-w-4xl mx-auto mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-2.5 print:hidden">
         <button
           onClick={onBack}
-          className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-[#d8d3c7] bg-white hover:bg-[#ede8dc] text-xs font-serif text-[#333] transition-all shadow-sm"
+          className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-[#d8d3c7] bg-white hover:bg-[#ede8dc] text-xs font-serif text-[#333] transition-all shadow-sm"
         >
           <ArrowLeft className="w-4 h-4 text-[#b82828]" />
           <span>가정통신문으로 돌아가기</span>
         </button>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5 sm:space-x-2">
           {onGoToSeat && (
             <button
               onClick={onGoToSeat}
-              className="px-3 py-1.5 rounded-lg border border-[#c8c0b0] bg-white hover:bg-[#ede8dc] text-xs font-serif text-[#333] transition-all shadow-sm"
+              className="px-2.5 py-1.5 rounded-lg border border-[#c8c0b0] bg-white hover:bg-[#ede8dc] text-xs font-serif text-[#333] transition-all shadow-sm"
             >
-              자리 배치 보기
+              자리 배치
             </button>
           )}
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-[#c8c0b0] bg-white hover:bg-[#f0ece1] text-xs font-serif text-[#1b3323] transition-all shadow-sm"
+            className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-[#c8c0b0] bg-white hover:bg-[#f0ece1] text-xs font-serif text-[#1b3323] transition-all shadow-sm"
             title="CSV 파일로 저장"
           >
             <Download className="w-3.5 h-3.5 text-[#2e5238]" />
-            <span>CSV 다운로드</span>
+            <span className="hidden sm:inline">CSV 다운로드</span>
+            <span className="sm:hidden">CSV</span>
           </button>
           <button
             onClick={handlePrint}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#1b3323] hover:bg-[#112217] text-white text-xs font-serif font-bold transition-all shadow-sm"
+            className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-[#1b3323] hover:bg-[#112217] text-white text-xs font-serif font-bold transition-all shadow-sm"
             title="보고서 인쇄"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>인쇄하기</span>
+            <span>인쇄</span>
           </button>
         </div>
       </div>
 
       {/* 정산 보고서 본문 컨테이너 (레트로 공문서 느낌) */}
-      <div className="max-w-4xl mx-auto bg-white rounded-xl border-2 border-[#1f1b18] shadow-2xl p-6 sm:p-10 relative overflow-hidden">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl border-2 border-[#1f1b18] shadow-2xl p-3.5 sm:p-8 md:p-10 relative overflow-hidden">
         
         {/* 상단 공문 헤더 & 3단 결재란 */}
-        <div className="border-b-2 border-[#1f1b18] pb-6 mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="border-b-2 border-[#1f1b18] pb-4 sm:pb-6 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
             
             {/* 좌측: 공문 제목 및 발송정보 */}
             <div>
-              <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-[#1b3323] text-white text-[11px] font-mono mb-2">
-                <Receipt className="w-3.5 h-3.5 text-[#dfc27d]" />
+              <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-[#1b3323] text-white text-[10px] sm:text-[11px] font-mono mb-1.5">
+                <Receipt className="w-3 h-3 text-[#dfc27d]" />
                 <span>제 2026-결산1호</span>
               </div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-black tracking-tight text-[#111]">
+              <h1 className="text-base sm:text-2xl md:text-3xl font-serif font-black tracking-tight text-[#111]">
                 2026 플래닛 독서학교 연말모임 학생회비 투명 정산 보고서
               </h1>
               <p className="text-xs sm:text-sm font-serif text-[#555] mt-1">
@@ -468,8 +469,8 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
         </div>
 
         {/* 상세 입출금 내역 테이블 */}
-        <div className="overflow-x-auto mb-8 border border-[#1f1b18] rounded-lg">
-          <table className="w-full text-left text-xs font-serif border-collapse">
+        <div className="overflow-x-auto -mx-1 sm:mx-0 mb-8 border border-[#1f1b18] rounded-lg">
+          <table className="min-w-[500px] sm:min-w-full text-left text-xs font-serif border-collapse">
             <thead>
               <tr className="bg-[#ede8dc] text-[#1f1b18] font-bold border-b border-[#1f1b18]">
                 <th className="p-3 w-20 text-center">구분</th>
