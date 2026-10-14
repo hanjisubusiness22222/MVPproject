@@ -158,8 +158,10 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
     e.preventDefault();
     const clean = secretCode.trim().toUpperCase();
 
-    // 관리자 코드 입력 시 관리자 대시보드로 바로 이동
-    if (clean === 'PLANET2026' || clean === 'ADMIN' || clean === '관리자') {
+    // 관리자 코드 입력 시 관리자 대시보드로 바로 이동 ("플래닛연말준비2026")
+    const noSpace = clean.replace(/\s+/g, '');
+    if (noSpace === '플래닛연말준비2026' || clean === 'PLANET2026' || clean === 'ADMIN' || clean === '관리자') {
+      sessionStorage.setItem('planet_admin_auth', 'true');
       window.location.hash = '#admin';
       return;
     }
