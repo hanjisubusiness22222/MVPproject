@@ -3,40 +3,89 @@
 @tailwind utilities;
 
 @layer utilities {
-  /* 아가일 & 타탄 체크 은은한 패턴 */
+  /* 아카데믹 다크 포레스트 & 레더 패턴 */
   .bg-ivy-pattern {
-    background-color: #081a14;
-    background-image: radial-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 1px), radial-gradient(rgba(27, 42, 74, 0.4) 1px, transparent 1px);
-    background-size: 28px 28px;
-    background-position: 0 0, 14px 14px;
+    background-color: #071510;
+    background-image: 
+      radial-gradient(ellipse at 50% 20%, rgba(22, 56, 44, 0.7) 0%, transparent 60%),
+      radial-gradient(rgba(212, 175, 55, 0.07) 1px, transparent 1px),
+      radial-gradient(rgba(16, 28, 54, 0.4) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 16px 16px;
+    background-position: center, 0 0, 16px 16px;
   }
 
+  /* 타탄체크 & 미세 헤리티지 그리드 */
   .bg-tartan-overlay {
     background-image: 
-      linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
-    background-size: 32px 32px;
+      linear-gradient(rgba(212, 175, 55, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 175, 55, 0.04) 1px, transparent 1px),
+      linear-gradient(rgba(92, 19, 36, 0.03) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(92, 19, 36, 0.03) 2px, transparent 2px);
+    background-size: 48px 48px, 48px 48px, 96px 96px, 96px 96px;
   }
 
-  /* 종이 질감 오버레이 */
+  /* 최고급 코튼 페이퍼 질감 (Watermark & Grain) */
   .paper-grain {
-    background-color: #f9f6f0;
-    background-image: radial-gradient(#d9cfbe 0.75px, transparent 0.75px);
-    background-size: 12px 12px;
+    background-color: #fbf9f5;
+    background-image: 
+      radial-gradient(#cfc5b4 0.65px, transparent 0.65px),
+      linear-gradient(135deg, rgba(212, 175, 55, 0.03) 0%, transparent 50%, rgba(92, 19, 36, 0.02) 100%);
+    background-size: 10px 10px, 100% 100%;
   }
+
+  /* 샴페인 골드 메탈릭 텍스트 */
+  .text-gold-metallic {
+    background: linear-gradient(135deg, #f9f2d9 0%, #e8cb85 25%, #d4af37 50%, #f3df9b 75%, #aa8438 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* 은은한 금박 테두리 (Gold Foil Border) */
+  .gold-foil-border {
+    border: 1px solid transparent;
+    border-image: linear-gradient(135deg, #f9f2d9, #d4af37, #741b2d, #d4af37, #f9f2d9) 1;
+  }
+
+  /* 3D 실링 왁스 엠보싱 셰도우 */
+  .wax-seal-shadow {
+    box-shadow: 
+      0 12px 30px -4px rgba(0, 0, 0, 0.9),
+      0 6px 16px -2px rgba(92, 19, 36, 0.8),
+      inset 0 2px 4px rgba(255, 255, 255, 0.3),
+      inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+  }
+
+  /* 럭셔리 봉투 입체 그림자 */
+  .envelope-shadow {
+    box-shadow: 
+      0 25px 60px -12px rgba(0, 0, 0, 0.85),
+      0 0 40px rgba(212, 175, 55, 0.12),
+      inset 0 1px 1px rgba(212, 175, 55, 0.3);
+  }
+}
+
+/* 금빛 은은한 펄 애니메이션 */
+@keyframes shimmer {
+  0% { opacity: 0.3; transform: scale(0.95); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+  100% { opacity: 0.3; transform: scale(0.95); }
+}
+
+.animate-shimmer {
+  animation: shimmer 4s infinite ease-in-out;
 }
 
 /* 커스텀 골드 스크롤바 */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #0d281e;
+  background: #071510;
 }
 ::-webkit-scrollbar-thumb {
-  background: #a8823b;
+  background: linear-gradient(to bottom, #741b2d, #a8823b, #d4af37);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4af37;
+  background: #f3df9b;
 }
