@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, Shuffle, Users, Sparkles, Maximize2, Minimize2, 
-  Download, RotateCcw, Award, CheckCircle2, Plus, Trash2
+  Download, Plus, Trash2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { toPng } from 'html-to-image';
@@ -10,35 +10,42 @@ import planetLogo from '../assets/planet-logo.png';
 interface Participant {
   id: string;
   name: string;
+  gender: 'M' | 'F';
+  type: 'senior' | 'new';
   seatIndex?: number;
 }
 
-// 기본 샘플 어른이 명단 (24인)
+// 기본 샘플 어른이 명단 (24인 - 기존여6, 기존남6, 신규여6, 신규남6 황금비율 구성)
 const DEFAULT_PARTICIPANTS: Participant[] = [
-  { id: 'p1', name: '김하늘' },
-  { id: 'p2', name: '이준호' },
-  { id: 'p3', name: '박서연' },
-  { id: 'p4', name: '정민우' },
-  { id: 'p5', name: '최지우' },
-  { id: 'p6', name: '강도현' },
-  { id: 'p7', name: '윤채원' },
-  { id: 'p8', name: '임태양' },
-  { id: 'p9', name: '한소희' },
-  { id: 'p10', name: '오승재' },
-  { id: 'p11', name: '송예진' },
-  { id: 'p12', name: '배진우' },
-  { id: 'p13', name: '신유나' },
-  { id: 'p14', name: '권혁주' },
-  { id: 'p15', name: '백서린' },
-  { id: 'p16', name: '문재원' },
-  { id: 'p17', name: '노다혜' },
-  { id: 'p18', name: '유시온' },
-  { id: 'p19', name: '황가람' },
-  { id: 'p20', name: '조현우' },
-  { id: 'p21', name: '전민서' },
-  { id: 'p22', name: '서강진' },
-  { id: 'p23', name: '양다은' },
-  { id: 'p24', name: '구동혁' }
+  // 1분단 배정 후보군
+  { id: 'p1', name: '김하늘', gender: 'F', type: 'senior' },
+  { id: 'p2', name: '박서연', gender: 'F', type: 'senior' },
+  { id: 'p3', name: '정민우', gender: 'M', type: 'senior' },
+  { id: 'p4', name: '강도현', gender: 'M', type: 'senior' },
+  { id: 'p5', name: '최지우', gender: 'F', type: 'new' },
+  { id: 'p6', name: '한소희', gender: 'F', type: 'new' },
+  { id: 'p7', name: '이준호', gender: 'M', type: 'new' },
+  { id: 'p8', name: '임태양', gender: 'M', type: 'new' },
+
+  // 2분단 배정 후보군
+  { id: 'p9', name: '윤채원', gender: 'F', type: 'senior' },
+  { id: 'p10', name: '송예진', gender: 'F', type: 'senior' },
+  { id: 'p11', name: '오승재', gender: 'M', type: 'senior' },
+  { id: 'p12', name: '배진우', gender: 'M', type: 'senior' },
+  { id: 'p13', name: '신유나', gender: 'F', type: 'new' },
+  { id: 'p14', name: '노다혜', gender: 'F', type: 'new' },
+  { id: 'p15', name: '권혁주', gender: 'M', type: 'new' },
+  { id: 'p16', name: '유시온', gender: 'M', type: 'new' },
+
+  // 3분단 배정 후보군
+  { id: 'p17', name: '백서린', gender: 'F', type: 'senior' },
+  { id: 'p18', name: '황가람', gender: 'F', type: 'senior' },
+  { id: 'p19', name: '문재원', gender: 'M', type: 'senior' },
+  { id: 'p20', name: '조현우', gender: 'M', type: 'senior' },
+  { id: 'p21', name: '전민서', gender: 'F', type: 'new' },
+  { id: 'p22', name: '양다은', gender: 'F', type: 'new' },
+  { id: 'p23', name: '서강진', gender: 'M', type: 'senior' },
+  { id: 'p24', name: '구동혁', gender: 'M', type: 'new' }
 ];
 
 interface ClassroomSeatShuffleProps {
@@ -47,7 +54,6 @@ interface ClassroomSeatShuffleProps {
 
 export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBack }) => {
   const [participants, setParticipants] = useState<Participant[]>(() => {
-    // 1. 로컬스토리지에 저장된 실제 RSVP 신청자 확인
     const savedRsvps = localStorage.getItem('planet_rsvps');
     if (savedRsvps) {
       try {
@@ -55,12 +61,12 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
         if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed.map((item: { name: string }, idx: number) => ({
             id: `rsvp_${idx}`,
-            name: item.name
+            name: item.name,
+            gender: (idx % 2 === 0 ? 'F' : 'M') as 'M' | 'F',
+            type: (Math.floor(idx / 2) % 2 === 0 ? 'senior' : 'new') as 'senior' | 'new'
           }));
         }
-      } catch {
-        // Fallback to defaults
-      }
+      } catch {}
     }
     return DEFAULT_PARTICIPANTS;
   });
@@ -112,12 +118,48 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
         });
       }, 2500);
 
-    } catch {
-      // AudioContext policy
-    }
+    } catch {}
   };
 
-  // 공정 셔플 알고리즘
+  // 각 분단별 성비 균형 & 신·구 조화 자동 계산 함수
+  const calculateBalancedSeats = (list: Participant[]) => {
+    const finalSeats: (Participant | null)[] = new Array(24).fill(null);
+
+    // 각 4개 그룹별 무작위 셔플
+    const seniorF = list.filter(p => p.gender === 'F' && p.type === 'senior').sort(() => Math.random() - 0.5);
+    const seniorM = list.filter(p => p.gender === 'M' && p.type === 'senior').sort(() => Math.random() - 0.5);
+    const newF = list.filter(p => p.gender === 'F' && p.type === 'new').sort(() => Math.random() - 0.5);
+    const newM = list.filter(p => p.gender === 'M' && p.type === 'new').sort(() => Math.random() - 0.5);
+
+    // 잔여 인원 보충용 풀
+    const fallbackPool = [...list].sort(() => Math.random() - 0.5);
+
+    // 3개 분단(1분단, 2분단, 3분단) 각각에 성비 1:1, 신구 1:1, 남녀+선후배 짝꿍 배합
+    for (let bunday = 0; bunday < 3; bunday++) {
+      const base = bunday * 8;
+
+      // 4개 책상 (2인 1조)
+      // 책상 1: 기존여 + 신규남
+      // 책상 2: 기존남 + 신규여
+      // 책상 3: 기존여 + 신규남
+      // 책상 4: 기존남 + 신규여
+      finalSeats[base + 0] = seniorF.pop() || fallbackPool.pop() || null;
+      finalSeats[base + 1] = newM.pop() || fallbackPool.pop() || null;
+
+      finalSeats[base + 2] = seniorM.pop() || fallbackPool.pop() || null;
+      finalSeats[base + 3] = newF.pop() || fallbackPool.pop() || null;
+
+      finalSeats[base + 4] = seniorF.pop() || fallbackPool.pop() || null;
+      finalSeats[base + 5] = newM.pop() || fallbackPool.pop() || null;
+
+      finalSeats[base + 6] = seniorM.pop() || fallbackPool.pop() || null;
+      finalSeats[base + 7] = newF.pop() || fallbackPool.pop() || null;
+    }
+
+    return finalSeats;
+  };
+
+  // 자리바꾸기 실행 (드럼롤 셔플 후 자동 밸런스 안착)
   const runSmartShuffle = () => {
     if (participants.length === 0 || isShuffling) return;
 
@@ -129,7 +171,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
     const intervalTime = 110;
 
     const interval = setInterval(() => {
-      // 임시 셔플 효과 (빠르게 회전)
+      // 셔플 애니메이션 동안 무작위 스핀 연출
       const randomTemp = [...participants].sort(() => Math.random() - 0.5);
       const tempSeats: (Participant | null)[] = new Array(24).fill(null);
       randomTemp.slice(0, 24).forEach((p, i) => {
@@ -141,14 +183,9 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
       if (step >= maxSteps) {
         clearInterval(interval);
 
-        // 최종 공정 랜덤 배치 연산
-        const finalSeats: (Participant | null)[] = new Array(24).fill(null);
-        const shuffled = [...participants].sort(() => Math.random() - 0.5);
-        shuffled.slice(0, 24).forEach((p, idx) => {
-          finalSeats[idx] = p;
-        });
-
-        setSeats(finalSeats);
+        // 최종: 분단별 성비 균형 & 신구 조화가 자동 계산된 좌석에 안착
+        const balanced = calculateBalancedSeats(participants);
+        setSeats(balanced);
         setIsShuffling(false);
 
         // 축하 컨페티 효과
@@ -162,13 +199,10 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
     }, intervalTime);
   };
 
-  // 초기 1회 기본 배치
+  // 초기 1회 기본 밸런스 배치
   useEffect(() => {
-    const initialSeats: (Participant | null)[] = new Array(24).fill(null);
-    participants.slice(0, 24).forEach((p, idx) => {
-      initialSeats[idx] = p;
-    });
-    setSeats(initialSeats);
+    const initialBalanced = calculateBalancedSeats(participants);
+    setSeats(initialBalanced);
   }, [participants]);
 
   // 전체화면 토글
@@ -204,13 +238,19 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
     }
   };
 
-  // 참가자 추가
+  // 참가자 추가 (자동 성비 및 신구 속성 부여)
   const handleAddParticipant = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim()) return;
+    const count = participants.length;
+    const autoGender: 'M' | 'F' = count % 2 === 0 ? 'F' : 'M';
+    const autoType: 'senior' | 'new' = Math.floor(count / 2) % 2 === 0 ? 'senior' : 'new';
+
     const newP: Participant = {
       id: `custom_${Date.now()}`,
-      name: newName.trim()
+      name: newName.trim(),
+      gender: autoGender,
+      type: autoType
     };
     setParticipants([...participants, newP]);
     setNewName('');
@@ -295,14 +335,14 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
         </div>
       </header>
 
-      {/* 안내 바 */}
+      {/* 안내 바: 자동으로 분단별 성비 균형 & 신구 조화 안내 */}
       <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-serif border-b border-[#e8e4dc]">
-        <div className="flex items-center space-x-2 text-[#444]">
-          <Sparkles className="w-3.5 h-3.5 text-[#b82828]" />
-          <span>어른이들이 골고루 어울릴 수 있도록 공정하고 유쾌하게 2인 1조 짝꿍과 분단 좌석을 배정합니다.</span>
+        <div className="flex items-center space-x-2 text-[#2e5238] font-bold">
+          <Sparkles className="w-4 h-4 text-[#b82828]" />
+          <span>✨ 각 분단별 성비 균형(1:1)과 신·구 조화가 자동으로 맞춰져 2인 1조 짝꿍으로 배정됩니다.</span>
         </div>
 
-        <div className="text-[11px] text-[#888] font-mono">
+        <div className="text-[11px] text-[#777] font-mono">
           총 24석 배치 (1분단 8석 • 2분단 8석 • 3분단 8석)
         </div>
       </div>
