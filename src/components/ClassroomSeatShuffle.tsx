@@ -286,7 +286,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
               <img src={planetLogo} alt="플래닛" className="w-8 h-8 object-contain rounded bg-white border border-[#e5e0d8] p-0.5 shadow-sm" />
               <div>
                 <h1 className="text-sm font-serif font-bold text-[#1f1b18] flex items-center space-x-1.5">
-                  <span>추억의 교실 자리바꾸기</span>
+                  <span>자리 배치</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#b82828] text-white">현장용</span>
                 </h1>
                 <p className="text-[10px] text-[#666] font-serif">2026 플래닛 독서학교 1·2·3분단 짝꿍 좌석 배정</p>
@@ -330,7 +330,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
               className="px-4 py-2 rounded-lg bg-[#b82828] hover:bg-[#961e1e] text-white font-serif font-bold text-xs sm:text-sm flex items-center space-x-1.5 shadow-md transition-all disabled:opacity-50 active:scale-95"
             >
               <Shuffle className={`w-4 h-4 ${isShuffling ? 'animate-spin' : ''}`} />
-              <span>{isShuffling ? '자리 섞는 중...' : '자리바꾸기 시작!'}</span>
+              <span>{isShuffling ? '자리 섞는 중...' : '자리 배치 시작!'}</span>
             </button>
 
           </div>

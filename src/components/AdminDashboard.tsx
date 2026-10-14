@@ -248,7 +248,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onGoToSe
               className="px-3 py-1.5 rounded text-xs font-serif border border-[#1f1b18] bg-[#1f1b18] text-white hover:bg-[#333] flex items-center space-x-1 shadow-sm transition-all"
             >
               <Users className="w-3.5 h-3.5" />
-              <span>자리바꾸기 프로그램 이동</span>
+              <span>자리 배치 프로그램 이동</span>
             </button>
 
             <button

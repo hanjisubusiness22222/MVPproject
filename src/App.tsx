@@ -59,10 +59,10 @@ export const App: React.FC = () => {
         <button
           onClick={() => changeView('seat')}
           className={`px-2.5 py-1 rounded-full transition-all flex items-center space-x-1 ${viewMode === 'seat' ? 'bg-[#2e5238] text-white font-bold shadow-sm' : 'hover:bg-white/10 text-[#ccc]'}`}
-          title="추억의 교실 자리바꾸기"
+          title="자리 배치"
         >
-          <Users className="w-3 h-3" />
-          <span>자리바꾸기</span>
+          <Users className="w-3.5 h-3.5" />
+          <span>자리 배치</span>
         </button>
         <button
           onClick={() => changeView('admin')}
