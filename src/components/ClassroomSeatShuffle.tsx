@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  ArrowLeft, Shuffle, Users, Sparkles, Maximize2, Minimize2, 
+  ArrowLeft, Shuffle, Users, Maximize2, Minimize2, 
   Download, Plus, Trash2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -338,16 +338,9 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
         </div>
       </header>
 
-      {/* 안내 바: 자동으로 분단별 성비 균형 & 신구 조화 안내 */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs font-serif border-b border-[#e8e4dc]">
-        <div className="flex items-center space-x-1.5 text-[#2e5238] font-bold">
-          <Sparkles className="w-3.5 h-3.5 text-[#b82828] flex-shrink-0" />
-          <span>각 분단별 성비(1:1)와 신·구 조화가 보장되며, 짝꿍은 랜덤 매칭됩니다.</span>
-        </div>
-
-        <div className="text-[10px] sm:text-[11px] text-[#777] font-mono">
-          총 24석 (1·2·3분단 각 8석)
-        </div>
+      {/* 상단 좌석 현황 바 */}
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-end text-[10px] sm:text-[11px] text-[#777] font-mono border-b border-[#e8e4dc]">
+        <div>총 24석 (1·2·3분단 각 8석)</div>
       </div>
 
       {/* 메인 교실 배치도 영역 (캡처 대상) */}
