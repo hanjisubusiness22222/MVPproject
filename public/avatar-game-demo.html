@@ -228,47 +228,34 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- [우측 5컬럼] 실시간 발급 카드 (학생증/도서대출증) & 폼      -->
+      <!-- [우측 5컬럼] 실시간 공식 학생증(STUDENT PASS) & 폼          -->
       <!-- ======================================================== -->
       <section class="lg:col-span-5 space-y-4">
 
-        <!-- 카드 탭 스위처: [학생증 모드] vs [도서대출카드 모드] -->
-        <div class="flex items-center bg-[#e8e4dc] p-1 rounded-xl border border-[#1f1b18]/30 font-hand text-lg font-bold">
-          <button 
-            id="tab-mode-student"
-            class="flex-1 py-1.5 rounded-lg bg-white text-[#1f1b18] shadow-sm transition-all text-center"
-          >
-            🪪 학생증 모드
-          </button>
-          <button 
-            id="tab-mode-library"
-            class="flex-1 py-1.5 rounded-lg text-[#666] hover:text-[#111] transition-all text-center"
-          >
-            📖 도서대출카드 모드
-          </button>
-        </div>
-
         <!-- 캡처 대상: 실시간 발급 카드 영역 -->
-        <div id="card-capture-area" class="bg-white border-2 border-[#1f1b18] rounded-xl p-4 sm:p-5 shadow-2xl space-y-3 relative overflow-hidden">
+        <div id="card-capture-area" class="bg-[#FFFDF9] border-2 border-[#1f1b18] rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4 relative overflow-hidden"
+             style="box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);">
           
-          <!-- 카드 헤더 바 -->
-          <div class="border-b-2 border-[#1f1b18] pb-2 flex items-center justify-between">
-            <div class="flex items-center space-x-1.5">
-              <span class="w-3 h-3 rounded-full bg-[#b82828]"></span>
-              <span class="font-mono text-[9px] tracking-widest text-[#777]">PLANET 2026-1</span>
+          <!-- 상단 헤더: PLANET READING SCHOOL ★ 2026 STUDENT PASS -->
+          <div class="bg-[#1f1b18] text-[#F4F1EA] py-2 px-3 rounded-lg flex items-center justify-between tracking-wide shadow-sm">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#b82828] inline-block animate-pulse"></span>
+              <span class="font-serif-kr font-black text-xs sm:text-sm tracking-wider">
+                PLANET READING SCHOOL
+              </span>
             </div>
-            <div id="card-badge-title" class="font-serif-kr text-[11px] sm:text-xs font-bold text-[#1f1b18]">
-              2026 플래닛의 새학기 공식 학생증
+            <div class="font-mono font-bold text-xs text-[#EAB308] flex items-center space-x-1">
+              <span>★</span>
+              <span class="text-[#F4F1EA]">2026 STUDENT PASS</span>
             </div>
           </div>
 
-          <!-- 카드 본문: [5겹 고화질 합체 증명사진] + [인적사항 란] -->
-          <div class="grid grid-cols-12 gap-3 items-center">
+          <!-- 카드 본문: [공책 볼펜 스톱 게임 아바타] + [인적사항 란] -->
+          <div class="grid grid-cols-12 gap-3.5 items-center">
             
             <!-- 증명사진 란: 5겹 SVG 합체 캔버스 (몸통 -> 얼굴형 -> 눈 -> 입 -> 헤어스타일 순서로 완벽 레이어링) -->
             <div class="col-span-5">
-              <div class="aspect-[3/4] w-full grid-notebook border-2 border-[#1f1b18] rounded-lg relative overflow-hidden flex items-center justify-center shadow-inner">
-                
+              <div class="aspect-[3/4] w-full grid-notebook border-2 border-[#1f1b18] rounded-xl relative overflow-hidden flex items-center justify-center shadow-md">
                 <!-- 레이어 0: 몸통 & 의상 (가장 아래) -->
                 <svg id="canvas-body" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
                 <!-- 레이어 1: 얼굴형 & 피부톤 & 볼터치 -->
@@ -279,73 +266,89 @@
                 <svg id="canvas-mouth" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
                 <!-- 레이어 4: 헤어스타일 (가장 위) -->
                 <svg id="canvas-hair" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
-
               </div>
-              <div class="text-center mt-1 font-hand text-[12px] text-[#777]">증명사진 (고화질 아바타)</div>
             </div>
 
             <!-- 우측 인적사항 란 -->
-            <div class="col-span-7 space-y-1.5 font-serif-kr text-xs text-[#2c2621]">
+            <div class="col-span-7 space-y-2 font-serif-kr text-[#1f1b18]">
               
-              <!-- 학생증 모드 뷰 -->
-              <div id="view-student-info" class="space-y-1">
-                <div>
-                  <span class="text-[10px] text-[#777] font-sans">성명:</span>
-                  <div id="card-name" class="font-bold text-sm sm:text-base text-[#111]">김플래닛</div>
+              <div class="space-y-1.5 border-l-2 border-[#1f1b18]/20 pl-3">
+                <div class="flex items-baseline text-xs sm:text-sm">
+                  <span class="font-bold text-[#666] w-14 shrink-0 tracking-wider">성 명 :</span>
+                  <span id="card-name" class="font-extrabold text-base sm:text-lg text-[#111]">김플래닛</span>
                 </div>
-                <div class="grid grid-cols-2 gap-1 text-[11px]">
-                  <div>
-                    <span class="text-[10px] text-[#777] font-sans">소속반:</span>
-                    <div id="card-group" class="font-bold text-[#2e5238]">윈터블반</div>
-                  </div>
-                  <div>
-                    <span class="text-[10px] text-[#777] font-sans">학년:</span>
-                    <div id="card-grade" class="font-bold text-[#b82828]">2학년 (기존)</div>
-                  </div>
+                <div class="flex items-baseline text-xs sm:text-sm">
+                  <span class="font-bold text-[#666] w-14 shrink-0 tracking-wider">소 속 :</span>
+                  <span id="card-group" class="font-bold text-sm sm:text-base text-[#2e5238]">윈터블반</span>
                 </div>
-                <div>
-                  <span class="text-[10px] text-[#777] font-sans">기증 도서 힌트:</span>
-                  <div id="card-book" class="text-[10px] text-[#444] line-clamp-1 italic">인생 소설 1권 준비 중</div>
+                <div class="flex items-baseline text-xs sm:text-sm">
+                  <span class="font-bold text-[#666] w-14 shrink-0 tracking-wider">학 년 :</span>
+                  <span id="card-grade" class="font-bold text-xs sm:text-sm text-[#b82828]">2학년 (기존)</span>
                 </div>
-                <div class="pt-0.5">
-                  <span class="text-[10px] text-[#777] font-sans">등교 일자:</span>
-                  <div class="font-mono text-[10px] text-[#333]">2026. 12. 19. (토) 10:00</div>
-                </div>
-              </div>
-
-              <!-- 도서대출카드 모드 뷰 (도서관 레트로 표) -->
-              <div id="view-library-info" class="hidden space-y-1 font-mono text-[10px]">
-                <div class="border border-[#1f1b18] text-center p-1 bg-[#fdfbf7] rounded">
-                  <div class="font-bold text-[11px] font-serif-kr text-[#1f1b18]">독서학교 도서대출증</div>
-                  <div class="text-[9px] text-[#888]">NO. 2026-PLANET-BOOK</div>
-                </div>
-                <div class="border border-[#1f1b18] text-[9px] text-center">
-                  <div class="grid grid-cols-2 bg-[#eae5d8] font-bold border-b border-[#1f1b18] p-0.5">
-                    <span>대출일자</span>
-                    <span>반납예정</span>
-                  </div>
-                  <div class="grid grid-cols-2 p-0.5 text-red-600 font-bold">
-                    <span>2026.12.19</span>
-                    <span>평생 반납금지</span>
-                  </div>
+                <div class="flex items-baseline text-xs sm:text-sm">
+                  <span class="font-bold text-[#666] w-14 shrink-0 tracking-wider">학 번 :</span>
+                  <span id="card-student-number" class="font-mono font-bold text-xs sm:text-sm text-[#111]">2026-PLANET-2084</span>
                 </div>
               </div>
 
               <!-- 아바타 조합 코드 -->
-              <div class="pt-1 border-t border-dashed border-[#ddd]">
-                <span class="text-[9px] text-[#888] font-mono">AVATAR_CODE:</span>
-                <div id="card-avatar-code" class="font-mono font-bold text-[10px] text-[#2563EB]">F1-H1-E1-M1-B1</div>
+              <div class="pl-3 pt-1 text-[10px] font-mono text-[#888]">
+                CODE: <span id="card-avatar-code" class="text-[#2563EB] font-bold">F1-H1-E1-M1-B1</span>
               </div>
 
             </div>
 
           </div>
 
-          <!-- 카드 하단 결재 직인 스탬프 -->
-          <div class="pt-2 border-t border-[#1f1b18]/20 flex items-center justify-between">
-            <div class="font-mono text-[9px] text-[#888]">PLANET READING SCHOOL ★</div>
-            <div class="seal-stamp text-[10px] px-2 py-0.5 rounded">
-              플래닛독서학교장
+          <!-- 카드 하단: [도장: 플래닛 독서학교장 직인 🔴] + 바코드 그래픽 -->
+          <div class="pt-3 border-t-2 border-[#1f1b18]/20 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+            <!-- 붉은색 레트로 직인 도장 -->
+            <div class="border-2 border-[#b82828] bg-red-50/70 text-[#b82828] text-xs px-2.5 py-1 rounded font-serif-kr font-black tracking-wider flex items-center space-x-1.5 rotate-[-2deg] shadow-xs">
+              <span>도장: 플래닛 독서학교장 직인</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#b82828] inline-block"></span>
+            </div>
+
+            <!-- 바코드 그래픽 -->
+            <div class="flex flex-col items-center sm:items-end">
+              <svg class="h-6 w-44" viewBox="0 0 160 24" fill="#1f1b18">
+                <rect x="0" y="0" width="3" height="24" />
+                <rect x="5" y="0" width="1" height="24" />
+                <rect x="8" y="0" width="2" height="24" />
+                <rect x="13" y="0" width="4" height="24" />
+                <rect x="19" y="0" width="1" height="24" />
+                <rect x="22" y="0" width="3" height="24" />
+                <rect x="27" y="0" width="2" height="24" />
+                <rect x="32" y="0" width="1" height="24" />
+                <rect x="35" y="0" width="4" height="24" />
+                <rect x="42" y="0" width="2" height="24" />
+                <rect x="46" y="0" width="1" height="24" />
+                <rect x="50" y="0" width="3" height="24" />
+                <rect x="55" y="0" width="2" height="24" />
+                <rect x="60" y="0" width="4" height="24" />
+                <rect x="66" y="0" width="1" height="24" />
+                <rect x="70" y="0" width="2" height="24" />
+                <rect x="74" y="0" width="3" height="24" />
+                <rect x="80" y="0" width="1" height="24" />
+                <rect x="83" y="0" width="4" height="24" />
+                <rect x="90" y="0" width="2" height="24" />
+                <rect x="94" y="0" width="3" height="24" />
+                <rect x="99" y="0" width="1" height="24" />
+                <rect x="103" y="0" width="4" height="24" />
+                <rect x="110" y="0" width="2" height="24" />
+                <rect x="114" y="0" width="1" height="24" />
+                <rect x="118" y="0" width="3" height="24" />
+                <rect x="124" y="0" width="2" height="24" />
+                <rect x="128" y="0" width="4" height="24" />
+                <rect x="135" y="0" width="1" height="24" />
+                <rect x="138" y="0" width="3" height="24" />
+                <rect x="144" y="0" width="2" height="24" />
+                <rect x="148" y="0" width="1" height="24" />
+                <rect x="152" y="0" width="3" height="24" />
+                <rect x="157" y="0" width="3" height="24" />
+              </svg>
+              <span id="card-barcode-text" class="font-mono text-[9px] tracking-widest text-[#555] mt-0.5">
+                *2026-PLANET-2084*
+              </span>
             </div>
           </div>
 
@@ -360,12 +363,12 @@
           <span>📸 내 학생증 이미지 저장하기 (PNG)</span>
         </button>
 
-        <!-- 인적사항 3대 항목 실시간 입력 폼 -->
+        <!-- 인적사항 실시간 입력 폼 -->
         <form id="rsvp-form" class="bg-white border-2 border-[#1f1b18] rounded-xl p-4 shadow-md space-y-3 font-serif-kr">
           
           <div class="border-b border-[#1f1b18]/20 pb-1.5">
             <h4 class="font-bold text-xs sm:text-sm text-[#1f1b18] flex items-center space-x-1">
-              <span>✍️ 학생증 인적사항 3대 항목</span>
+              <span>✍️ 학생증 인적사항</span>
             </h4>
             <p class="text-[10px] text-[#777] font-sans mt-0.5">입력하신 정보가 위의 학생증에 실시간 반영됩니다.</p>
           </div>
@@ -443,17 +446,24 @@
             </div>
           </div>
 
-          <!-- 선물할 도서 힌트 -->
+          <!-- 4. 학번 -->
           <div>
-            <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
-              선물할 도서 제목 또는 힌트 <span class="text-[#888] font-normal">(선택)</span>
-            </label>
+            <div class="flex items-center justify-between mb-0.5">
+              <label class="text-[11px] font-bold text-[#1f1b18]">4. 학번 (학생증 고유번호)</label>
+              <button
+                id="btn-random-student-number"
+                type="button"
+                class="text-[10px] text-[#2563EB] hover:underline"
+              >
+                🎲 랜덤 생성
+              </button>
+            </div>
             <input 
-              id="input-book"
+              id="input-student-number"
               type="text" 
-              value="삶의 쉼표가 되어준 소설 1권"
-              placeholder="예: 삶의 쉼표가 되어준 소설 1권"
-              class="w-full text-xs p-2 border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
+              value="2026-PLANET-2084"
+              placeholder="2026-PLANET-2084"
+              class="w-full text-xs p-2 border border-[#ccc] rounded font-mono focus:border-[#b82828] focus:outline-none"
             />
           </div>
 
@@ -946,18 +956,30 @@
 
     // 폼 동기화
     const inputName = document.getElementById('input-name');
-    const inputBook = document.getElementById('input-book');
+    const inputStudentNumber = document.getElementById('input-student-number');
+    const btnRandomStudentNumber = document.getElementById('btn-random-student-number');
     const cardName = document.getElementById('card-name');
-    const cardBook = document.getElementById('card-book');
     const cardGroup = document.getElementById('card-group');
     const cardGrade = document.getElementById('card-grade');
+    const cardStudentNumber = document.getElementById('card-student-number');
+    const cardBarcodeText = document.getElementById('card-barcode-text');
 
     inputName.addEventListener('input', (e) => {
       cardName.textContent = e.target.value.trim() || '김플래닛';
     });
 
-    inputBook.addEventListener('input', (e) => {
-      cardBook.textContent = e.target.value.trim() || '선물할 책 준비 중';
+    inputStudentNumber.addEventListener('input', (e) => {
+      const val = e.target.value.trim() || '2026-PLANET-2084';
+      cardStudentNumber.textContent = val;
+      cardBarcodeText.textContent = `*${val}*`;
+    });
+
+    btnRandomStudentNumber.addEventListener('click', () => {
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      const val = `2026-PLANET-${rand}`;
+      inputStudentNumber.value = val;
+      cardStudentNumber.textContent = val;
+      cardBarcodeText.textContent = `*${val}*`;
     });
 
     document.querySelectorAll('input[name="seasonGroup"]').forEach(radio => {
@@ -971,35 +993,6 @@
         const sub = e.target.value === '1학년' ? ' (신규)' : e.target.value === '2학년' ? ' (기존)' : e.target.value === '3학년' ? ' (진행)' : ' (준비)';
         cardGrade.textContent = e.target.value + sub;
       });
-    });
-
-    // 탭 전환
-    const tabStudent = document.getElementById('tab-mode-student');
-    const tabLibrary = document.getElementById('tab-mode-library');
-    const viewStudent = document.getElementById('view-student-info');
-    const viewLibrary = document.getElementById('view-library-info');
-    const cardBadgeTitle = document.getElementById('card-badge-title');
-
-    tabStudent.addEventListener('click', () => {
-      tabStudent.classList.add('bg-white', 'text-[#1f1b18]', 'shadow-sm');
-      tabStudent.classList.remove('text-[#666]');
-      tabLibrary.classList.remove('bg-white', 'text-[#1f1b18]', 'shadow-sm');
-      tabLibrary.classList.add('text-[#666]');
-
-      viewStudent.classList.remove('hidden');
-      viewLibrary.classList.add('hidden');
-      cardBadgeTitle.textContent = '2026 플래닛의 새학기 공식 학생증';
-    });
-
-    tabLibrary.addEventListener('click', () => {
-      tabLibrary.classList.add('bg-white', 'text-[#1f1b18]', 'shadow-sm');
-      tabLibrary.classList.remove('text-[#666]');
-      tabStudent.classList.remove('bg-white', 'text-[#1f1b18]', 'shadow-sm');
-      tabStudent.classList.add('text-[#666]');
-
-      viewLibrary.classList.remove('hidden');
-      viewStudent.classList.add('hidden');
-      cardBadgeTitle.textContent = '플래닛 도서관 공식 도서대출증';
     });
 
     // 이미지 다운로드

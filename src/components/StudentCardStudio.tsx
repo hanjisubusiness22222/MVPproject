@@ -353,15 +353,28 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
   const [selectedResults, setSelectedResults] = useState<(number | null)[]>([0, 0, 0, 0, 0]); // 기본 1번 세트 세팅
   const [isPlaying, setIsPlaying] = useState(true);
 
-  // 카드 탭: 'student' (학생증) | 'library' (도서대출카드)
-  const [cardMode, setCardMode] = useState<'student' | 'library'>('student');
-
-  // 학생증 인적사항 3대 항목 + 세션
+  // 학생증 인적사항 4대 항목
   const [name, setName] = useState('김플래닛');
   const [seasonGroup, setSeasonGroup] = useState<'스프링토' | '미들썸머' | '어텀' | '윈터블'>('윈터블');
   const [grade, setGrade] = useState<'1학년' | '2학년' | '3학년' | '4학년'>('2학년');
-  const [sessionType, setSessionType] = useState('1부+2부 전체 참석');
-  const [bookHint, setBookHint] = useState('삶의 쉼표가 되어준 소설 1권');
+  const [studentNumber, setStudentNumber] = useState('2026-PLANET-2084');
+
+  // 학년 표시 포맷터 (1학년: 신규 / 2학년: 기존 / 3학년: 진행 / 4학년: 준비)
+  const getGradeDisplay = (g: string) => {
+    switch (g) {
+      case '1학년': return '1학년 (신규)';
+      case '2학년': return '2학년 (기존)';
+      case '3학년': return '3학년 (진행)';
+      case '4학년': return '4학년 (준비)';
+      default: return g;
+    }
+  };
+
+  // 학번 랜덤 생성
+  const handleRandomStudentNumber = () => {
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    setStudentNumber(`2026-PLANET-${randomDigits}`);
+  };
 
   // 이미지 다운로드
   const cardRef = useRef<HTMLDivElement>(null);
@@ -513,8 +526,14 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
     const found = registeredList.find(r => r.name === val || r.studentNumber === val);
     if (found) {
       setName(found.name || '');
-      setBookHint(found.bookTitle || found.bookHint || '선물할 책 준비 중');
-      setSessionType(found.session || '1부+2부 전체 참석');
+      if (found.phone) {
+        const cleaned = found.phone.replace(/[^0-9]/g, '');
+        const last4 = cleaned.slice(-4) || '2084';
+        setStudentNumber(`2026-PLANET-${last4}`);
+      } else {
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        setStudentNumber(`2026-PLANET-${rand}`);
+      }
     }
   };
 
@@ -710,55 +729,39 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
           </section>
 
           {/* ======================================================== */}
-          {/* [우측 5컬럼] 실시간 발급 카드 (학생증/대출증) & 정보 편집 */}
+          {/* [우측 5컬럼] 실시간 공식 학생증(STUDENT PASS) & 정보 편집 */}
           {/* ======================================================== */}
           <section className="lg:col-span-5 space-y-4">
             
-            {/* 카드 탭 스위처: [학생증 모드] vs [도서대출카드 모드] */}
-            <div className="flex items-center bg-[#e8e4dc] p-1 rounded-xl border border-[#1f1b18]/30 font-serif text-xs sm:text-sm font-bold">
-              <button 
-                type="button"
-                onClick={() => setCardMode('student')}
-                className={`flex-1 py-1.5 rounded-lg transition-all text-center ${
-                  cardMode === 'student' ? 'bg-white text-[#1f1b18] shadow-sm' : 'text-[#666] hover:text-[#111]'
-                }`}
-              >
-                🪪 학생증 모드
-              </button>
-              <button 
-                type="button"
-                onClick={() => setCardMode('library')}
-                className={`flex-1 py-1.5 rounded-lg transition-all text-center ${
-                  cardMode === 'library' ? 'bg-white text-[#1f1b18] shadow-sm' : 'text-[#666] hover:text-[#111]'
-                }`}
-              >
-                📖 도서대출카드 모드
-              </button>
-            </div>
-
-            {/* 캡처 대상: 실물 발급 카드 */}
+            {/* 캡처 대상: 2026 플래닛 학생증 실물 카드 */}
             <div 
               ref={cardRef}
-              className="bg-white border-2 border-[#1f1b18] rounded-xl p-4 sm:p-5 shadow-2xl space-y-3 relative overflow-hidden"
+              className="bg-[#FFFDF9] border-2 border-[#1f1b18] rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4 relative overflow-hidden"
+              style={{
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)'
+              }}
             >
-              {/* 카드 상단 헤더 */}
-              <div className="border-b-2 border-[#1f1b18] pb-2 flex items-center justify-between">
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#b82828]"></span>
-                  <span className="font-mono text-[9px] tracking-widest text-[#777]">PLANET-2026</span>
+              {/* 상단 헤더: PLANET READING SCHOOL ★ 2026 STUDENT PASS */}
+              <div className="bg-[#1f1b18] text-[#F4F1EA] py-2 px-3 rounded-lg flex items-center justify-between tracking-wide shadow-sm">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#b82828] inline-block animate-pulse"></span>
+                  <span className="font-serif font-black text-xs sm:text-sm tracking-wider">
+                    PLANET READING SCHOOL
+                  </span>
                 </div>
-                <div className="font-serif text-[11px] sm:text-xs font-bold text-[#1f1b18]">
-                  {cardMode === 'student' ? '2026 플래닛의 새학기 공식 학생증' : '플래닛 도서관 공식 도서대출증'}
+                <div className="font-mono font-bold text-xs text-[#EAB308] flex items-center space-x-1">
+                  <span>★</span>
+                  <span className="text-[#F4F1EA]">2026 STUDENT PASS</span>
                 </div>
               </div>
 
-              {/* 카드 본문: [5겹 고화질 합체 증명사진] + [인적사항 3대 항목] */}
-              <div className="grid grid-cols-12 gap-3 items-center">
+              {/* 본문: [공책 볼펜 스톱 게임 아바타] + [인적사항: 성명/소속/학년/학번] */}
+              <div className="grid grid-cols-12 gap-3.5 items-center">
                 
-                {/* 증명사진 란 (5겹 SVG 레이어 스택: 몸통 -> 얼굴형 -> 눈 -> 입 -> 헤어스타일 순서로 완벽 결합) */}
+                {/* 좌측 증명사진 프레임 (5겹 SVG 레이어 스택: 몸통 -> 얼굴형 -> 눈 -> 입 -> 헤어스타일 순서로 완벽 결합) */}
                 <div className="col-span-5">
                   <div 
-                    className="aspect-[3/4] w-full border-2 border-[#1f1b18] rounded-lg relative overflow-hidden flex items-center justify-center shadow-inner"
+                    className="aspect-[3/4] w-full border-2 border-[#1f1b18] rounded-xl relative overflow-hidden flex items-center justify-center shadow-md"
                     style={{
                       backgroundColor: '#FAF8F5',
                       backgroundImage: 'linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px)',
@@ -795,74 +798,86 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                            dangerouslySetInnerHTML={{ __html: HIGH_QUALITY_PARTS.hair.options[selectedResults[1]!].svg }} />
                     )}
                   </div>
-                  <div className="text-center mt-1 font-serif text-[10px] text-[#777]">증명사진 (고화질 아바타)</div>
                 </div>
 
-                {/* 우측 인적사항 란 */}
-                <div className="col-span-7 space-y-1.5 font-serif text-xs text-[#2c2621]">
-                  
-                  {cardMode === 'student' ? (
-                    <div className="space-y-1">
-                      <div>
-                        <span className="text-[10px] text-[#777]">성명:</span>
-                        <div className="font-bold text-sm sm:text-base text-[#111]">{name || '김플래닛'}</div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-1 text-[11px]">
-                        <div>
-                          <span className="text-[10px] text-[#777]">소속반:</span>
-                          <div className="font-bold text-[#2e5238]">{seasonGroup}반</div>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-[#777]">학년:</span>
-                          <div className="font-bold text-[#b82828]">{grade}</div>
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-[#777]">기증 도서 힌트:</span>
-                        <div className="text-[10px] text-[#444] line-clamp-1 italic">{bookHint || '선물할 책 준비 중'}</div>
-                      </div>
-                      <div className="pt-0.5">
-                        <span className="text-[10px] text-[#777]">등교 일자:</span>
-                        <div className="font-mono text-[10px] text-[#333]">2026. 12. 19. (토) 10:00</div>
-                      </div>
+                {/* 우측 인적사항 4대 항목 */}
+                <div className="col-span-7 space-y-2 font-serif text-[#1f1b18]">
+                  <div className="space-y-1.5 border-l-2 border-[#1f1b18]/20 pl-3">
+                    <div className="flex items-baseline text-xs sm:text-sm">
+                      <span className="font-bold text-[#666] w-14 shrink-0 tracking-wider">성 명 :</span>
+                      <span className="font-extrabold text-base sm:text-lg text-[#111]">{name || '김플래닛'}</span>
                     </div>
-                  ) : (
-                    <div className="space-y-1 font-mono text-[10px]">
-                      <div className="border border-[#1f1b18] text-center p-1 bg-[#fdfbf7] rounded">
-                        <div className="font-bold text-[11px] font-serif text-[#1f1b18]">플래닛 도서대출증</div>
-                        <div className="text-[9px] text-[#888]">NO. 2026-PLANET-BOOK</div>
-                      </div>
-                      <div className="border border-[#1f1b18] text-[9px] text-center">
-                        <div className="grid grid-cols-2 bg-[#eae5d8] font-bold border-b border-[#1f1b18] p-0.5">
-                          <span>대출일자</span>
-                          <span>반납예정</span>
-                        </div>
-                        <div className="grid grid-cols-2 p-0.5 text-red-600 font-bold">
-                          <span>2026.12.19</span>
-                          <span>평생 반납금지</span>
-                        </div>
-                      </div>
-                      <div className="text-[9px] text-[#666] pt-0.5">
-                        대출자: <strong className="text-[#111]">{name}</strong> ({seasonGroup}반 {grade})
-                      </div>
+                    <div className="flex items-baseline text-xs sm:text-sm">
+                      <span className="font-bold text-[#666] w-14 shrink-0 tracking-wider">소 속 :</span>
+                      <span className="font-bold text-sm sm:text-base text-[#2e5238]">{seasonGroup}반</span>
                     </div>
-                  )}
-
-                  {/* 아바타 조합 코드 */}
-                  <div className="pt-1 border-t border-dashed border-[#ddd]">
-                    <span className="text-[9px] text-[#888] font-mono">AVATAR_CODE:</span>
-                    <div className="font-mono font-bold text-[10px] text-[#2563EB]">{avatarCode}</div>
+                    <div className="flex items-baseline text-xs sm:text-sm">
+                      <span className="font-bold text-[#666] w-14 shrink-0 tracking-wider">학 년 :</span>
+                      <span className="font-bold text-xs sm:text-sm text-[#b82828]">{getGradeDisplay(grade)}</span>
+                    </div>
+                    <div className="flex items-baseline text-xs sm:text-sm">
+                      <span className="font-bold text-[#666] w-14 shrink-0 tracking-wider">학 번 :</span>
+                      <span className="font-mono font-bold text-xs sm:text-sm text-[#111]">{studentNumber || '2026-PLANET-2084'}</span>
+                    </div>
                   </div>
 
+                  {/* 아바타 조합 코드 (보조 표시) */}
+                  <div className="pl-3 pt-1 text-[10px] font-mono text-[#888]">
+                    CODE: <span className="text-[#2563EB] font-bold">{avatarCode}</span>
+                  </div>
                 </div>
 
               </div>
 
-              {/* 카드 하단 결재 직인 날인 */}
-              <div className="pt-2 border-t border-[#1f1b18]/20 flex items-center justify-between">
-                <div className="font-mono text-[9px] text-[#888]">PLANET READING SCHOOL ★</div>
-                <div className="border-2 border-[#b82828] text-[#b82828] text-[10px] px-2 py-0.5 rounded font-bold rotate-[-8deg] shadow-xs">
-                  플래닛독서학교장
+              {/* 카드 하단: [도장: 플래닛 독서학교장 직인 🔴] + 바코드 그래픽 */}
+              <div className="pt-3 border-t-2 border-[#1f1b18]/20 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                {/* 붉은색 레트로 직인 도장 */}
+                <div className="border-2 border-[#b82828] bg-red-50/70 text-[#b82828] text-xs px-2.5 py-1 rounded font-serif font-black tracking-wider flex items-center space-x-1.5 rotate-[-2deg] shadow-xs">
+                  <span>도장: 플래닛 독서학교장 직인</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#b82828] inline-block"></span>
+                </div>
+
+                {/* 바코드 그래픽 */}
+                <div className="flex flex-col items-center sm:items-end">
+                  <svg className="h-6 w-44" viewBox="0 0 160 24" fill="#1f1b18">
+                    <rect x="0" y="0" width="3" height="24" />
+                    <rect x="5" y="0" width="1" height="24" />
+                    <rect x="8" y="0" width="2" height="24" />
+                    <rect x="13" y="0" width="4" height="24" />
+                    <rect x="19" y="0" width="1" height="24" />
+                    <rect x="22" y="0" width="3" height="24" />
+                    <rect x="27" y="0" width="2" height="24" />
+                    <rect x="32" y="0" width="1" height="24" />
+                    <rect x="35" y="0" width="4" height="24" />
+                    <rect x="42" y="0" width="2" height="24" />
+                    <rect x="46" y="0" width="1" height="24" />
+                    <rect x="50" y="0" width="3" height="24" />
+                    <rect x="55" y="0" width="2" height="24" />
+                    <rect x="60" y="0" width="4" height="24" />
+                    <rect x="66" y="0" width="1" height="24" />
+                    <rect x="70" y="0" width="2" height="24" />
+                    <rect x="74" y="0" width="3" height="24" />
+                    <rect x="80" y="0" width="1" height="24" />
+                    <rect x="83" y="0" width="4" height="24" />
+                    <rect x="90" y="0" width="2" height="24" />
+                    <rect x="94" y="0" width="3" height="24" />
+                    <rect x="99" y="0" width="1" height="24" />
+                    <rect x="103" y="0" width="4" height="24" />
+                    <rect x="110" y="0" width="2" height="24" />
+                    <rect x="114" y="0" width="1" height="24" />
+                    <rect x="118" y="0" width="3" height="24" />
+                    <rect x="124" y="0" width="2" height="24" />
+                    <rect x="128" y="0" width="4" height="24" />
+                    <rect x="135" y="0" width="1" height="24" />
+                    <rect x="138" y="0" width="3" height="24" />
+                    <rect x="144" y="0" width="2" height="24" />
+                    <rect x="148" y="0" width="1" height="24" />
+                    <rect x="152" y="0" width="3" height="24" />
+                    <rect x="157" y="0" width="3" height="24" />
+                  </svg>
+                  <span className="font-mono text-[9px] tracking-widest text-[#555] mt-0.5">
+                    *{studentNumber || '2026-PLANET-2084'}*
+                  </span>
                 </div>
               </div>
 
@@ -883,7 +898,7 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
             <div className="bg-white border-2 border-[#1f1b18] rounded-xl p-4 shadow-sm space-y-3 font-serif">
               <div className="border-b border-[#1f1b18]/20 pb-1.5">
                 <h4 className="font-bold text-xs sm:text-sm text-[#1f1b18]">
-                  ✍️ 학생증 인적사항 3대 항목 실시간 편집
+                  ✍️ 학생증 인적사항 실시간 편집
                 </h4>
                 <p className="text-[10px] text-[#777]">수정 시 위의 학생증 카드에 즉시 반영됩니다.</p>
               </div>
@@ -945,15 +960,25 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                 </div>
               </div>
 
-              {/* 도서 힌트 */}
+              {/* 4. 학번 */}
               <div>
-                <label className="block text-[11px] font-bold text-[#1f1b18] mb-0.5">선물할 도서 제목 / 힌트</label>
+                <div className="flex items-center justify-between mb-0.5">
+                  <label className="text-[11px] font-bold text-[#1f1b18]">4. 학번 (학생증 고유번호)</label>
+                  <button
+                    type="button"
+                    onClick={handleRandomStudentNumber}
+                    className="text-[10px] text-[#2563EB] hover:underline flex items-center space-x-1"
+                  >
+                    <Shuffle className="w-3 h-3" />
+                    <span>랜덤 생성</span>
+                  </button>
+                </div>
                 <input 
                   type="text" 
-                  value={bookHint} 
-                  onChange={e => setBookHint(e.target.value)}
-                  placeholder="예: 삶의 쉼표가 되어준 소설 1권"
-                  className="w-full text-xs p-2 border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
+                  value={studentNumber} 
+                  onChange={e => setStudentNumber(e.target.value)}
+                  placeholder="2026-PLANET-2084"
+                  className="w-full text-xs p-2 border border-[#ccc] rounded font-mono focus:border-[#b82828] focus:outline-none"
                 />
               </div>
 
