@@ -272,7 +272,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
           className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-[#d8d3c7] bg-white hover:bg-[#ede8dc] text-xs font-serif text-[#333] transition-all shadow-sm"
         >
           <ArrowLeft className="w-4 h-4 text-[#b82828]" />
-          <span>가정통신문으로 돌아가기</span>
+          <span>관리자 대시보드로 돌아가기</span>
         </button>
 
         <div className="flex items-center space-x-1.5 sm:space-x-2">

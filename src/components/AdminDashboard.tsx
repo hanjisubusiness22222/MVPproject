@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, ShieldCheck, Download, Search, CheckCircle2, 
   Clock, Users, DollarSign, BookOpen, Lock, Unlock, 
-  RefreshCw, Plus, Trash2, Check, X
+  RefreshCw, Plus, Trash2, Check, X, Receipt
 } from 'lucide-react';
 import { EVENT_CONFIG } from '../constants/eventConfig';
 import planetLogo from '../assets/planet-logo.png';
@@ -324,6 +324,51 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack, onGoToSe
             <div className="text-[10px] text-[#777]">총 예상액: {totalExpectedFee.toLocaleString()}원</div>
           </div>
 
+        </div>
+
+        {/* 관리자 주요 업무 메뉴: 자리배치 & 결산보고서 바로가기 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div 
+            onClick={onGoToSeat}
+            className="cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#1f1b18]/20 hover:border-[#1f1b18] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-lg bg-[#2e5238]/10 text-[#2e5238] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-serif font-bold text-sm text-[#1f1b18] flex items-center space-x-1.5">
+                  <span>추억의 교실 자리배치</span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#2e5238] text-white">현장용</span>
+                </div>
+                <p className="text-[11px] text-[#666] font-serif mt-0.5">
+                  1·2·3분단 좌석 배정 및 빔프로젝터 셔플 모드
+                </p>
+              </div>
+            </div>
+            <span className="text-xs text-[#2e5238] font-serif font-bold group-hover:translate-x-1 transition-transform">바로가기 →</span>
+          </div>
+
+          <div 
+            onClick={onGoToSettlement}
+            className="cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#c29b38]/30 hover:border-[#c29b38] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-lg bg-[#c29b38]/10 text-[#8c6b1b] flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Receipt className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-serif font-bold text-sm text-[#1f1b18] flex items-center space-x-1.5">
+                  <span>학생회비 투명 정산 보고서</span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#c29b38] text-white">결산</span>
+                </div>
+                <p className="text-[11px] text-[#666] font-serif mt-0.5">
+                  회비 수입/실비 지출 내역 및 실물 영수증 증빙 확인
+                </p>
+              </div>
+            </div>
+            <span className="text-xs text-[#8c6b1b] font-serif font-bold group-hover:translate-x-1 transition-transform">바로가기 →</span>
+          </div>
         </div>
 
         {/* 필터 및 검색 바 */}
