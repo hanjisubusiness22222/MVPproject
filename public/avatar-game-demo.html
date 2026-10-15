@@ -35,9 +35,8 @@
     .ruled-notebook {
       background-color: #FAF8F2;
       background-image: 
-        linear-gradient(rgba(219, 39, 119, 0.15) 1px, transparent 1px),
         repeating-linear-gradient(transparent, transparent 27px, rgba(37, 99, 235, 0.12) 28px);
-      background-size: 100% 100%, 100% 28px;
+      background-size: 100% 28px;
     }
 
     /* 모눈종이 배경 */
@@ -49,27 +48,6 @@
       background-size: 14px 14px;
     }
 
-    /* 스프링 바인더 구멍 */
-    .spiral-binder {
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 16px,
-        #2A2622 16px,
-        #2A2622 28px,
-        transparent 28px,
-        transparent 40px
-      );
-    }
-
-    /* 삐뚤빼뚤 손그림 SVG 스타일 */
-    .doodle-path {
-      fill: none;
-      stroke-width: 4;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
     /* 활성 박스 펄스 */
     @keyframes highlighterPulse {
       0%, 100% { transform: scale(1.02); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.6); }
@@ -77,7 +55,7 @@
     }
     .active-slot {
       animation: highlighterPulse 0.15s infinite;
-      background-color: rgba(254, 240, 138, 0.5) !important;
+      background-color: rgba(254, 240, 138, 0.6) !important;
       border-color: #DC2626 !important;
     }
 
@@ -104,7 +82,7 @@
         🎒 2026 플래닛 독서학교 「새학기」 공식 학생증 공작소
       </div>
       <h1 class="text-2xl sm:text-4xl font-bold font-serif-kr text-[#1f1b18] tracking-tight">
-        추억의 공책 게임 <span class="text-[#2563EB] font-hand text-3xl sm:text-5xl">"볼펜 멈춰!"</span> 아바타 뽑기
+        추억의 공책 게임 <span class="text-[#2563EB] font-hand text-3xl sm:text-5xl">"볼펜 멈춰!"</span> 고화질 아바타 뽑기
       </h1>
       <p class="text-xs sm:text-sm text-[#666] font-hand text-lg max-w-xl mx-auto">
         학창시절 쉬는 시간 종합장에 볼펜 굴리며 얼굴 뽑던 그 게임! <br class="hidden sm:inline" />
@@ -121,7 +99,7 @@
       <section class="lg:col-span-7 bg-[#FAF8F2] border-2 border-[#1f1b18] rounded-xl shadow-xl overflow-hidden relative">
         
         <!-- 스프링 철 바인더 장식 -->
-        <div class="absolute left-0 top-0 bottom-0 w-6 sm:w-8 bg-[#e8e4dc] border-r-2 border-[#1f1b18] flex flex-col justify-around py-4 items-center z-10">
+        <div class="absolute left-0 top-0 bottom-0 w-6 sm:w-8 bg-[#e8e4dc] border-r-2 border-[#1f1b18] flex flex-col justify-around py-4 items-center z-10 select-none">
           <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
           <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
           <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
@@ -147,64 +125,79 @@
             </div>
 
             <!-- 현재 카테고리 알림 바 -->
-            <div class="bg-white/90 border border-[#1f1b18]/30 rounded-lg p-2.5 mb-4 shadow-sm flex items-center justify-between">
+            <div class="bg-white/95 border border-[#1f1b18]/30 rounded-lg p-2.5 mb-3 shadow-sm flex items-center justify-between">
               <div>
                 <span class="text-xs text-[#777] font-sans">현재 뽑는 부위:</span>
                 <h3 id="category-title" class="font-hand text-2xl font-bold text-[#2563EB]">
-                  1단계 &lt;얼굴형&gt; (파란 사인펜)
+                  1단계 &lt;얼굴형 & 피부&gt;
                 </h3>
+                <p id="category-sub" class="text-xs text-[#666] font-hand text-base">개성 있는 피부톤과 귀여운 볼터치</p>
               </div>
               <div class="text-[11px] font-sans text-right text-[#555]">
                 <span class="inline-block w-2 h-2 rounded-full bg-red-500 animate-ping mr-1"></span>
-                <span>볼펜 질주 중 (80ms)</span>
+                <span>볼펜 질주 중 (85ms)</span>
               </div>
             </div>
 
-            <!-- 5개 파츠 카드 슬롯 그리드 -->
-            <div class="grid grid-cols-5 gap-1.5 sm:gap-2 mb-4">
+            <!-- 5개 파츠 카드 슬롯 그리드 (고화질 썸네일) -->
+            <div class="grid grid-cols-5 gap-1.5 sm:gap-2 mb-3">
               <!-- Slot 0 -->
-              <div id="slot-0" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
-                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">①번</div>
-                <div id="preview-svg-0" class="w-full aspect-square flex items-center justify-center"></div>
-                <div id="label-0" class="text-[10px] font-hand text-gray-700 truncate mt-1">동글 찐빵</div>
+              <div id="slot-0" onclick="handleDirectSelect(0)" class="slot-card bg-white/95 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative cursor-pointer hover:border-[#1f1b18]">
+                <div class="flex items-center justify-between text-[10px] font-hand font-bold text-[#555] mb-0.5">
+                  <span>①번</span>
+                  <span id="badge-0" class="text-[9px] font-mono px-1 rounded bg-[#eee] text-[#555]">인기</span>
+                </div>
+                <div id="preview-svg-0" class="w-full aspect-square flex items-center justify-center bg-[#FAF8F5] rounded border border-gray-200 overflow-hidden"></div>
+                <div id="label-0" class="text-[11px] font-hand font-bold text-[#1f1b18] truncate mt-1">동글 복숭아</div>
               </div>
               <!-- Slot 1 -->
-              <div id="slot-1" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
-                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">②번</div>
-                <div id="preview-svg-1" class="w-full aspect-square flex items-center justify-center"></div>
-                <div id="label-1" class="text-[10px] font-hand text-gray-700 truncate mt-1">각진 네모</div>
+              <div id="slot-1" onclick="handleDirectSelect(1)" class="slot-card bg-white/95 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative cursor-pointer hover:border-[#1f1b18]">
+                <div class="flex items-center justify-between text-[10px] font-hand font-bold text-[#555] mb-0.5">
+                  <span>②번</span>
+                  <span id="badge-1" class="text-[9px] font-mono px-1 rounded bg-[#eee] text-[#555]">청순</span>
+                </div>
+                <div id="preview-svg-1" class="w-full aspect-square flex items-center justify-center bg-[#FAF8F5] rounded border border-gray-200 overflow-hidden"></div>
+                <div id="label-1" class="text-[11px] font-hand font-bold text-[#1f1b18] truncate mt-1">갸름 계란형</div>
               </div>
               <!-- Slot 2 -->
-              <div id="slot-2" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
-                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">③번</div>
-                <div id="preview-svg-2" class="w-full aspect-square flex items-center justify-center"></div>
-                <div id="label-2" class="text-[10px] font-hand text-gray-700 truncate mt-1">역삼각형</div>
+              <div id="slot-2" onclick="handleDirectSelect(2)" class="slot-card bg-white/95 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative cursor-pointer hover:border-[#1f1b18]">
+                <div class="flex items-center justify-between text-[10px] font-hand font-bold text-[#555] mb-0.5">
+                  <span>③번</span>
+                  <span id="badge-2" class="text-[9px] font-mono px-1 rounded bg-[#eee] text-[#555]">귀염</span>
+                </div>
+                <div id="preview-svg-2" class="w-full aspect-square flex items-center justify-center bg-[#FAF8F5] rounded border border-gray-200 overflow-hidden"></div>
+                <div id="label-2" class="text-[11px] font-hand font-bold text-[#1f1b18] truncate mt-1">통통 찹쌀떡</div>
               </div>
               <!-- Slot 3 -->
-              <div id="slot-3" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
-                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">④번</div>
-                <div id="preview-svg-3" class="w-full aspect-square flex items-center justify-center"></div>
-                <div id="label-3" class="text-[10px] font-hand text-gray-700 truncate mt-1">볼록 땅콩</div>
+              <div id="slot-3" onclick="handleDirectSelect(3)" class="slot-card bg-white/95 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative cursor-pointer hover:border-[#1f1b18]">
+                <div class="flex items-center justify-between text-[10px] font-hand font-bold text-[#555] mb-0.5">
+                  <span>④번</span>
+                  <span id="badge-3" class="text-[9px] font-mono px-1 rounded bg-[#eee] text-[#555]">신뢰</span>
+                </div>
+                <div id="preview-svg-3" class="w-full aspect-square flex items-center justify-center bg-[#FAF8F5] rounded border border-gray-200 overflow-hidden"></div>
+                <div id="label-3" class="text-[11px] font-hand font-bold text-[#1f1b18] truncate mt-1">각진 듬직형</div>
               </div>
               <!-- Slot 4 -->
-              <div id="slot-4" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
-                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">⑤번</div>
-                <div id="preview-svg-4" class="w-full aspect-square flex items-center justify-center"></div>
-                <div id="label-4" class="text-[10px] font-hand text-gray-700 truncate mt-1">식빵 모양</div>
+              <div id="slot-4" onclick="handleDirectSelect(4)" class="slot-card bg-white/95 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative cursor-pointer hover:border-[#1f1b18]">
+                <div class="flex items-center justify-between text-[10px] font-hand font-bold text-[#555] mb-0.5">
+                  <span>⑤번</span>
+                  <span id="badge-4" class="text-[9px] font-mono px-1 rounded bg-[#eee] text-[#555]">발랄</span>
+                </div>
+                <div id="preview-svg-4" class="w-full aspect-square flex items-center justify-center bg-[#FAF8F5] rounded border border-gray-200 overflow-hidden"></div>
+                <div id="label-4" class="text-[11px] font-hand font-bold text-[#1f1b18] truncate mt-1">하트 요정형</div>
               </div>
             </div>
 
-            <!-- 볼펜 지시봉 애니메이션 안내 -->
+            <!-- 볼펜 안내 -->
             <div class="text-center py-1">
               <div class="inline-flex items-center space-x-2 bg-yellow-100/90 px-3 py-1 rounded-full border border-yellow-300 text-xs font-hand text-yellow-900">
-                <span>🖋️ 모나미 볼펜이 눈 깜짝할 새 왔다 갔다 하는 중! 타이밍을 노리세요!</span>
+                <span>🖋️ 모나미 볼펜이 눈 깜짝할 새 왔다 갔다 하는 중! 타이밍을 노리세요! (직접 클릭 선택도 가능)</span>
               </div>
             </div>
           </div>
 
           <!-- 공책 하단 조작 컨트롤러 -->
           <div class="pt-4 border-t-2 border-[#1f1b18]/20 space-y-2.5">
-            <!-- 메인 스톱 버튼 -->
             <button
               id="btn-stop"
               class="w-full py-4 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white font-serif-kr font-black text-xl sm:text-2xl shadow-lg border-2 border-[#7F1D1D] active:scale-95 transition-all flex items-center justify-center space-x-2"
@@ -212,7 +205,6 @@
               <span>✋ 멈춰! (클릭 또는 스페이스바)</span>
             </button>
 
-            <!-- 보조 버튼 그룹 -->
             <div class="flex items-center justify-between gap-2 text-xs font-hand text-base">
               <button 
                 id="btn-quick-random"
@@ -270,30 +262,26 @@
             </div>
           </div>
 
-          <!-- 카드 본문: [증명사진 란] + [인적사항 란] -->
+          <!-- 카드 본문: [5겹 고화질 합체 증명사진] + [인적사항 란] -->
           <div class="grid grid-cols-12 gap-3 items-center">
             
-            <!-- 증명사진 란: 5겹 SVG 합체 캔버스 -->
+            <!-- 증명사진 란: 5겹 SVG 합체 캔버스 (몸통 -> 얼굴형 -> 눈 -> 입 -> 헤어스타일 순서로 완벽 레이어링) -->
             <div class="col-span-5">
               <div class="aspect-[3/4] w-full grid-notebook border-2 border-[#1f1b18] rounded-lg relative overflow-hidden flex items-center justify-center shadow-inner">
                 
-                <!-- 레이어 0: 얼굴형 (파랑) -->
-                <svg id="canvas-face" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#2563EB]"></svg>
-                <!-- 레이어 1: 눈 (초록) -->
-                <svg id="canvas-eyes" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#16A34A]"></svg>
-                <!-- 레이어 2: 코 (주황) -->
-                <svg id="canvas-nose" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#EA580C]"></svg>
-                <!-- 레이어 3: 입 (분홍) -->
-                <svg id="canvas-mouth" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#DB2777]"></svg>
-                <!-- 레이어 4: 몸통 & 소품 (보라) -->
-                <svg id="canvas-body" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#7C3AED]"></svg>
+                <!-- 레이어 0: 몸통 & 의상 (가장 아래) -->
+                <svg id="canvas-body" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
+                <!-- 레이어 1: 얼굴형 & 피부톤 & 볼터치 -->
+                <svg id="canvas-face" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
+                <!-- 레이어 2: 눈 & 눈썹 -->
+                <svg id="canvas-eyes" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
+                <!-- 레이어 3: 코 & 입 -->
+                <svg id="canvas-mouth" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
+                <!-- 레이어 4: 헤어스타일 (가장 위) -->
+                <svg id="canvas-hair" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full"></svg>
 
-                <!-- 아직 안 뽑았을 때 안내 텍스트 -->
-                <div id="empty-photo-guide" class="text-center p-2 font-hand text-xs text-[#888] select-none">
-                  왼쪽 공책에서<br/>볼펜 멈춰를 눌러<br/>얼굴을 뽑아줘!
-                </div>
               </div>
-              <div class="text-center mt-1 font-hand text-[11px] text-[#777]">증명사진 (5겹 사인펜)</div>
+              <div class="text-center mt-1 font-hand text-[12px] text-[#777]">증명사진 (고화질 아바타)</div>
             </div>
 
             <!-- 우측 인적사항 란 -->
@@ -305,9 +293,15 @@
                   <span class="text-[10px] text-[#777] font-sans">성명:</span>
                   <div id="card-name" class="font-bold text-sm sm:text-base text-[#111]">김플래닛</div>
                 </div>
-                <div>
-                  <span class="text-[10px] text-[#777] font-sans">참여 과정:</span>
-                  <div id="card-session" class="font-medium text-[#b82828] text-[11px]">1부(새학기) + 2부(수학여행)</div>
+                <div class="grid grid-cols-2 gap-1 text-[11px]">
+                  <div>
+                    <span class="text-[10px] text-[#777] font-sans">소속반:</span>
+                    <div id="card-group" class="font-bold text-[#2e5238]">윈터블반</div>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-[#777] font-sans">학년:</span>
+                    <div id="card-grade" class="font-bold text-[#b82828]">2학년 (기존)</div>
+                  </div>
                 </div>
                 <div>
                   <span class="text-[10px] text-[#777] font-sans">기증 도서 힌트:</span>
@@ -340,7 +334,7 @@
               <!-- 아바타 조합 코드 -->
               <div class="pt-1 border-t border-dashed border-[#ddd]">
                 <span class="text-[9px] text-[#888] font-mono">AVATAR_CODE:</span>
-                <div id="card-avatar-code" class="font-mono font-bold text-[10px] text-[#2563EB]">F0-E0-N0-M0-B0</div>
+                <div id="card-avatar-code" class="font-mono font-bold text-[10px] text-[#2563EB]">F1-H1-E1-M1-B1</div>
               </div>
 
             </div>
@@ -366,20 +360,20 @@
           <span>📸 내 학생증 이미지 저장하기 (PNG)</span>
         </button>
 
-        <!-- 참가 신청 실시간 연동 폼 -->
+        <!-- 인적사항 3대 항목 실시간 입력 폼 -->
         <form id="rsvp-form" class="bg-white border-2 border-[#1f1b18] rounded-xl p-4 shadow-md space-y-3 font-serif-kr">
           
           <div class="border-b border-[#1f1b18]/20 pb-1.5">
             <h4 class="font-bold text-xs sm:text-sm text-[#1f1b18] flex items-center space-x-1">
-              <span>✍️ 가정통신문 회신서 (참가 신청)</span>
+              <span>✍️ 학생증 인적사항 3대 항목</span>
             </h4>
             <p class="text-[10px] text-[#777] font-sans mt-0.5">입력하신 정보가 위의 학생증에 실시간 반영됩니다.</p>
           </div>
 
-          <!-- 성함 -->
+          <!-- 1. 성함 -->
           <div>
             <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
-              성함 (이름) <span class="text-red-500">*</span>
+              1. 성함 (이름) <span class="text-red-500">*</span>
             </label>
             <input 
               id="input-name"
@@ -391,52 +385,61 @@
             />
           </div>
 
-          <!-- 연락처 -->
-          <div>
-            <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
-              휴대폰 번호 <span class="text-red-500">*</span>
-            </label>
-            <input 
-              id="input-phone"
-              type="tel" 
-              required
-              value="010-1234-5678"
-              placeholder="010-0000-0000"
-              class="w-full text-xs p-2 font-mono border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
-            />
-          </div>
-
-          <!-- 참석 세션 선택 (라디오 카드) -->
+          <!-- 2. 소속반 -->
           <div>
             <label class="block text-[11px] font-bold text-[#1f1b18] mb-1">
-              참석 세션 선택 <span class="text-red-500">*</span>
+              2. 소속반 (계절 모임반) <span class="text-red-500">*</span>
             </label>
-            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
-              
+            <div class="grid grid-cols-4 gap-1.5 text-center text-xs">
               <label class="cursor-pointer">
-                <input type="radio" name="session" value="both" checked class="peer sr-only" />
-                <div class="p-2 border-2 rounded peer-checked:border-[#b82828] peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
-                  <div class="font-bold text-[#111]">1+2부 전체</div>
-                  <div class="text-red-600 font-mono font-bold">80,000원</div>
+                <input type="radio" name="seasonGroup" value="스프링토" class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#2e5238] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">스프링토</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="seasonGroup" value="미들썸머" class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#2e5238] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">미들썸머</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="seasonGroup" value="어텀" class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#2e5238] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">어텀</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="seasonGroup" value="윈터블" checked class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#2e5238] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">윈터블</div>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. 학년 -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1f1b18] mb-1">
+              3. 학년 (플래닛 역할) <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-4 gap-1.5 text-center text-[10px]">
+              <label class="cursor-pointer">
+                <input type="radio" name="grade" value="1학년" class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#b82828] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">
+                  <div>1학년</div><div class="text-[8px] opacity-80">신규</div>
                 </div>
               </label>
-
               <label class="cursor-pointer">
-                <input type="radio" name="session" value="s1" class="peer sr-only" />
-                <div class="p-2 border-2 rounded peer-checked:border-[#b82828] peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
-                  <div class="font-bold text-[#111]">1부만 (새학기)</div>
-                  <div class="text-red-600 font-mono font-bold">45,000원</div>
+                <input type="radio" name="grade" value="2학년" checked class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#b82828] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">
+                  <div>2학년</div><div class="text-[8px] opacity-80">기존</div>
                 </div>
               </label>
-
               <label class="cursor-pointer">
-                <input type="radio" name="session" value="s2" class="peer sr-only" />
-                <div class="p-2 border-2 rounded peer-checked:border-[#b82828] peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
-                  <div class="font-bold text-[#111]">2부만 (수학여행)</div>
-                  <div class="text-red-600 font-mono font-bold">35,000원</div>
+                <input type="radio" name="grade" value="3학년" class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#b82828] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">
+                  <div>3학년</div><div class="text-[8px] opacity-80">진행</div>
                 </div>
               </label>
-
+              <label class="cursor-pointer">
+                <input type="radio" name="grade" value="4학년" class="peer sr-only" />
+                <div class="p-1.5 border rounded peer-checked:bg-[#b82828] peer-checked:text-white peer-checked:font-bold hover:bg-gray-50">
+                  <div>4학년</div><div class="text-[8px] opacity-80">준비</div>
+                </div>
+              </label>
             </div>
           </div>
 
@@ -448,22 +451,10 @@
             <input 
               id="input-book"
               type="text" 
+              value="삶의 쉼표가 되어준 소설 1권"
               placeholder="예: 삶의 쉼표가 되어준 소설 1권"
               class="w-full text-xs p-2 border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
             />
-          </div>
-
-          <!-- 메모 -->
-          <div>
-            <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
-              운영진에게 남기는 메모 / 건의사항 <span class="text-[#888] font-normal">(선택)</span>
-            </label>
-            <textarea 
-              id="input-memo"
-              rows="2"
-              placeholder="못 먹는 음식(알레르기)이나 전하고 싶은 한마디"
-              class="w-full text-xs p-2 border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
-            ></textarea>
           </div>
 
           <!-- 폼 제출 버튼 -->
@@ -471,7 +462,7 @@
             type="submit"
             class="w-full py-3 rounded-lg bg-[#b82828] hover:bg-[#961e1e] text-white font-bold text-sm shadow-md transition-all active:scale-98"
           >
-            📮 플래닛 독서학교 참가 신청서 제출하기
+            📮 플래닛 독서학교 학생증 발급 등록
           </button>
 
         </form>
@@ -483,149 +474,382 @@
   </div>
 
   <!-- ======================================================== -->
-  <!-- 5단계 SVG 파츠 정의 & 로직 스크립트                       -->
+  <!-- 고화질 SVG 파츠 데이터 & 로직 스크립트                       -->
   <!-- ======================================================== -->
   <script>
-    // 5단계 SVG 경로 데이터 (viewBox: 0 0 200 200, 낙서풍)
-    const PARTS_DATA = {
-      // 1단계: 얼굴형 (파란 사인펜 #2563EB, Y: 30~155)
+    const HIGH_QUALITY_PARTS = {
       face: {
-        category: "얼굴형",
-        colorName: "파란 사인펜",
+        category: "얼굴형 & 피부",
+        subTitle: "개성 있는 피부톤과 귀여운 볼터치",
         colorHex: "#2563EB",
         options: [
-          { name: "동글 찐빵", path: "M 100 35 C 145 35 168 65 168 105 C 168 145 145 155 100 155 C 55 155 32 145 32 105 C 32 65 55 35 100 35 Z" },
-          { name: "각진 네모턱", path: "M 50 42 L 150 42 C 160 42 165 55 162 90 L 158 140 C 158 152 148 155 135 155 L 65 155 C 52 155 42 152 42 140 L 38 90 C 35 55 40 42 50 42 Z" },
-          { name: "뾰족 역삼각", path: "M 40 45 C 80 40 120 40 160 45 C 165 75 145 120 100 158 C 55 120 35 75 40 45 Z" },
-          { name: "볼록 땅콩", path: "M 100 35 C 135 35 155 55 150 78 C 145 92 135 96 148 112 C 162 130 148 155 100 155 C 52 155 38 130 52 112 C 65 96 55 92 50 78 C 45 55 65 35 100 35 Z" },
-          { name: "식빵 모양", path: "M 60 40 C 80 32 100 42 100 42 C 100 42 120 32 140 40 C 160 48 165 75 158 95 C 165 115 162 150 145 155 L 55 155 C 38 150 35 115 42 95 C 35 75 40 48 60 40 Z" }
+          {
+            name: "동글 복숭아",
+            badge: "인기",
+            svg: `
+              <circle cx="58" cy="95" r="9" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+              <circle cx="142" cy="95" r="9" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+              <ellipse cx="100" cy="95" rx="42" ry="44" fill="#FFF0DE" stroke="#1F1B18" stroke-width="3" />
+              <ellipse cx="73" cy="108" rx="8" ry="4" fill="#FDA4AF" opacity="0.85" />
+              <ellipse cx="127" cy="108" rx="8" ry="4" fill="#FDA4AF" opacity="0.85" />
+            `
+          },
+          {
+            name: "갸름 계란형",
+            badge: "청순",
+            svg: `
+              <circle cx="60" cy="95" r="8" fill="#FFF5EB" stroke="#1F1B18" stroke-width="2.5" />
+              <circle cx="140" cy="95" r="8" fill="#FFF5EB" stroke="#1F1B18" stroke-width="2.5" />
+              <path d="M 62 80 C 62 50 138 50 138 80 C 138 115 120 142 100 142 C 80 142 62 115 62 80 Z" fill="#FFF5EB" stroke="#1F1B18" stroke-width="3" />
+              <ellipse cx="74" cy="106" rx="7" ry="4" fill="#F472B6" opacity="0.75" />
+              <ellipse cx="126" cy="106" rx="7" ry="4" fill="#F472B6" opacity="0.75" />
+            `
+          },
+          {
+            name: "통통 찹쌀떡",
+            badge: "귀염",
+            svg: `
+              <circle cx="56" cy="98" r="9" fill="#FEF7EE" stroke="#1F1B18" stroke-width="2.5" />
+              <circle cx="144" cy="98" r="9" fill="#FEF7EE" stroke="#1F1B18" stroke-width="2.5" />
+              <path d="M 100 52 C 135 52 144 72 144 95 C 144 125 130 144 100 144 C 70 144 56 125 56 95 C 56 72 65 52 100 52 Z" fill="#FEF7EE" stroke="#1F1B18" stroke-width="3" />
+              <circle cx="71" cy="110" r="7" fill="#FB7185" opacity="0.75" />
+              <circle cx="129" cy="110" r="7" fill="#FB7185" opacity="0.75" />
+            `
+          },
+          {
+            name: "각진 듬직형",
+            badge: "신뢰",
+            svg: `
+              <circle cx="56" cy="95" r="9" fill="#FEEBC8" stroke="#1F1B18" stroke-width="2.5" />
+              <circle cx="144" cy="95" r="9" fill="#FEEBC8" stroke="#1F1B18" stroke-width="2.5" />
+              <path d="M 64 58 L 136 58 C 145 58 145 75 143 100 L 140 132 C 140 142 130 145 100 145 C 70 145 60 142 60 132 L 57 100 C 55 75 55 58 64 58 Z" fill="#FEEBC8" stroke="#1F1B18" stroke-width="3" />
+              <ellipse cx="73" cy="108" rx="8" ry="4" fill="#FBBF24" opacity="0.65" />
+              <ellipse cx="127" cy="108" rx="8" ry="4" fill="#FBBF24" opacity="0.65" />
+            `
+          },
+          {
+            name: "하트 요정형",
+            badge: "발랄",
+            svg: `
+              <circle cx="58" cy="92" r="8" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+              <circle cx="142" cy="92" r="8" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+              <path d="M 60 70 C 60 48 140 48 140 70 C 142 98 122 132 100 144 C 78 132 58 98 60 70 Z" fill="#FFF0DE" stroke="#1F1B18" stroke-width="3" />
+              <path d="M 72 107 C 72 105 75 104 76 106 C 77 104 80 105 80 107 C 80 109 76 112 76 112 C 76 112 72 109 72 107 Z" fill="#FDA4AF" />
+              <path d="M 120 107 C 120 105 123 104 124 106 C 125 104 128 105 128 107 C 128 109 124 112 124 112 C 124 112 120 109 120 107 Z" fill="#FDA4AF" />
+            `
+          }
         ]
       },
 
-      // 2단계: 눈 (초록 사인펜 #16A34A, Y: 70~85)
+      hair: {
+        category: "헤어스타일",
+        subTitle: "단정한 스쿨룩 & 레트로 헤어",
+        colorHex: "#78350F",
+        options: [
+          {
+            name: "모범 댄디컷",
+            badge: "클래식",
+            svg: `
+              <path d="M 54 85 C 50 65 65 36 100 35 C 135 36 150 65 146 85 C 144 75 140 68 132 68 C 120 68 115 76 100 70 C 88 65 80 72 70 68 C 60 70 56 75 54 85 Z" fill="#38281F" stroke="#1F1B18" stroke-width="3" />
+              <path d="M 75 48 Q 100 42 125 48" stroke="#6B4F3B" stroke-width="3" stroke-linecap="round" fill="none" />
+            `
+          },
+          {
+            name: "레트로 단발",
+            badge: "단정",
+            svg: `
+              <path d="M 52 98 C 48 65 65 35 100 34 C 135 35 152 65 148 98 C 148 110 142 116 138 112 C 140 85 136 68 126 66 C 110 63 92 78 68 70 C 60 75 58 90 62 112 C 58 116 52 110 52 98 Z" fill="#1F2937" stroke="#1F1B18" stroke-width="3" />
+              <path d="M 125 58 L 135 62" stroke="#DC2626" stroke-width="4" stroke-linecap="round" />
+            `
+          },
+          {
+            name: "양갈래 땋은머리",
+            badge: "러블리",
+            svg: `
+              <path d="M 56 82 C 52 58 68 35 100 35 C 132 35 148 58 144 82 C 140 68 130 68 118 68 C 105 68 100 74 95 68 C 85 68 75 68 66 76 C 60 80 58 82 56 82 Z" fill="#78350F" stroke="#1F1B18" stroke-width="3" />
+              <ellipse cx="46" cy="105" rx="8" ry="12" fill="#78350F" stroke="#1F1B18" stroke-width="2.5" />
+              <circle cx="46" cy="118" r="4.5" fill="#EF4444" />
+              <ellipse cx="154" cy="105" rx="8" ry="12" fill="#78350F" stroke="#1F1B18" stroke-width="2.5" />
+              <circle cx="154" cy="118" r="4.5" fill="#EF4444" />
+            `
+          },
+          {
+            name: "복슬 베이비펌",
+            badge: "포근",
+            svg: `
+              <path d="M 52 82 C 45 75 45 58 55 50 C 55 40 68 33 80 34 C 90 28 110 28 120 34 C 132 33 145 40 145 50 C 155 58 155 75 148 82 C 142 68 128 65 118 68 C 105 65 95 68 82 65 C 68 68 58 75 52 82 Z" fill="#92400E" stroke="#1F1B18" stroke-width="3" />
+            `
+          },
+          {
+            name: "프레피 베레모",
+            badge: "스쿨룩",
+            svg: `
+              <ellipse cx="100" cy="46" rx="44" ry="16" fill="#166534" stroke="#1F1B18" stroke-width="3" transform="rotate(-6 100 46)" />
+              <circle cx="124" cy="44" r="5" fill="#FBBF24" stroke="#B45309" stroke-width="1.5" />
+              <path d="M 58 64 C 58 82 64 94 68 96 M 132 96 C 136 94 142 82 142 64" stroke="#1F1B18" stroke-width="3" fill="none" />
+              <path d="M 75 58 Q 100 66 125 58" fill="#38281F" stroke="#1F1B18" stroke-width="2" />
+            `
+          }
+        ]
+      },
+
       eyes: {
-        category: "눈",
-        colorName: "초록 사인펜",
+        category: "눈 & 표정",
+        subTitle: "빛나는 눈동자와 섬세한 눈썹",
         colorHex: "#16A34A",
         options: [
-          // ① 순정만화 눈 (큰 타원 + 별/하이라이트)
-          { name: "순정만화 눈", path: "M 65 72 C 78 72 82 85 75 88 C 68 90 60 85 65 72 Z M 72 75 A 2 2 0 1 0 72 79 A 2 2 0 1 0 72 75 M 135 72 C 148 72 152 85 145 88 C 138 90 130 85 135 72 Z M 142 75 A 2 2 0 1 0 142 79 A 2 2 0 1 0 142 75" },
-          // ② 맑은 눈의 광인 (땡그란 원 + 점)
-          { name: "맑눈광", path: "M 70 78 A 8 8 0 1 1 70 77.9 M 70 78 A 2 2 0 1 1 70 77.9 M 130 78 A 8 8 0 1 1 130 77.9 M 130 78 A 2 2 0 1 1 130 77.9" },
-          // ③ 팬더 다크서클 (처진 눈 + 아래 음영)
-          { name: "밤샘 팬더", path: "M 60 82 C 70 75 80 82 82 84 M 58 87 C 68 95 82 92 84 86 M 140 82 C 130 75 120 82 118 84 M 142 87 C 132 95 118 92 116 86 M 68 80 A 2 2 0 1 1 68 79.9 M 132 80 A 2 2 0 1 1 132 79.9" },
-          // ④ 뱅글뱅글 뿔테안경 (안경테 + 소용돌이)
-          { name: "뱅글 뿔테", path: "M 55 78 A 12 12 0 1 1 55 77.9 M 145 78 A 12 12 0 1 1 145 77.9 M 92 78 L 108 78 M 67 78 C 65 75 62 76 62 78 C 62 80 66 81 68 79 M 133 78 C 135 75 138 76 138 78 C 138 80 134 81 132 79" },
-          // ⑤ 새침 반달 눈 (웃는 반달)
-          { name: "새침 반달", path: "M 60 76 C 70 68 82 76 82 82 M 140 76 C 130 68 118 76 118 82 M 85 70 L 90 68 M 115 70 L 110 68" }
+          {
+            name: "순정만화 반짝이",
+            badge: "초롱초롱",
+            svg: `
+              <path d="M 66 76 C 72 73 82 74 86 77" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+              <path d="M 114 77 C 118 74 128 73 134 76" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+              <ellipse cx="76" cy="88" rx="8" ry="10" fill="#1F1B18" />
+              <circle cx="74" cy="85" r="3" fill="#FFFFFF" />
+              <circle cx="78" cy="92" r="1.5" fill="#FFFFFF" />
+              <ellipse cx="124" cy="88" rx="8" ry="10" fill="#1F1B18" />
+              <circle cx="122" cy="85" r="3" fill="#FFFFFF" />
+              <circle cx="126" cy="92" r="1.5" fill="#FFFFFF" />
+            `
+          },
+          {
+            name: "지적 뿔테안경",
+            badge: "모범생",
+            svg: `
+              <circle cx="75" cy="88" r="13" fill="none" stroke="#1F1B18" stroke-width="3.5" />
+              <circle cx="125" cy="88" r="13" fill="none" stroke="#1F1B18" stroke-width="3.5" />
+              <path d="M 88 87 Q 100 84 112 87" stroke="#1F1B18" stroke-width="3.5" fill="none" />
+              <circle cx="75" cy="88" r="5" fill="#1F1B18" />
+              <circle cx="73" cy="86" r="1.8" fill="#FFF" />
+              <circle cx="125" cy="88" r="5" fill="#1F1B18" />
+              <circle cx="123" cy="86" r="1.8" fill="#FFF" />
+              <path d="M 66 73 L 84 73" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+              <path d="M 116 73 L 134 73" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+            `
+          },
+          {
+            name: "러블리 윙크",
+            badge: "심쿵",
+            svg: `
+              <path d="M 68 89 Q 76 82 84 89" stroke="#1F1B18" stroke-width="3.5" fill="none" stroke-linecap="round" />
+              <path d="M 82 86 L 86 83" stroke="#1F1B18" stroke-width="2.5" stroke-linecap="round" />
+              <ellipse cx="124" cy="88" rx="8" ry="10" fill="#1F1B18" />
+              <circle cx="122" cy="85" r="3" fill="#FFFFFF" />
+              <path d="M 68 76 Q 76 72 84 76" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+              <path d="M 116 76 Q 124 72 132 76" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+            `
+          },
+          {
+            name: "반달 눈웃음",
+            badge: "다정",
+            svg: `
+              <path d="M 67 89 Q 76 80 85 89" stroke="#1F1B18" stroke-width="3.5" fill="none" stroke-linecap="round" />
+              <path d="M 115 89 Q 124 80 133 89" stroke="#1F1B18" stroke-width="3.5" fill="none" stroke-linecap="round" />
+              <path d="M 68 75 Q 76 71 84 75" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+              <path d="M 116 75 Q 124 71 132 75" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+            `
+          },
+          {
+            name: "밤샘 독서팬더",
+            badge: "열정",
+            svg: `
+              <ellipse cx="76" cy="91" rx="12" ry="7" fill="#E2E8F0" opacity="0.8" />
+              <ellipse cx="124" cy="91" rx="12" ry="7" fill="#E2E8F0" opacity="0.8" />
+              <ellipse cx="76" cy="87" rx="7" ry="8" fill="#1F1B18" />
+              <circle cx="74" cy="85" r="2.5" fill="#FFF" />
+              <ellipse cx="124" cy="87" rx="7" ry="8" fill="#1F1B18" />
+              <circle cx="122" cy="85" r="2.5" fill="#FFF" />
+              <path d="M 68 75 L 84 78" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+              <path d="M 132 75 L 116 78" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+            `
+          }
         ]
       },
 
-      // 3단계: 코 (주황 사인펜 #EA580C, Y: 100~115)
-      nose: {
-        category: "코",
-        colorName: "주황 사인펜",
-        colorHex: "#EA580C",
-        options: [
-          // ① 돼지코
-          { name: "돼지코", path: "M 90 106 C 90 101 110 101 110 106 C 110 114 90 114 90 106 Z M 95 106 A 2 2 0 1 1 95 105.9 M 105 106 A 2 2 0 1 1 105 105.9" },
-          // ② 피노키오 뾰족코
-          { name: "피노키오 코", path: "M 98 98 L 122 108 L 98 110" },
-          // ③ 콧물 한 줄기 코
-          { name: "콧물 줄줄", path: "M 96 102 C 104 100 106 108 96 109 M 104 108 C 104 116 107 118 105 120 C 103 121 101 118 101 114" },
-          // ④ 복스러운 주먹코
-          { name: "복 주먹코", path: "M 93 103 C 90 109 97 114 100 114 C 103 114 110 109 107 103 M 92 108 C 96 109 104 109 108 108" },
-          // ⑤ L자 콧대
-          { name: "L자 콧대", path: "M 98 98 L 98 110 L 106 110" }
-        ]
-      },
-
-      // 4단계: 입 (분홍/빨간 사인펜 #DB2777, Y: 128~145)
       mouth: {
-        category: "입",
-        colorName: "빨간 사인펜",
+        category: "코 & 입",
+        subTitle: "생기 있는 입술과 귀여운 미소",
         colorHex: "#DB2777",
         options: [
-          // ① 개구쟁이 씩 웃는 입
-          { name: "씨익 미소", path: "M 80 132 C 90 144 110 144 122 130 M 78 130 L 82 134 M 124 128 L 120 132" },
-          // ② 두꺼운 명란젓 입술
-          { name: "명란젓 입술", path: "M 82 134 C 92 128 108 128 118 134 C 112 142 88 142 82 134 Z M 82 134 C 92 146 108 146 118 134" },
-          // ③ '3' 모양 삐죽 입
-          { name: "'3' 모양 입", path: "M 88 135 C 94 130 98 134 100 137 C 102 134 106 130 112 135" },
-          // ④ 장미꽃 물고 있는 입
-          { name: "장미 물기", path: "M 86 135 C 95 140 105 140 114 135 M 110 136 L 135 132 M 135 132 C 142 126 142 138 135 136 Z M 125 134 L 127 138" },
-          // ⑤ 이빨 보이는 함박웃음
-          { name: "함박 건치", path: "M 78 130 C 88 146 112 146 122 130 Z M 78 133 L 122 133 M 92 130 L 92 142 M 108 130 L 108 142" }
+          {
+            name: "체리빛 미소",
+            badge: "화사함",
+            svg: `
+              <ellipse cx="100" cy="104" rx="2.5" ry="2" fill="#E29D82" />
+              <path d="M 90 119 Q 100 133 110 119 Z" fill="#E11D48" stroke="#1F1B18" stroke-width="2.5" />
+              <path d="M 93 121 Q 100 124 107 121" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2" />
+            `
+          },
+          {
+            name: "고양이 ':3' 입",
+            badge: "장난기",
+            svg: `
+              <polygon points="98,103 102,103 100,106" fill="#F472B6" />
+              <path d="M 92 118 Q 96 123 100 119 Q 104 123 108 118" fill="none" stroke="#1F1B18" stroke-width="3" stroke-linecap="round" />
+            `
+          },
+          {
+            name: "앵두 삐죽입",
+            badge: "새침",
+            svg: `
+              <circle cx="100" cy="104" r="2" fill="#D97706" />
+              <ellipse cx="100" cy="122" rx="6" ry="5" fill="#FB7185" stroke="#1F1B18" stroke-width="2.5" />
+              <path d="M 97 122 Q 100 124 103 122" stroke="#BE123C" stroke-width="2" fill="none" />
+            `
+          },
+          {
+            name: "장미꽃 물기",
+            badge: "로맨틱",
+            svg: `
+              <path d="M 98 102 L 102 105 L 98 107" stroke="#1F1B18" stroke-width="2" fill="none" stroke-linecap="round" />
+              <path d="M 91 120 Q 100 126 109 120" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+              <path d="M 105 120 L 128 114" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="132" cy="112" r="6" fill="#E11D48" stroke="#9F1239" stroke-width="1.5" />
+            `
+          },
+          {
+            name: "건치 함박웃음",
+            badge: "유쾌",
+            svg: `
+              <circle cx="100" cy="104" r="3" fill="#FBBF24" stroke="#1F1B18" stroke-width="1.5" />
+              <path d="M 86 116 Q 100 138 114 116 Z" fill="#BE123C" stroke="#1F1B18" stroke-width="3" />
+              <path d="M 92 128 Q 100 120 108 128 Q 100 137 92 128 Z" fill="#FB7185" />
+            `
+          }
         ]
       },
 
-      // 5단계: 몸통 & 소품 (보라 사인펜 #7C3AED, Y: 155~195)
       body: {
-        category: "몸통 & 소품",
-        colorName: "보라 사인펜",
-        colorHex: "#7C3AED",
+        category: "스쿨룩 & 소품",
+        subTitle: "단정한 프레피 교복과 독서 소품",
+        colorHex: "#1E3A8A",
         options: [
-          // ① 프레피 니트조끼 (V넥)
-          { name: "프레피 조끼", path: "M 65 155 L 50 195 L 150 195 L 135 155 M 82 155 L 100 178 L 118 155 M 100 178 L 100 195" },
-          // ② 근육질 헐크 어깨
-          { name: "헐크 어깨", path: "M 68 155 C 40 152 20 165 15 195 M 132 155 C 160 152 180 165 185 195 M 78 175 C 100 185 122 175 122 175" },
-          // ③ 두꺼운 벽돌책 든 손
-          { name: "벽돌책 독서", path: "M 65 155 L 50 195 L 150 195 L 135 155 M 75 165 L 125 165 L 125 195 L 75 195 Z M 100 165 L 100 195 M 70 178 C 76 172 82 178 78 186 M 130 178 C 124 172 118 178 122 186" },
-          // ④ 줄무늬 수학여행 파자마
-          { name: "수학여행 파자마", path: "M 65 155 L 45 195 L 155 195 L 135 155 M 58 168 L 142 168 M 52 182 L 148 182 M 90 155 L 100 162 L 110 155" },
-          // ⑤ 커피잔 든 손
-          { name: "따아 커피잔", path: "M 65 155 L 50 195 L 150 195 L 135 155 M 120 172 L 140 172 L 138 190 L 122 190 Z M 140 176 C 145 176 146 186 140 186 M 126 168 C 128 163 126 160 128 156 M 134 168 C 136 163 134 160 136 156" }
+          {
+            name: "프레피 블레이저",
+            badge: "대표 교복",
+            svg: `
+              <path d="M 64 140 L 40 200 L 160 200 L 136 140 Z" fill="#1E3A8A" stroke="#1F1B18" stroke-width="3" />
+              <polygon points="100,162 82,140 100,146 118,140" fill="#FFFFFF" stroke="#1F1B18" stroke-width="2" />
+              <polygon points="97,152 103,152 105,188 100,194 95,188" fill="#DC2626" stroke="#991B1B" stroke-width="1.5" />
+              <path d="M 80 140 L 92 170 M 120 140 L 108 170" stroke="#1E293B" stroke-width="2.5" />
+              <circle cx="100" cy="180" r="3" fill="#FBBF24" />
+            `
+          },
+          {
+            name: "케이블 니트조끼",
+            badge: "따뜻함",
+            svg: `
+              <path d="M 64 140 L 42 200 L 158 200 L 136 140 Z" fill="#FEF3C7" stroke="#1F1B18" stroke-width="3" />
+              <polygon points="100,160 84,140 100,146 116,140" fill="#78350F" stroke="#1F1B18" stroke-width="2" />
+              <path d="M 84 140 L 100 168 L 116 140" stroke="#D97706" stroke-width="3" fill="none" />
+              <path d="M 88 172 L 88 198 M 112 172 L 112 198" stroke="#D97706" stroke-width="2" stroke-dasharray="3 3" />
+            `
+          },
+          {
+            name: "초록 체육복 져지",
+            badge: "추억의 2줄",
+            svg: `
+              <path d="M 64 140 L 38 200 L 162 200 L 136 140 Z" fill="#15803D" stroke="#1F1B18" stroke-width="3" />
+              <polygon points="98,140 102,140 102,200 98,200" fill="#FFFFFF" stroke="#1F1B18" stroke-width="1.5" />
+              <path d="M 52 158 L 44 200 M 58 155 L 50 200 M 148 158 L 156 200 M 142 155 L 150 200" stroke="#FFFFFF" stroke-width="2" />
+            `
+          },
+          {
+            name: "벽돌책 든 독서광",
+            badge: "독서왕",
+            svg: `
+              <path d="M 64 140 L 42 200 L 158 200 L 136 140 Z" fill="#475569" stroke="#1F1B18" stroke-width="3" />
+              <rect x="74" y="152" width="52" height="48" rx="4" fill="#B91C1C" stroke="#1F1B18" stroke-width="2.5" />
+              <line x1="82" y1="152" x2="82" y2="200" stroke="#FBBF24" stroke-width="2" />
+              <circle cx="102" cy="176" r="6" fill="#FBBF24" stroke="#78350F" stroke-width="1" />
+              <ellipse cx="72" cy="176" rx="6" ry="5" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2" />
+              <ellipse cx="128" cy="176" rx="6" ry="5" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2" />
+            `
+          },
+          {
+            name: "파자마 & 따아 머그",
+            badge: "수학여행",
+            svg: `
+              <path d="M 64 140 L 42 200 L 158 200 L 136 140 Z" fill="#E0F2FE" stroke="#1F1B18" stroke-width="3" />
+              <line x1="56" y1="160" x2="144" y2="160" stroke="#0284C7" stroke-width="2" />
+              <line x1="50" y1="178" x2="150" y2="178" stroke="#0284C7" stroke-width="2" />
+              <rect x="116" y="166" width="18" height="22" rx="3" fill="#FFFFFF" stroke="#1F1B18" stroke-width="2" />
+              <path d="M 134 171 C 140 171 140 182 134 182" stroke="#1F1B18" stroke-width="2" fill="none" />
+              <path d="M 122 158 Q 120 152 124 148 M 128 159 Q 130 153 127 149" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" fill="none" />
+            `
+          }
         ]
       }
     };
 
-    const STEP_KEYS = ['face', 'eyes', 'nose', 'mouth', 'body'];
+    const STEP_KEYS = ['face', 'hair', 'eyes', 'mouth', 'body'];
 
-    // 상태 관리
-    let currentStepIndex = 0; // 0: face, 1: eyes, 2: nose, 3: mouth, 4: body
-    let activeSlot = 0;      // 0..4 빠르게 왔다갔다
+    let currentStepIndex = 0;
+    let activeSlot = 0;
     let timerId = null;
-    let selectedResults = [null, null, null, null, null]; // 각 단계별 당첨 인덱스 (0..4)
+    let selectedResults = [0, 0, 0, 0, 0]; // 기본 1번 세트 장착
+    let isPlaying = true;
 
-    // DOM 요소 캐시
     const categoryTitleEl = document.getElementById('category-title');
+    const categorySubEl = document.getElementById('category-sub');
     const currentStepBadgeEl = document.getElementById('current-step-badge');
-    const emptyGuideEl = document.getElementById('empty-photo-guide');
     const cardAvatarCodeEl = document.getElementById('card-avatar-code');
 
-    // 1. 공책 슬롯 UI 렌더링 함수
     function renderStepSlots(stepIdx) {
       const key = STEP_KEYS[stepIdx];
-      const stepData = PARTS_DATA[key];
+      const stepData = HIGH_QUALITY_PARTS[key];
 
-      categoryTitleEl.textContent = `${stepIdx + 1}단계 <${stepData.category}> (${stepData.colorName})`;
-      categoryTitleEl.style.color = stepData.colorHex;
+      categoryTitleEl.textContent = `${stepIdx + 1}단계 <${stepData.category}>`;
+      categorySubEl.textContent = stepData.subTitle;
       currentStepBadgeEl.textContent = `${stepIdx + 1}/5단계`;
 
       stepData.options.forEach((opt, idx) => {
         const svgContainer = document.getElementById(`preview-svg-${idx}`);
         const labelEl = document.getElementById(`label-${idx}`);
+        const badgeEl = document.getElementById(`badge-${idx}`);
         labelEl.textContent = opt.name;
+        badgeEl.textContent = opt.badge;
 
         svgContainer.innerHTML = `
-          <svg viewBox="0 0 200 200" class="w-full h-full doodle-path" style="stroke: ${stepData.colorHex}">
-            <path d="${opt.path}" />
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            ${opt.svg}
           </svg>
         `;
       });
     }
 
-    // 2. 볼펜 왔다갔다 (80ms~100ms) 애니메이션 타이머
+    function renderCanvasLayers() {
+      // 5개 레이어 순서대로 렌더링
+      const order = ['body', 'face', 'eyes', 'mouth', 'hair'];
+      const indexMap = {
+        face: selectedResults[0],
+        hair: selectedResults[1],
+        eyes: selectedResults[2],
+        mouth: selectedResults[3],
+        body: selectedResults[4]
+      };
+
+      order.forEach(k => {
+        const optIdx = indexMap[k];
+        const el = document.getElementById(`canvas-${k}`);
+        if (optIdx !== null) {
+          el.innerHTML = HIGH_QUALITY_PARTS[k].options[optIdx].svg;
+        } else {
+          el.innerHTML = '';
+        }
+      });
+
+      updateAvatarCode();
+    }
+
     function startPenSweep() {
       if (timerId) clearInterval(timerId);
-      
-      let direction = 1; // 1: 우측으로, -1: 좌측으로
+      let direction = 1;
+
       timerId = setInterval(() => {
-        // 기존 active 제거
         const prevSlotEl = document.getElementById(`slot-${activeSlot}`);
         if (prevSlotEl) prevSlotEl.classList.remove('active-slot');
 
-        // 슬롯 번호 좌우 왕복
         activeSlot += direction;
         if (activeSlot >= 4) {
           activeSlot = 4;
@@ -637,82 +861,57 @@
 
         const nextSlotEl = document.getElementById(`slot-${activeSlot}`);
         if (nextSlotEl) nextSlotEl.classList.add('active-slot');
-      }, 90);
+      }, 85);
     }
 
-    // 3. 스톱 버튼 클릭 처리 ("볼펜 멈춰!")
     function handleStop() {
-      if (currentStepIndex >= STEP_KEYS.length) return; // 이미 완성됨
+      if (currentStepIndex >= STEP_KEYS.length) return;
 
-      const key = STEP_KEYS[currentStepIndex];
-      const chosenOptionIdx = activeSlot;
-      selectedResults[currentStepIndex] = chosenOptionIdx;
+      selectedResults[currentStepIndex] = activeSlot;
+      renderCanvasLayers();
 
-      // 증명사진 캔버스에 해당 레이어 path 적용
-      const layerSvg = document.getElementById(`canvas-${key}`);
-      const chosenPath = PARTS_DATA[key].options[chosenOptionIdx].path;
-      layerSvg.innerHTML = `<path d="${chosenPath}" />`;
+      confetti({ particleCount: 15, spread: 40, origin: { y: 0.65 } });
 
-      // 안내 문구 숨김
-      emptyGuideEl.style.display = 'none';
-
-      // 찰칵 미니 컨페티
-      confetti({
-        particleCount: 15,
-        spread: 40,
-        origin: { y: 0.7 }
-      });
-
-      // 아바타 코드 갱신
-      updateAvatarCode();
-
-      // 다음 단계로 전진
       currentStepIndex++;
       if (currentStepIndex < STEP_KEYS.length) {
         renderStepSlots(currentStepIndex);
       } else {
-        // 5단계 완성!
         clearInterval(timerId);
         timerId = null;
-        categoryTitleEl.textContent = "🎉 5단계 완성! 멋진 아바타가 탄생했습니다!";
-        categoryTitleEl.style.color = "#16A34A";
+        isPlaying = false;
+        categoryTitleEl.textContent = "🎉 5단계 완성! 아바타가 모두 조립되었습니다!";
+        categorySubEl.textContent = "원하는 부위를 클릭하여 언제든 수정하거나 다시 촬영할 수 있습니다.";
         currentStepBadgeEl.textContent = "완성 (5/5)";
         
-        // 전체 축하 컨페티
-        confetti({
-          particleCount: 60,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
+        confetti({ particleCount: 70, spread: 80, origin: { y: 0.6 } });
 
-        // 멈춰 버튼 텍스트 변경
-        document.getElementById('btn-stop').innerHTML = "<span>✨ 아바타 완성 완료! (재촬영 가능)</span>";
-        document.getElementById('btn-stop').classList.replace('bg-[#DC2626]', 'bg-[#16A34A]');
-        document.getElementById('btn-stop').classList.replace('hover:bg-[#B91C1C]', 'hover:bg-[#15803D]');
+        const btn = document.getElementById('btn-stop');
+        btn.innerHTML = "<span>✨ 아바타 조립 완료! (재촬영 가능)</span>";
+        btn.classList.replace('bg-[#DC2626]', 'bg-[#16A34A]');
+        btn.classList.replace('hover:bg-[#B91C1C]', 'hover:bg-[#15803D]');
       }
     }
 
-    // 아바타 코드 생성: F0-E0-N0-M0-B0
+    function handleDirectSelect(optIdx) {
+      selectedResults[currentStepIndex < 5 ? currentStepIndex : 0] = optIdx;
+      renderCanvasLayers();
+    }
+
     function updateAvatarCode() {
-      const prefix = ['F', 'E', 'N', 'M', 'B'];
+      const prefix = ['F', 'H', 'E', 'M', 'B'];
       const code = selectedResults
-        .map((r, i) => `${prefix[i]}${r !== null ? r + 1 : '?'}`)
+        .map((r, i) => `${prefix[i]}${r !== null ? r + 1 : '1'}`)
         .join('-');
       cardAvatarCodeEl.textContent = `AVATAR_CODE: ${code}`;
     }
 
-    // 4. 선도부한테 빌어서 재촬영하기 (초기화)
     function handleReset() {
       currentStepIndex = 0;
       activeSlot = 0;
-      selectedResults = [null, null, null, null, null];
+      selectedResults = [0, 0, 0, 0, 0];
+      isPlaying = true;
 
-      STEP_KEYS.forEach(key => {
-        document.getElementById(`canvas-${key}`).innerHTML = '';
-      });
-
-      emptyGuideEl.style.display = 'block';
-      updateAvatarCode();
+      renderCanvasLayers();
 
       const btnStop = document.getElementById('btn-stop');
       btnStop.innerHTML = "<span>✋ 멈춰! (클릭 또는 스페이스바)</span>";
@@ -723,7 +922,6 @@
       startPenSweep();
     }
 
-    // 5. 1초 올랜덤 뽑기
     function handleQuickRandom() {
       selectedResults = [
         Math.floor(Math.random() * 5),
@@ -733,30 +931,26 @@
         Math.floor(Math.random() * 5)
       ];
 
-      STEP_KEYS.forEach((key, i) => {
-        const path = PARTS_DATA[key].options[selectedResults[i]].path;
-        document.getElementById(`canvas-${key}`).innerHTML = `<path d="${path}" />`;
-      });
-
-      emptyGuideEl.style.display = 'none';
-      updateAvatarCode();
+      renderCanvasLayers();
       currentStepIndex = 5;
-
       clearInterval(timerId);
       timerId = null;
+      isPlaying = false;
+
       categoryTitleEl.textContent = "🎲 운명 랜덤 뽑기 완료!";
-      categoryTitleEl.style.color = "#16A34A";
+      categorySubEl.textContent = "마음에 안 드는 부위는 왼쪽 공책에서 직접 골라보세요.";
       currentStepBadgeEl.textContent = "완성 (5/5)";
 
       confetti({ particleCount: 50, spread: 70 });
     }
 
-    // 6. 폼 입력 실시간 반영
+    // 폼 동기화
     const inputName = document.getElementById('input-name');
     const inputBook = document.getElementById('input-book');
     const cardName = document.getElementById('card-name');
     const cardBook = document.getElementById('card-book');
-    const cardSession = document.getElementById('card-session');
+    const cardGroup = document.getElementById('card-group');
+    const cardGrade = document.getElementById('card-grade');
 
     inputName.addEventListener('input', (e) => {
       cardName.textContent = e.target.value.trim() || '김플래닛';
@@ -766,19 +960,20 @@
       cardBook.textContent = e.target.value.trim() || '선물할 책 준비 중';
     });
 
-    document.querySelectorAll('input[name="session"]').forEach(radio => {
+    document.querySelectorAll('input[name="seasonGroup"]').forEach(radio => {
       radio.addEventListener('change', (e) => {
-        if (e.target.value === 'both') {
-          cardSession.textContent = '1부(새학기) + 2부(수학여행)';
-        } else if (e.target.value === 's1') {
-          cardSession.textContent = '1부(새학기)만 참석';
-        } else {
-          cardSession.textContent = '2부(수학여행)만 참석';
-        }
+        cardGroup.textContent = e.target.value + '반';
       });
     });
 
-    // 7. 카드 탭 전환: [학생증 모드] vs [도서대출카드 모드]
+    document.querySelectorAll('input[name="grade"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const sub = e.target.value === '1학년' ? ' (신규)' : e.target.value === '2학년' ? ' (기존)' : e.target.value === '3학년' ? ' (진행)' : ' (준비)';
+        cardGrade.textContent = e.target.value + sub;
+      });
+    });
+
+    // 탭 전환
     const tabStudent = document.getElementById('tab-mode-student');
     const tabLibrary = document.getElementById('tab-mode-library');
     const viewStudent = document.getElementById('view-student-info');
@@ -807,43 +1002,23 @@
       cardBadgeTitle.textContent = '플래닛 도서관 공식 도서대출증';
     });
 
-    // 8. html2canvas 학생증 PNG 다운로드
+    // 이미지 다운로드
     document.getElementById('btn-download-card').addEventListener('click', () => {
       const cardEl = document.getElementById('card-capture-area');
-      
-      html2canvas(cardEl, {
-        scale: 3,
-        backgroundColor: '#ffffff'
-      }).then(canvas => {
+      html2canvas(cardEl, { scale: 3, backgroundColor: '#ffffff' }).then(canvas => {
         const link = document.createElement('a');
         const nameVal = inputName.value.trim() || '학우';
         link.download = `2026_플래닛_학생증_${nameVal}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-      }).catch(err => {
-        console.error('Download error:', err);
-        alert('이미지 저장 중 오류가 발생했습니다. 화면을 캡처해 주세요!');
       });
     });
 
-    // 9. 폼 제출 시 아바타 코드 패키징 전송
     document.getElementById('rsvp-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      
-      const payload = {
-        name: inputName.value.trim(),
-        phone: document.getElementById('input-phone').value.trim(),
-        session: document.querySelector('input[name="session"]:checked').value,
-        book: inputBook.value.trim(),
-        memo: document.getElementById('input-memo').value.trim(),
-        avatarCode: cardAvatarCodeEl.textContent.replace('AVATAR_CODE: ', '')
-      };
-
-      console.log('Submitted Payload:', payload);
-      alert(`🎉 참가 신청이 접수되었습니다!\n\n• 성함: ${payload.name}\n• 세션: ${payload.session}\n• 아바타 코드: ${payload.avatarCode}\n\n화면의 [📸 내 학생증 이미지 저장하기]를 눌러 학생증을 저장하세요!`);
+      alert('🎉 학생증 등록이 완료되었습니다!');
     });
 
-    // 10. 스페이스바 및 버튼 이벤트 등록
     document.getElementById('btn-stop').addEventListener('click', handleStop);
     document.getElementById('btn-reset').addEventListener('click', handleReset);
     document.getElementById('btn-quick-random').addEventListener('click', handleQuickRandom);
@@ -857,6 +1032,7 @@
 
     // 초기 실행
     renderStepSlots(0);
+    renderCanvasLayers();
     startPenSweep();
   </script>
 

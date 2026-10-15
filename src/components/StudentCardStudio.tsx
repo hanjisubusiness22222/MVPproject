@@ -9,85 +9,338 @@ import planetLogo from '../assets/planet-logo.png';
 
 interface PartOption {
   name: string;
-  path: string;
+  badge: string;
+  svg: string; // SVG inner elements
 }
 
 interface StepData {
   category: string;
+  subTitle: string;
   colorName: string;
   colorHex: string;
   options: PartOption[];
 }
 
-const PARTS_DATA: Record<string, StepData> = {
-  // 1단계: 얼굴형 (파란 사인펜 #2563EB, Y: 30~155)
+// 5단계 고화질 일러스트 SVG 데이터 (viewBox: 0 0 200 200)
+const HIGH_QUALITY_PARTS: Record<string, StepData> = {
+  // 1단계: 얼굴형 & 피부톤 & 볼터치
   face: {
-    category: '얼굴형',
-    colorName: '파란 사인펜',
+    category: '얼굴형 & 피부',
+    subTitle: '개성 있는 피부톤과 귀여운 볼터치',
+    colorName: '살구빛 톤',
     colorHex: '#2563EB',
     options: [
-      { name: '동글 찐빵', path: 'M 100 35 C 145 35 168 65 168 105 C 168 145 145 155 100 155 C 55 155 32 145 32 105 C 32 65 55 35 100 35 Z' },
-      { name: '각진 네모턱', path: 'M 50 42 L 150 42 C 160 42 165 55 162 90 L 158 140 C 158 152 148 155 135 155 L 65 155 C 52 155 42 152 42 140 L 38 90 C 35 55 40 42 50 42 Z' },
-      { name: '뾰족 역삼각', path: 'M 40 45 C 80 40 120 40 160 45 C 165 75 145 120 100 158 C 55 120 35 75 40 45 Z' },
-      { name: '볼록 땅콩', path: 'M 100 35 C 135 35 155 55 150 78 C 145 92 135 96 148 112 C 162 130 148 155 100 155 C 52 155 38 130 52 112 C 65 96 55 92 50 78 C 45 55 65 35 100 35 Z' },
-      { name: '식빵 모양', path: 'M 60 40 C 80 32 100 42 100 42 C 100 42 120 32 140 40 C 160 48 165 75 158 95 C 165 115 162 150 145 155 L 55 155 C 38 150 35 115 42 95 C 35 75 40 48 60 40 Z' }
+      {
+        name: '동글 복숭아',
+        badge: '인기',
+        svg: `
+          <!-- 귀 -->
+          <circle cx="58" cy="95" r="9" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+          <circle cx="142" cy="95" r="9" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+          <!-- 얼굴 본체 -->
+          <ellipse cx="100" cy="95" rx="42" ry="44" fill="#FFF0DE" stroke="#1F1B18" stroke-width="3" />
+          <!-- 볼터치 -->
+          <ellipse cx="73" cy="108" rx="8" ry="4" fill="#FDA4AF" opacity="0.85" />
+          <ellipse cx="127" cy="108" rx="8" ry="4" fill="#FDA4AF" opacity="0.85" />
+        `
+      },
+      {
+        name: '갸름 계란형',
+        badge: '청순',
+        svg: `
+          <circle cx="60" cy="95" r="8" fill="#FFF5EB" stroke="#1F1B18" stroke-width="2.5" />
+          <circle cx="140" cy="95" r="8" fill="#FFF5EB" stroke="#1F1B18" stroke-width="2.5" />
+          <path d="M 62 80 C 62 50 138 50 138 80 C 138 115 120 142 100 142 C 80 142 62 115 62 80 Z" fill="#FFF5EB" stroke="#1F1B18" stroke-width="3" />
+          <ellipse cx="74" cy="106" rx="7" ry="4" fill="#F472B6" opacity="0.75" />
+          <ellipse cx="126" cy="106" rx="7" ry="4" fill="#F472B6" opacity="0.75" />
+        `
+      },
+      {
+        name: '통통 찹쌀떡',
+        badge: '귀염',
+        svg: `
+          <circle cx="56" cy="98" r="9" fill="#FEF7EE" stroke="#1F1B18" stroke-width="2.5" />
+          <circle cx="144" cy="98" r="9" fill="#FEF7EE" stroke="#1F1B18" stroke-width="2.5" />
+          <path d="M 100 52 C 135 52 144 72 144 95 C 144 125 130 144 100 144 C 70 144 56 125 56 95 C 56 72 65 52 100 52 Z" fill="#FEF7EE" stroke="#1F1B18" stroke-width="3" />
+          <circle cx="71" cy="110" r="7" fill="#FB7185" opacity="0.75" />
+          <circle cx="129" cy="110" r="7" fill="#FB7185" opacity="0.75" />
+        `
+      },
+      {
+        name: '각진 듬직형',
+        badge: '신뢰',
+        svg: `
+          <circle cx="56" cy="95" r="9" fill="#FEEBC8" stroke="#1F1B18" stroke-width="2.5" />
+          <circle cx="144" cy="95" r="9" fill="#FEEBC8" stroke="#1F1B18" stroke-width="2.5" />
+          <path d="M 64 58 L 136 58 C 145 58 145 75 143 100 L 140 132 C 140 142 130 145 100 145 C 70 145 60 142 60 132 L 57 100 C 55 75 55 58 64 58 Z" fill="#FEEBC8" stroke="#1F1B18" stroke-width="3" />
+          <ellipse cx="73" cy="108" rx="8" ry="4" fill="#FBBF24" opacity="0.65" />
+          <ellipse cx="127" cy="108" rx="8" ry="4" fill="#FBBF24" opacity="0.65" />
+        `
+      },
+      {
+        name: '하트 요정형',
+        badge: '발랄',
+        svg: `
+          <circle cx="58" cy="92" r="8" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+          <circle cx="142" cy="92" r="8" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2.5" />
+          <path d="M 60 70 C 60 48 140 48 140 70 C 142 98 122 132 100 144 C 78 132 58 98 60 70 Z" fill="#FFF0DE" stroke="#1F1B18" stroke-width="3" />
+          <path d="M 72 107 C 72 105 75 104 76 106 C 77 104 80 105 80 107 C 80 109 76 112 76 112 C 76 112 72 109 72 107 Z" fill="#FDA4AF" />
+          <path d="M 120 107 C 120 105 123 104 124 106 C 125 104 128 105 128 107 C 128 109 124 112 124 112 C 124 112 120 109 120 107 Z" fill="#FDA4AF" />
+        `
+      }
     ]
   },
-  // 2단계: 눈 (초록 사인펜 #16A34A, Y: 70~85)
+
+  // 2단계: 헤어스타일
+  hair: {
+    category: '헤어스타일',
+    subTitle: '단정한 스쿨룩 & 레트로 헤어',
+    colorName: '초코·블랙 톤',
+    colorHex: '#78350F',
+    options: [
+      {
+        name: '모범 댄디컷',
+        badge: '클래식',
+        svg: `
+          <path d="M 54 85 C 50 65 65 36 100 35 C 135 36 150 65 146 85 C 144 75 140 68 132 68 C 120 68 115 76 100 70 C 88 65 80 72 70 68 C 60 70 56 75 54 85 Z" fill="#38281F" stroke="#1F1B18" stroke-width="3" />
+          <path d="M 75 48 Q 100 42 125 48" stroke="#6B4F3B" stroke-width="3" stroke-linecap="round" fill="none" />
+        `
+      },
+      {
+        name: '레트로 단발',
+        badge: '단정',
+        svg: `
+          <path d="M 52 98 C 48 65 65 35 100 34 C 135 35 152 65 148 98 C 148 110 142 116 138 112 C 140 85 136 68 126 66 C 110 63 92 78 68 70 C 60 75 58 90 62 112 C 58 116 52 110 52 98 Z" fill="#1F2937" stroke="#1F1B18" stroke-width="3" />
+          <path d="M 125 58 L 135 62" stroke="#DC2626" stroke-width="4" stroke-linecap="round" />
+        `
+      },
+      {
+        name: '양갈래 땋은머리',
+        badge: '러블리',
+        svg: `
+          <path d="M 56 82 C 52 58 68 35 100 35 C 132 35 148 58 144 82 C 140 68 130 68 118 68 C 105 68 100 74 95 68 C 85 68 75 68 66 76 C 60 80 58 82 56 82 Z" fill="#78350F" stroke="#1F1B18" stroke-width="3" />
+          <ellipse cx="46" cy="105" rx="8" ry="12" fill="#78350F" stroke="#1F1B18" stroke-width="2.5" />
+          <circle cx="46" cy="118" r="4.5" fill="#EF4444" />
+          <ellipse cx="154" cy="105" rx="8" ry="12" fill="#78350F" stroke="#1F1B18" stroke-width="2.5" />
+          <circle cx="154" cy="118" r="4.5" fill="#EF4444" />
+        `
+      },
+      {
+        name: '복슬 베이비펌',
+        badge: '포근',
+        svg: `
+          <path d="M 52 82 C 45 75 45 58 55 50 C 55 40 68 33 80 34 C 90 28 110 28 120 34 C 132 33 145 40 145 50 C 155 58 155 75 148 82 C 142 68 128 65 118 68 C 105 65 95 68 82 65 C 68 68 58 75 52 82 Z" fill="#92400E" stroke="#1F1B18" stroke-width="3" />
+        `
+      },
+      {
+        name: '프레피 베레모',
+        badge: '스쿨룩',
+        svg: `
+          <ellipse cx="100" cy="46" rx="44" ry="16" fill="#166534" stroke="#1F1B18" stroke-width="3" transform="rotate(-6 100 46)" />
+          <circle cx="124" cy="44" r="5" fill="#FBBF24" stroke="#B45309" stroke-width="1.5" />
+          <path d="M 58 64 C 58 82 64 94 68 96 M 132 96 C 136 94 142 82 142 64" stroke="#1F1B18" stroke-width="3" fill="none" />
+          <path d="M 75 58 Q 100 66 125 58" fill="#38281F" stroke="#1F1B18" stroke-width="2" />
+        `
+      }
+    ]
+  },
+
+  // 3단계: 눈 & 표정
   eyes: {
-    category: '눈',
+    category: '눈 & 표정',
+    subTitle: '빛나는 눈동자와 섬세한 눈썹',
     colorName: '초록 사인펜',
     colorHex: '#16A34A',
     options: [
-      { name: '순정만화 눈', path: 'M 65 72 C 78 72 82 85 75 88 C 68 90 60 85 65 72 Z M 72 75 A 2 2 0 1 0 72 79 A 2 2 0 1 0 72 75 M 135 72 C 148 72 152 85 145 88 C 138 90 130 85 135 72 Z M 142 75 A 2 2 0 1 0 142 79 A 2 2 0 1 0 142 75' },
-      { name: '맑눈광', path: 'M 70 78 A 8 8 0 1 1 70 77.9 M 70 78 A 2 2 0 1 1 70 77.9 M 130 78 A 8 8 0 1 1 130 77.9 M 130 78 A 2 2 0 1 1 130 77.9' },
-      { name: '밤샘 팬더', path: 'M 60 82 C 70 75 80 82 82 84 M 58 87 C 68 95 82 92 84 86 M 140 82 C 130 75 120 82 118 84 M 142 87 C 132 95 118 92 116 86 M 68 80 A 2 2 0 1 1 68 79.9 M 132 80 A 2 2 0 1 1 132 79.9' },
-      { name: '뱅글 뿔테', path: 'M 55 78 A 12 12 0 1 1 55 77.9 M 145 78 A 12 12 0 1 1 145 77.9 M 92 78 L 108 78 M 67 78 C 65 75 62 76 62 78 C 62 80 66 81 68 79 M 133 78 C 135 75 138 76 138 78 C 138 80 134 81 132 79' },
-      { name: '새침 반달', path: 'M 60 76 C 70 68 82 76 82 82 M 140 76 C 130 68 118 76 118 82 M 85 70 L 90 68 M 115 70 L 110 68' }
+      {
+        name: '순정만화 반짝이',
+        badge: '초롱초롱',
+        svg: `
+          <path d="M 66 76 C 72 73 82 74 86 77" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path d="M 114 77 C 118 74 128 73 134 76" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <ellipse cx="76" cy="88" rx="8" ry="10" fill="#1F1B18" />
+          <circle cx="74" cy="85" r="3" fill="#FFFFFF" />
+          <circle cx="78" cy="92" r="1.5" fill="#FFFFFF" />
+          <ellipse cx="124" cy="88" rx="8" ry="10" fill="#1F1B18" />
+          <circle cx="122" cy="85" r="3" fill="#FFFFFF" />
+          <circle cx="126" cy="92" r="1.5" fill="#FFFFFF" />
+        `
+      },
+      {
+        name: '지적 뿔테안경',
+        badge: '모범생',
+        svg: `
+          <circle cx="75" cy="88" r="13" fill="none" stroke="#1F1B18" stroke-width="3.5" />
+          <circle cx="125" cy="88" r="13" fill="none" stroke="#1F1B18" stroke-width="3.5" />
+          <path d="M 88 87 Q 100 84 112 87" stroke="#1F1B18" stroke-width="3.5" fill="none" />
+          <circle cx="75" cy="88" r="5" fill="#1F1B18" />
+          <circle cx="73" cy="86" r="1.8" fill="#FFF" />
+          <circle cx="125" cy="88" r="5" fill="#1F1B18" />
+          <circle cx="123" cy="86" r="1.8" fill="#FFF" />
+          <path d="M 66 73 L 84 73" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+          <path d="M 116 73 L 134 73" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+        `
+      },
+      {
+        name: '러블리 윙크',
+        badge: '심쿵',
+        svg: `
+          <path d="M 68 89 Q 76 82 84 89" stroke="#1F1B18" stroke-width="3.5" fill="none" stroke-linecap="round" />
+          <path d="M 82 86 L 86 83" stroke="#1F1B18" stroke-width="2.5" stroke-linecap="round" />
+          <ellipse cx="124" cy="88" rx="8" ry="10" fill="#1F1B18" />
+          <circle cx="122" cy="85" r="3" fill="#FFFFFF" />
+          <path d="M 68 76 Q 76 72 84 76" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path d="M 116 76 Q 124 72 132 76" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+        `
+      },
+      {
+        name: '반달 눈웃음',
+        badge: '다정',
+        svg: `
+          <path d="M 67 89 Q 76 80 85 89" stroke="#1F1B18" stroke-width="3.5" fill="none" stroke-linecap="round" />
+          <path d="M 115 89 Q 124 80 133 89" stroke="#1F1B18" stroke-width="3.5" fill="none" stroke-linecap="round" />
+          <path d="M 68 75 Q 76 71 84 75" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path d="M 116 75 Q 124 71 132 75" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+        `
+      },
+      {
+        name: '밤샘 독서팬더',
+        badge: '열정',
+        svg: `
+          <ellipse cx="76" cy="91" rx="12" ry="7" fill="#E2E8F0" opacity="0.8" />
+          <ellipse cx="124" cy="91" rx="12" ry="7" fill="#E2E8F0" opacity="0.8" />
+          <ellipse cx="76" cy="87" rx="7" ry="8" fill="#1F1B18" />
+          <circle cx="74" cy="85" r="2.5" fill="#FFF" />
+          <ellipse cx="124" cy="87" rx="7" ry="8" fill="#1F1B18" />
+          <circle cx="122" cy="85" r="2.5" fill="#FFF" />
+          <path d="M 68 75 L 84 78" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+          <path d="M 132 75 L 116 78" stroke="#1F1B18" stroke-width="2" stroke-linecap="round" />
+        `
+      }
     ]
   },
-  // 3단계: 코 (주황 사인펜 #EA580C, Y: 100~115)
-  nose: {
-    category: '코',
-    colorName: '주황 사인펜',
-    colorHex: '#EA580C',
-    options: [
-      { name: '돼지코', path: 'M 90 106 C 90 101 110 101 110 106 C 110 114 90 114 90 106 Z M 95 106 A 2 2 0 1 1 95 105.9 M 105 106 A 2 2 0 1 1 105 105.9' },
-      { name: '피노키오 코', path: 'M 98 98 L 122 108 L 98 110' },
-      { name: '콧물 줄줄', path: 'M 96 102 C 104 100 106 108 96 109 M 104 108 C 104 116 107 118 105 120 C 103 121 101 118 101 114' },
-      { name: '복 주먹코', path: 'M 93 103 C 90 109 97 114 100 114 C 103 114 110 109 107 103 M 92 108 C 96 109 104 109 108 108' },
-      { name: 'L자 콧대', path: 'M 98 98 L 98 110 L 106 110' }
-    ]
-  },
-  // 4단계: 입 (분홍/빨간 사인펜 #DB2777, Y: 128~145)
+
+  // 4단계: 코 & 입
   mouth: {
-    category: '입',
-    colorName: '빨간 사인펜',
+    category: '코 & 입',
+    subTitle: '생기 있는 입술과 귀여운 미소',
+    colorName: '체리 레드 톤',
     colorHex: '#DB2777',
     options: [
-      { name: '씨익 미소', path: 'M 80 132 C 90 144 110 144 122 130 M 78 130 L 82 134 M 124 128 L 120 132' },
-      { name: '명란젓 입술', path: 'M 82 134 C 92 128 108 128 118 134 C 112 142 88 142 82 134 Z M 82 134 C 92 146 108 146 118 134' },
-      { name: "'3' 모양 입", path: 'M 88 135 C 94 130 98 134 100 137 C 102 134 106 130 112 135' },
-      { name: '장미 물기', path: 'M 86 135 C 95 140 105 140 114 135 M 110 136 L 135 132 M 135 132 C 142 126 142 138 135 136 Z M 125 134 L 127 138' },
-      { name: '함박 건치', path: 'M 78 130 C 88 146 112 146 122 130 Z M 78 133 L 122 133 M 92 130 L 92 142 M 108 130 L 108 142' }
+      {
+        name: '체리빛 미소',
+        badge: '화사함',
+        svg: `
+          <ellipse cx="100" cy="104" rx="2.5" ry="2" fill="#E29D82" />
+          <path d="M 90 119 Q 100 133 110 119 Z" fill="#E11D48" stroke="#1F1B18" stroke-width="2.5" />
+          <path d="M 93 121 Q 100 124 107 121" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2" />
+        `
+      },
+      {
+        name: "고양이 ':3' 입",
+        badge: '장난기',
+        svg: `
+          <polygon points="98,103 102,103 100,106" fill="#F472B6" />
+          <path d="M 92 118 Q 96 123 100 119 Q 104 123 108 118" fill="none" stroke="#1F1B18" stroke-width="3" stroke-linecap="round" />
+        `
+      },
+      {
+        name: '앵두 삐죽입',
+        badge: '새침',
+        svg: `
+          <circle cx="100" cy="104" r="2" fill="#D97706" />
+          <ellipse cx="100" cy="122" rx="6" ry="5" fill="#FB7185" stroke="#1F1B18" stroke-width="2.5" />
+          <path d="M 97 122 Q 100 124 103 122" stroke="#BE123C" stroke-width="2" fill="none" />
+        `
+      },
+      {
+        name: '장미꽃 물기',
+        badge: '로맨틱',
+        svg: `
+          <path d="M 98 102 L 102 105 L 98 107" stroke="#1F1B18" stroke-width="2" fill="none" stroke-linecap="round" />
+          <path d="M 91 120 Q 100 126 109 120" stroke="#1F1B18" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path d="M 105 120 L 128 114" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="132" cy="112" r="6" fill="#E11D48" stroke="#9F1239" stroke-width="1.5" />
+        `
+      },
+      {
+        name: '건치 함박웃음',
+        badge: '유쾌',
+        svg: `
+          <circle cx="100" cy="104" r="3" fill="#FBBF24" stroke="#1F1B18" stroke-width="1.5" />
+          <path d="M 86 116 Q 100 138 114 116 Z" fill="#BE123C" stroke="#1F1B18" stroke-width="3" />
+          <path d="M 92 128 Q 100 120 108 128 Q 100 137 92 128 Z" fill="#FB7185" />
+        `
+      }
     ]
   },
-  // 5단계: 몸통 & 소품 (보라 사인펜 #7C3AED, Y: 155~195)
+
+  // 5단계: 스쿨룩 의상 & 소품
   body: {
-    category: '몸통 & 소품',
-    colorName: '보라 사인펜',
-    colorHex: '#7C3AED',
+    category: '스쿨룩 & 소품',
+    subTitle: '단정한 프레피 교복과 독서 소품',
+    colorName: '보라·네이비',
+    colorHex: '#1E3A8A',
     options: [
-      { name: '프레피 조끼', path: 'M 65 155 L 50 195 L 150 195 L 135 155 M 82 155 L 100 178 L 118 155 M 100 178 L 100 195' },
-      { name: '헐크 어깨', path: 'M 68 155 C 40 152 20 165 15 195 M 132 155 C 160 152 180 165 185 195 M 78 175 C 100 185 122 175 122 175' },
-      { name: '벽돌책 독서', path: 'M 65 155 L 50 195 L 150 195 L 135 155 M 75 165 L 125 165 L 125 195 L 75 195 Z M 100 165 L 100 195 M 70 178 C 76 172 82 178 78 186 M 130 178 C 124 172 118 178 122 186' },
-      { name: '수학여행 파자마', path: 'M 65 155 L 45 195 L 155 195 L 135 155 M 58 168 L 142 168 M 52 182 L 148 182 M 90 155 L 100 162 L 110 155' },
-      { name: '따아 커피잔', path: 'M 65 155 L 50 195 L 150 195 L 135 155 M 120 172 L 140 172 L 138 190 L 122 190 Z M 140 176 C 145 176 146 186 140 186 M 126 168 C 128 163 126 160 128 156 M 134 168 C 136 163 134 160 136 156' }
+      {
+        name: '프레피 블레이저',
+        badge: '대표 교복',
+        svg: `
+          <path d="M 64 140 L 40 200 L 160 200 L 136 140 Z" fill="#1E3A8A" stroke="#1F1B18" stroke-width="3" />
+          <polygon points="100,162 82,140 100,146 118,140" fill="#FFFFFF" stroke="#1F1B18" stroke-width="2" />
+          <polygon points="97,152 103,152 105,188 100,194 95,188" fill="#DC2626" stroke="#991B1B" stroke-width="1.5" />
+          <path d="M 80 140 L 92 170 M 120 140 L 108 170" stroke="#1E293B" stroke-width="2.5" />
+          <circle cx="100" cy="180" r="3" fill="#FBBF24" />
+        `
+      },
+      {
+        name: '케이블 니트조끼',
+        badge: '따뜻함',
+        svg: `
+          <path d="M 64 140 L 42 200 L 158 200 L 136 140 Z" fill="#FEF3C7" stroke="#1F1B18" stroke-width="3" />
+          <polygon points="100,160 84,140 100,146 116,140" fill="#78350F" stroke="#1F1B18" stroke-width="2" />
+          <path d="M 84 140 L 100 168 L 116 140" stroke="#D97706" stroke-width="3" fill="none" />
+          <path d="M 88 172 L 88 198 M 112 172 L 112 198" stroke="#D97706" stroke-width="2" stroke-dasharray="3 3" />
+        `
+      },
+      {
+        name: '초록 체육복 져지',
+        badge: '추억의 2줄',
+        svg: `
+          <path d="M 64 140 L 38 200 L 162 200 L 136 140 Z" fill="#15803D" stroke="#1F1B18" stroke-width="3" />
+          <polygon points="98,140 102,140 102,200 98,200" fill="#FFFFFF" stroke="#1F1B18" stroke-width="1.5" />
+          <path d="M 52 158 L 44 200 M 58 155 L 50 200 M 148 158 L 156 200 M 142 155 L 150 200" stroke="#FFFFFF" stroke-width="2" />
+        `
+      },
+      {
+        name: '벽돌책 든 독서광',
+        badge: '독서왕',
+        svg: `
+          <path d="M 64 140 L 42 200 L 158 200 L 136 140 Z" fill="#475569" stroke="#1F1B18" stroke-width="3" />
+          <rect x="74" y="152" width="52" height="48" rx="4" fill="#B91C1C" stroke="#1F1B18" stroke-width="2.5" />
+          <line x1="82" y1="152" x2="82" y2="200" stroke="#FBBF24" stroke-width="2" />
+          <circle cx="102" cy="176" r="6" fill="#FBBF24" stroke="#78350F" stroke-width="1" />
+          <ellipse cx="72" cy="176" rx="6" ry="5" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2" />
+          <ellipse cx="128" cy="176" rx="6" ry="5" fill="#FFF0DE" stroke="#1F1B18" stroke-width="2" />
+        `
+      },
+      {
+        name: '파자마 & 따아 머그',
+        badge: '수학여행',
+        svg: `
+          <path d="M 64 140 L 42 200 L 158 200 L 136 140 Z" fill="#E0F2FE" stroke="#1F1B18" stroke-width="3" />
+          <line x1="56" y1="160" x2="144" y2="160" stroke="#0284C7" stroke-width="2" />
+          <line x1="50" y1="178" x2="150" y2="178" stroke="#0284C7" stroke-width="2" />
+          <rect x="116" y="166" width="18" height="22" rx="3" fill="#FFFFFF" stroke="#1F1B18" stroke-width="2" />
+          <path d="M 134 171 C 140 171 140 182 134 182" stroke="#1F1B18" stroke-width="2" fill="none" />
+          <path d="M 122 158 Q 120 152 124 148 M 128 159 Q 130 153 127 149" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" fill="none" />
+        `
+      }
     ]
   }
 };
 
-const STEP_KEYS = ['face', 'eyes', 'nose', 'mouth', 'body'];
+const STEP_KEYS = ['face', 'hair', 'eyes', 'mouth', 'body'];
 
 interface StudentCardStudioProps {
   onBack: () => void;
@@ -97,7 +350,7 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
   // 공책 게임 상태
   const [currentStepIndex, setCurrentStepIndex] = useState(0); // 0..4
   const [activeSlot, setActiveSlot] = useState(0);             // 0..4
-  const [selectedResults, setSelectedResults] = useState<(number | null)[]>([null, null, null, null, null]);
+  const [selectedResults, setSelectedResults] = useState<(number | null)[]>([0, 0, 0, 0, 0]); // 기본 1번 세트 세팅
   const [isPlaying, setIsPlaying] = useState(true);
 
   // 카드 탭: 'student' (학생증) | 'library' (도서대출카드)
@@ -113,7 +366,6 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
   // 이미지 다운로드
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [copiedCode, setCopiedCode] = useState(false);
 
   // 기존 등록 명단에서 불러오기
   const [registeredList, setRegisteredList] = useState<any[]>([]);
@@ -198,7 +450,7 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
 
   // 선도부한테 빌어서 재촬영 (초기화)
   const handleReset = () => {
-    setSelectedResults([null, null, null, null, null]);
+    setSelectedResults([0, null, null, null, null]);
     setCurrentStepIndex(0);
     setActiveSlot(0);
     setIsPlaying(true);
@@ -219,19 +471,18 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
     confetti({ particleCount: 50, spread: 70 });
   };
 
-  // 아바타 코드 생성: F{i}-E{i}-N{i}-M{i}-B{i}
-  const prefix = ['F', 'E', 'N', 'M', 'B'];
-  const avatarCode = selectedResults
-    .map((r, i) => `${prefix[i]}${r !== null ? r + 1 : '?'}`)
-    .join('-');
-
-  // 학년 라벨 매칭
-  const gradeLabelMap: Record<string, string> = {
-    '1학년': '1학년 (신규 학우)',
-    '2학년': '2학년 (기존 학우)',
-    '3학년': '3학년 (진행팀)',
-    '4학년': '4학년 (준비팀)'
+  // 특정 부위 직접 수동 선택 (파츠 클릭)
+  const handleDirectSelect = (stepIdx: number, optIdx: number) => {
+    const updated = [...selectedResults];
+    updated[stepIdx] = optIdx;
+    setSelectedResults(updated);
   };
+
+  // 아바타 코드 생성: F{i}-H{i}-E{i}-M{i}-B{i}
+  const prefix = ['F', 'H', 'E', 'M', 'B'];
+  const avatarCode = selectedResults
+    .map((r, i) => `${prefix[i]}${r !== null ? r + 1 : '1'}`)
+    .join('-');
 
   // 이미지 다운로드
   const handleDownload = async () => {
@@ -268,7 +519,7 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
   };
 
   const currentStepData = currentStepIndex < STEP_KEYS.length 
-    ? PARTS_DATA[STEP_KEYS[currentStepIndex]] 
+    ? HIGH_QUALITY_PARTS[STEP_KEYS[currentStepIndex]] 
     : null;
 
   return (
@@ -350,14 +601,17 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                 </div>
 
                 {/* 현재 카테고리 알림 */}
-                <div className="bg-white/90 border border-[#1f1b18]/30 rounded-lg p-2.5 mb-3 shadow-xs flex items-center justify-between">
+                <div className="bg-white/95 border border-[#1f1b18]/30 rounded-lg p-2.5 mb-3 shadow-xs flex items-center justify-between">
                   <div>
                     <span className="text-[10px] text-[#777] font-sans">현재 뽑는 부위:</span>
-                    <h3 className="font-serif text-lg sm:text-xl font-bold" style={{ color: currentStepData?.colorHex || '#16A34A' }}>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold text-[#1f1b18]">
                       {currentStepIndex < 5 
-                        ? `${currentStepIndex + 1}단계 <${currentStepData?.category}> (${currentStepData?.colorName})`
+                        ? `${currentStepIndex + 1}단계 <${currentStepData?.category}>`
                         : '🎉 5단계 완성! 아바타가 모두 조립되었습니다!'}
                     </h3>
+                    <p className="text-[11px] text-[#666] font-serif">
+                      {currentStepData?.subTitle || '마음에 안 들면 다시 뽑거나 직접 클릭해 수정하세요.'}
+                    </p>
                   </div>
                   {isPlaying && currentStepIndex < 5 && (
                     <div className="text-[11px] font-sans text-right text-[#555]">
@@ -367,7 +621,7 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                   )}
                 </div>
 
-                {/* 5개 파츠 카드 슬롯 그리드 */}
+                {/* 5개 파츠 카드 슬롯 그리드 (고화질 일러스트 썸네일) */}
                 {currentStepData && (
                   <div className="grid grid-cols-5 gap-1.5 sm:gap-2 mb-3">
                     {currentStepData.options.map((opt, idx) => {
@@ -375,21 +629,28 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                       return (
                         <div 
                           key={idx}
-                          className={`bg-white/90 border-2 rounded-lg p-1.5 text-center transition-all duration-75 relative ${
+                          onClick={() => handleDirectSelect(currentStepIndex, idx)}
+                          className={`cursor-pointer bg-white/95 border-2 rounded-lg p-1.5 text-center transition-all duration-75 relative hover:border-[#1f1b18] ${
                             isActive 
                               ? 'border-[#DC2626] bg-yellow-100/90 shadow-md scale-105' 
                               : 'border-dashed border-[#888]'
                           }`}
                         >
-                          <div className="text-[10px] sm:text-[11px] font-serif font-bold text-[#555] mb-0.5">
-                            {['①', '②', '③', '④', '⑤'][idx]}번
+                          <div className="flex items-center justify-between text-[10px] font-serif font-bold text-[#555] mb-0.5 px-0.5">
+                            <span>{['①', '②', '③', '④', '⑤'][idx]}</span>
+                            <span className="text-[8px] font-mono px-1 rounded bg-[#eee] text-[#555]">{opt.badge}</span>
                           </div>
-                          <div className="w-full aspect-square flex items-center justify-center">
-                            <svg viewBox="0 0 200 200" className="w-full h-full fill-none stroke-[4] stroke-linecap-round stroke-linejoin-round" style={{ stroke: currentStepData.colorHex }}>
-                              <path d={opt.path} />
-                            </svg>
+                          
+                          {/* 고화질 SVG 썸네일 */}
+                          <div className="w-full aspect-square flex items-center justify-center bg-[#FAF8F5] rounded border border-gray-200 overflow-hidden">
+                            <svg 
+                              viewBox="0 0 200 200" 
+                              className="w-full h-full"
+                              dangerouslySetInnerHTML={{ __html: opt.svg }}
+                            />
                           </div>
-                          <div className="text-[9px] sm:text-[10px] font-serif text-[#333] truncate mt-0.5">
+
+                          <div className="text-[10px] font-serif font-bold text-[#1f1b18] truncate mt-1">
                             {opt.name}
                           </div>
                         </div>
@@ -400,7 +661,7 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
 
                 <div className="text-center py-1">
                   <div className="inline-flex items-center space-x-1.5 bg-yellow-100/90 px-3 py-1 rounded-full border border-yellow-300 text-[11px] font-serif text-yellow-900">
-                    <span>🖋️ 모나미 볼펜이 눈 깜짝할 새 왔다 갔다 하는 중! 타이밍을 맞춰보세요.</span>
+                    <span>🖋️ 모나미 볼펜이 눈 깜짝할 새 왔다 갔다 하는 중! 타이밍을 맞춰보세요. (클릭 선택도 가능)</span>
                   </div>
                 </div>
               </div>
@@ -418,11 +679,9 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                   }`}
                 >
                   {currentStepIndex < 5 ? (
-                    <>
-                      <span>✋ 멈춰! (클릭 또는 스페이스바)</span>
-                    </>
+                    <span>✋ 멈춰! (클릭 또는 스페이스바)</span>
                   ) : (
-                    <span>✨ 아바타 완성 완료! (재촬영 가능)</span>
+                    <span>✨ 아바타 조립 완료! (다시 뽑기 가능)</span>
                   )}
                 </button>
 
@@ -493,10 +752,10 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                 </div>
               </div>
 
-              {/* 카드 본문: [5겹 합체 증명사진] + [인적사항 3대 항목] */}
+              {/* 카드 본문: [5겹 고화질 합체 증명사진] + [인적사항 3대 항목] */}
               <div className="grid grid-cols-12 gap-3 items-center">
                 
-                {/* 증명사진 란 (5겹 SVG 레이어 스택) */}
+                {/* 증명사진 란 (5겹 SVG 레이어 스택: 몸통 -> 얼굴형 -> 눈 -> 입 -> 헤어스타일 순서로 완벽 결합) */}
                 <div className="col-span-5">
                   <div 
                     className="aspect-[3/4] w-full border-2 border-[#1f1b18] rounded-lg relative overflow-hidden flex items-center justify-center shadow-inner"
@@ -506,44 +765,37 @@ export const StudentCardStudio: React.FC<StudentCardStudioProps> = ({ onBack }) 
                       backgroundSize: '12px 12px'
                     }}
                   >
-                    {/* 레이어 0: 얼굴형 */}
-                    {selectedResults[0] !== null && (
-                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full fill-none stroke-[4] stroke-[#2563EB] stroke-linecap-round stroke-linejoin-round">
-                        <path d={PARTS_DATA.face.options[selectedResults[0]!].path} />
-                      </svg>
-                    )}
-                    {/* 레이어 1: 눈 */}
-                    {selectedResults[1] !== null && (
-                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full fill-none stroke-[4] stroke-[#16A34A] stroke-linecap-round stroke-linejoin-round">
-                        <path d={PARTS_DATA.eyes.options[selectedResults[1]!].path} />
-                      </svg>
-                    )}
-                    {/* 레이어 2: 코 */}
-                    {selectedResults[2] !== null && (
-                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full fill-none stroke-[4] stroke-[#EA580C] stroke-linecap-round stroke-linejoin-round">
-                        <path d={PARTS_DATA.nose.options[selectedResults[2]!].path} />
-                      </svg>
-                    )}
-                    {/* 레이어 3: 입 */}
-                    {selectedResults[3] !== null && (
-                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full fill-none stroke-[4] stroke-[#DB2777] stroke-linecap-round stroke-linejoin-round">
-                        <path d={PARTS_DATA.mouth.options[selectedResults[3]!].path} />
-                      </svg>
-                    )}
-                    {/* 레이어 4: 몸통 & 소품 */}
+                    {/* 레이어 0: 몸통 & 의상 (가장 아래) */}
                     {selectedResults[4] !== null && (
-                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full fill-none stroke-[4] stroke-[#7C3AED] stroke-linecap-round stroke-linejoin-round">
-                        <path d={PARTS_DATA.body.options[selectedResults[4]!].path} />
-                      </svg>
+                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full"
+                           dangerouslySetInnerHTML={{ __html: HIGH_QUALITY_PARTS.body.options[selectedResults[4]!].svg }} />
                     )}
 
-                    {selectedResults.every(r => r === null) && (
-                      <div className="text-center p-2 font-serif text-[11px] text-[#888] select-none leading-tight">
-                        왼쪽 공책에서<br/>볼펜 멈춰로<br/>얼굴을 뽑아줘!
-                      </div>
+                    {/* 레이어 1: 얼굴형 & 피부톤 & 볼터치 */}
+                    {selectedResults[0] !== null && (
+                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full"
+                           dangerouslySetInnerHTML={{ __html: HIGH_QUALITY_PARTS.face.options[selectedResults[0]!].svg }} />
+                    )}
+
+                    {/* 레이어 2: 눈 & 눈썹 */}
+                    {selectedResults[2] !== null && (
+                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full"
+                           dangerouslySetInnerHTML={{ __html: HIGH_QUALITY_PARTS.eyes.options[selectedResults[2]!].svg }} />
+                    )}
+
+                    {/* 레이어 3: 코 & 입 */}
+                    {selectedResults[3] !== null && (
+                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full"
+                           dangerouslySetInnerHTML={{ __html: HIGH_QUALITY_PARTS.mouth.options[selectedResults[3]!].svg }} />
+                    )}
+
+                    {/* 레이어 4: 헤어스타일 & 모자/핀 (가장 위에서 얼굴을 덮음) */}
+                    {selectedResults[1] !== null && (
+                      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full"
+                           dangerouslySetInnerHTML={{ __html: HIGH_QUALITY_PARTS.hair.options[selectedResults[1]!].svg }} />
                     )}
                   </div>
-                  <div className="text-center mt-1 font-serif text-[10px] text-[#777]">증명사진 (5겹 사인펜)</div>
+                  <div className="text-center mt-1 font-serif text-[10px] text-[#777]">증명사진 (고화질 아바타)</div>
                 </div>
 
                 {/* 우측 인적사항 란 */}
