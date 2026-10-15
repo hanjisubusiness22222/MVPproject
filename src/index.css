@@ -75,6 +75,72 @@
   .tear-line {
     border-top: 2px dashed #6b5c4f;
   }
+
+  /* 70g 회색빛 만화용지/갱지 텍스처 (planet.html) */
+  .gengji-paper {
+    background-color: #e6e3da;
+    background-image: 
+      radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0),
+      radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+  }
+
+  /* 드로잉 스케치북 & 줄공책 질감 */
+  .lined-notebook {
+    background-color: #fbf9f3;
+    background-image: linear-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 100% 28px;
+  }
+
+  /* 학생증 크로키 배경지 */
+  .sketch-paper {
+    background-color: #faf8f2;
+    background-image: 
+      linear-gradient(to right, rgba(168, 162, 158, 0.14) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(168, 162, 158, 0.14) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  .font-hand {
+    font-family: 'Gaegu', cursive;
+  }
+
+  .font-hwp-title {
+    font-family: 'Noto Sans KR', sans-serif;
+    letter-spacing: 0.25em;
+  }
+
+  .font-hwp-body {
+    font-family: 'Nanum Myeongjo', serif;
+  }
+
+  /* 스프링 링 */
+  .spiral-ring {
+    width: 18px;
+    height: 9px;
+    background: linear-gradient(to right, #78716c, #e7e5e4, #57534e);
+    border-radius: 999px;
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.25);
+  }
+
+  /* 연필 커서 하이라이트 */
+  .pen-active {
+    border-color: #292524 !important;
+    background-color: #f5f0e6 !important;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 3px 4px 0px #292524;
+  }
+
+  /* 직인 도장 */
+  .stamp-seal {
+    border: 2.5px solid #b91c1c;
+    color: #b91c1c;
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 900;
+    transform: rotate(-6deg);
+    mix-blend-mode: multiply;
+  }
 }
 
 /* 커스텀 아날로그 스크롤바 */

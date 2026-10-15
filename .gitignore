@@ -29,6 +29,10 @@ build/
 Thumbs.db
 Desktop.ini
 
+# Scratch temporary scripts
+scratch/
+
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

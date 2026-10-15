@@ -27,6 +27,11 @@ export interface EventConfig {
     items: string[];
   };
   requirements: string[];
+  account: {
+    bank: string;
+    number: string;
+    holder: string;
+  };
   contact: {
     accountInfo: string;
     inquiryEmail: string;
@@ -78,8 +83,14 @@ export const EVENT_CONFIG: EventConfig = {
     "꺾이지 않는 텐션과 열린 마음",
   ],
   
+  account: {
+    bank: "카카오뱅크",
+    number: "3333-01-20261219",
+    holder: "플래닛준비위원회",
+  },
+  
   contact: {
-    accountInfo: "카카오뱅크 3333-01-XXXXXXX (예금주: 플래닛준비위)",
+    accountInfo: "카카오뱅크 3333-01-20261219 (예금주: 플래닛준비위원회)",
     inquiryEmail: "contact@planet-school.org",
   },
   
