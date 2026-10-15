@@ -387,81 +387,41 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
                 </div>
               </div>
 
-              {/* 절취선 및 회신서 작성 바로가기 버튼 */}
-              <div className="pt-4 border-t-2 border-dashed border-[#1f1b18]/40 text-center space-y-4">
-                <div className="text-xs font-serif text-[#666]">
+              {/* 절취선 및 참가 신청서(회신서) 바로가기 */}
+              <div className="pt-4 sm:pt-6 border-t-2 border-dashed border-[#1f1b18]/40 text-center space-y-3 sm:space-y-4">
+                <div className="text-xs font-serif text-[#666] tracking-wider">
                   ---------------------- (절  취  선) ----------------------
                 </div>
 
-                {/* QR 코드 접속 및 신청 안내 (초대장.png 양식) */}
-                <div className="p-4 border border-[#1f1b18]/20 rounded-lg bg-[#f8f6f0] flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left shadow-inner">
-                  <div 
-                    onClick={() => setIsQrModalOpen(true)}
-                    className="cursor-pointer group relative bg-white p-2 border border-[#1f1b18]/30 rounded shadow-sm hover:shadow transition-shadow flex-shrink-0"
-                    title="클릭하여 QR 코드 크게 보기"
-                  >
-                    <img 
-                      src={qrCodeImg} 
-                      alt="플래닛 모바일 접속 QR코드" 
-                      className="w-24 h-24 sm:w-28 sm:h-28 object-contain"
-                    />
-                    <div className="absolute inset-0 bg-black/60 text-white text-[10px] font-sans rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      🔍 확대 보기
-                    </div>
+                {/* 참가 신청서 바로가기 안내 박스 */}
+                <div className="bg-[#f8f6f0] border-2 border-[#1f1b18] rounded-xl p-4 sm:p-6 shadow-sm space-y-3 max-w-xl mx-auto">
+                  <div className="space-y-1">
+                    <span className="inline-block px-2 py-0.5 rounded bg-[#b82828] text-white font-mono text-[10px] font-bold">
+                      RSVP NOTICE
+                    </span>
+                    <h3 className="font-serif text-base sm:text-lg font-bold text-[#1f1b18]">
+                      2026 플래닛 연말모임 가정통신문 회신서
+                    </h3>
+                    <p className="text-xs text-[#555] font-serif">
+                      참석 여부 및 선물 도서 힌트를 제출하고 모바일 학생증을 발급받으세요.
+                    </p>
                   </div>
 
-                  <div className="space-y-1.5 font-serif">
-                    <div className="text-xs sm:text-sm font-bold text-[#1f1b18] leading-snug">
-                      ※ 참여를 원하시는 분은, 위의 QR 코드를 인식해서 신청해주시길 바랍니다.
-                    </div>
-                    <div className="text-[11px] text-[#666] font-mono break-all select-all">
-                      https://hanjisubusiness22222.github.io/MVPproject/
-                    </div>
-                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                      <a
-                        href={qrCodeImg}
-                        download="플래닛_연말모임_QR코드.png"
-                        className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 bg-[#2e5238] hover:bg-[#23402c] text-white rounded transition-colors"
-                      >
-                        <span>QR 다운로드</span>
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => setIsQrModalOpen(true)}
-                        className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 border border-[#1f1b18]/30 bg-white text-[#1f1b18] rounded hover:bg-[#ede8dc] transition-colors"
-                      >
-                        <QrCode className="w-3 h-3" />
-                        <span>크게 보기</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText('https://hanjisubusiness22222.github.io/MVPproject/');
-                          setCopiedLink(true);
-                          setTimeout(() => setCopiedLink(false), 2000);
-                        }}
-                        className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 border border-[#1f1b18]/30 bg-white text-[#1f1b18] rounded hover:bg-[#ede8dc] transition-colors"
-                      >
-                        <span>{copiedLink ? '✓ 복사됨!' : '주소 복사'}</span>
-                      </button>
-                    </div>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
+                    <button
+                      onClick={() => setActiveTab('rsvp')}
+                      className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#b82828] hover:bg-[#961e1e] text-white font-serif font-bold text-sm sm:text-base shadow-md flex items-center justify-center space-x-2 transition-all active:scale-98"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>참가 신청서 (회신서) 바로 작성하기</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('timeline')}
+                      className="w-full sm:w-auto px-5 py-3 rounded-lg border border-[#1f1b18]/40 bg-white hover:bg-[#ede8dc] text-[#1f1b18] font-serif font-bold text-sm transition-all"
+                    >
+                      일과표 세부 일정 보기
+                    </button>
                   </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
-                  <button
-                    onClick={() => setActiveTab('rsvp')}
-                    className="w-full sm:w-auto px-6 py-3 rounded bg-[#b82828] hover:bg-[#961e1e] text-white font-serif font-bold text-sm shadow flex items-center justify-center space-x-2"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>참가 신청서 (회신서) 바로 작성하기</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('timeline')}
-                    className="w-full sm:w-auto px-6 py-3 rounded border-2 border-[#1f1b18] bg-white hover:bg-[#ede8dc] text-[#1f1b18] font-serif font-bold text-sm"
-                  >
-                    일과표 세부 일정 보기
-                  </button>
                 </div>
               </div>
 
