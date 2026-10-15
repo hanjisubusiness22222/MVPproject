@@ -489,29 +489,29 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                       {selectedIndices[1] !== null && STAGES[1].items[selectedIndices[1]]?.backSvg && (
                         <g dangerouslySetInnerHTML={{ __html: STAGES[1].items[selectedIndices[1]].backSvg || '' }} />
                       )}
-                      {/* 2. 의상 & 소품 */}
-                      {selectedIndices[5] !== null && STAGES[5].items[selectedIndices[5]]?.svg && (
-                        <g dangerouslySetInnerHTML={{ __html: STAGES[5].items[selectedIndices[5]].svg || '' }} />
-                      )}
-                      {/* 3. 얼굴 & 귀목선 */}
+                      {/* 2. 얼굴 & 귀목선 */}
                       {selectedIndices[0] !== null && STAGES[0].items[selectedIndices[0]]?.svg && (
                         <g dangerouslySetInnerHTML={{ __html: STAGES[0].items[selectedIndices[0]].svg || '' }} />
                       )}
-                      {/* 4. 눈매 */}
+                      {/* 3. 눈매 */}
                       {selectedIndices[2] !== null && STAGES[2].items[selectedIndices[2]]?.svg && (
                         <g dangerouslySetInnerHTML={{ __html: STAGES[2].items[selectedIndices[2]].svg || '' }} />
                       )}
-                      {/* 5. 코 & 안경 */}
+                      {/* 4. 코 & 안경 */}
                       {selectedIndices[3] !== null && STAGES[3].items[selectedIndices[3]]?.svg && (
                         <g dangerouslySetInnerHTML={{ __html: STAGES[3].items[selectedIndices[3]].svg || '' }} />
                       )}
-                      {/* 6. 입모양 */}
+                      {/* 5. 입모양 */}
                       {selectedIndices[4] !== null && STAGES[4].items[selectedIndices[4]]?.svg && (
                         <g dangerouslySetInnerHTML={{ __html: STAGES[4].items[selectedIndices[4]].svg || '' }} />
                       )}
-                      {/* 7. 앞머리 */}
+                      {/* 6. 앞머리 */}
                       {selectedIndices[1] !== null && STAGES[1].items[selectedIndices[1]]?.frontSvg && (
                         <g dangerouslySetInnerHTML={{ __html: STAGES[1].items[selectedIndices[1]].frontSvg || '' }} />
+                      )}
+                      {/* 7. 의상 & 소품 (제일 앞으로 배치) */}
+                      {selectedIndices[5] !== null && STAGES[5].items[selectedIndices[5]]?.svg && (
+                        <g dangerouslySetInnerHTML={{ __html: STAGES[5].items[selectedIndices[5]].svg || '' }} />
                       )}
                     </svg>
                   </div>
@@ -600,26 +600,33 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                   <div className="col-span-5 flex flex-col items-center justify-center p-1 sketch-paper">
                     <div className="w-14 h-16">
                       <svg viewBox="0 0 200 220" className="w-full h-full" filter="url(#pencil-sketch)">
+                        {/* 1. 뒷머리 */}
                         {selectedIndices[1] !== null && STAGES[1].items[selectedIndices[1]]?.backSvg && (
                           <g dangerouslySetInnerHTML={{ __html: STAGES[1].items[selectedIndices[1]].backSvg || '' }} />
                         )}
-                        {selectedIndices[5] !== null && STAGES[5].items[selectedIndices[5]]?.svg && (
-                          <g dangerouslySetInnerHTML={{ __html: STAGES[5].items[selectedIndices[5]].svg || '' }} />
-                        )}
+                        {/* 2. 얼굴 & 귀목선 */}
                         {selectedIndices[0] !== null && STAGES[0].items[selectedIndices[0]]?.svg && (
                           <g dangerouslySetInnerHTML={{ __html: STAGES[0].items[selectedIndices[0]].svg || '' }} />
                         )}
+                        {/* 3. 눈매 */}
                         {selectedIndices[2] !== null && STAGES[2].items[selectedIndices[2]]?.svg && (
                           <g dangerouslySetInnerHTML={{ __html: STAGES[2].items[selectedIndices[2]].svg || '' }} />
                         )}
+                        {/* 4. 코 & 안경 */}
                         {selectedIndices[3] !== null && STAGES[3].items[selectedIndices[3]]?.svg && (
                           <g dangerouslySetInnerHTML={{ __html: STAGES[3].items[selectedIndices[3]].svg || '' }} />
                         )}
+                        {/* 5. 입모양 */}
                         {selectedIndices[4] !== null && STAGES[4].items[selectedIndices[4]]?.svg && (
                           <g dangerouslySetInnerHTML={{ __html: STAGES[4].items[selectedIndices[4]].svg || '' }} />
                         )}
+                        {/* 6. 앞머리 */}
                         {selectedIndices[1] !== null && STAGES[1].items[selectedIndices[1]]?.frontSvg && (
                           <g dangerouslySetInnerHTML={{ __html: STAGES[1].items[selectedIndices[1]].frontSvg || '' }} />
+                        )}
+                        {/* 7. 의상 & 소품 (제일 앞) */}
+                        {selectedIndices[5] !== null && STAGES[5].items[selectedIndices[5]]?.svg && (
+                          <g dangerouslySetInnerHTML={{ __html: STAGES[5].items[selectedIndices[5]].svg || '' }} />
                         )}
                       </svg>
                     </div>
