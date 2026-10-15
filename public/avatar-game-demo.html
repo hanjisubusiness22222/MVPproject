@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>추억의 공책 게임 아바타 뽑기 & 플래닛 학생증·도서대출증</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Gaegu (손글씨), Gowun Dodum, Noto Serif KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- html2canvas for PNG download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- canvas-confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      background-color: #F4F1EA;
+      font-family: 'Gowun Dodum', sans-serif;
+      color: #1f1b18;
+    }
+    .font-hand {
+      font-family: 'Gaegu', cursive;
+    }
+    .font-serif-kr {
+      font-family: 'Noto Serif KR', serif;
+    }
+
+    /* 레트로 줄공책 배경 */
+    .ruled-notebook {
+      background-color: #FAF8F2;
+      background-image: 
+        linear-gradient(rgba(219, 39, 119, 0.15) 1px, transparent 1px),
+        repeating-linear-gradient(transparent, transparent 27px, rgba(37, 99, 235, 0.12) 28px);
+      background-size: 100% 100%, 100% 28px;
+    }
+
+    /* 모눈종이 배경 */
+    .grid-notebook {
+      background-color: #FAF8F5;
+      background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+      background-size: 14px 14px;
+    }
+
+    /* 스프링 바인더 구멍 */
+    .spiral-binder {
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 16px,
+        #2A2622 16px,
+        #2A2622 28px,
+        transparent 28px,
+        transparent 40px
+      );
+    }
+
+    /* 삐뚤빼뚤 손그림 SVG 스타일 */
+    .doodle-path {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* 활성 박스 펄스 */
+    @keyframes highlighterPulse {
+      0%, 100% { transform: scale(1.02); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.6); }
+      50% { transform: scale(1.06); box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.9); }
+    }
+    .active-slot {
+      animation: highlighterPulse 0.15s infinite;
+      background-color: rgba(254, 240, 138, 0.5) !important;
+      border-color: #DC2626 !important;
+    }
+
+    /* 빨간 도장 효과 */
+    .seal-stamp {
+      border: 3px solid #B91C1C;
+      color: #B91C1C;
+      transform: rotate(-10deg);
+      mix-blend-mode: multiply;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 md:p-10 min-h-screen">
+
+  <div class="max-w-5xl mx-auto space-y-6">
+
+    <!-- 상단 레트로 안내 타이틀 -->
+    <header class="text-center space-y-2">
+      <div class="inline-block px-3 py-1 bg-[#2e5238] text-[#f7f5ed] text-xs font-hand font-bold tracking-widest rounded-full shadow-sm">
+        🎒 2026 플래닛 독서학교 「새학기」 공식 학생증 공작소
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-bold font-serif-kr text-[#1f1b18] tracking-tight">
+        추억의 공책 게임 <span class="text-[#2563EB] font-hand text-3xl sm:text-5xl">"볼펜 멈춰!"</span> 아바타 뽑기
+      </h1>
+      <p class="text-xs sm:text-sm text-[#666] font-hand text-lg max-w-xl mx-auto">
+        학창시절 쉬는 시간 종합장에 볼펜 굴리며 얼굴 뽑던 그 게임! <br class="hidden sm:inline" />
+        볼펜이 멈춘 자리가 나의 운명! 5단계로 나만의 독서학교 학생증을 완성해 보세요.
+      </p>
+    </header>
+
+    <!-- 메인 2단 레이아웃 (좌: 공책 게임 / 우: 실시간 학생증 & 폼) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- ======================================================== -->
+      <!-- [좌측 7컬럼] 추억의 스프링 공책 볼펜 멈춰 게임판           -->
+      <!-- ======================================================== -->
+      <section class="lg:col-span-7 bg-[#FAF8F2] border-2 border-[#1f1b18] rounded-xl shadow-xl overflow-hidden relative">
+        
+        <!-- 스프링 철 바인더 장식 -->
+        <div class="absolute left-0 top-0 bottom-0 w-6 sm:w-8 bg-[#e8e4dc] border-r-2 border-[#1f1b18] flex flex-col justify-around py-4 items-center z-10">
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+          <div class="w-3 h-5 sm:w-4 sm:h-6 bg-[#222] rounded-full border border-gray-400"></div>
+        </div>
+
+        <div class="pl-8 sm:pl-11 p-4 sm:p-6 ruled-notebook min-h-[560px] flex flex-col justify-between">
+          
+          <!-- 공책 상단 메타 헤더 -->
+          <div>
+            <div class="flex items-center justify-between border-b-2 border-[#b82828] pb-2 mb-3">
+              <div class="font-hand text-lg sm:text-xl font-bold text-[#b82828] flex items-center space-x-2">
+                <span>과목: 독서학교 학생증 사진촬영</span>
+                <span class="text-xs font-sans px-2 py-0.5 rounded bg-[#b82828] text-white">제 1 교시</span>
+              </div>
+              <div class="font-hand text-sm text-[#444]">
+                진행도: <strong id="current-step-badge" class="text-[#2563EB] text-lg">1/5단계</strong>
+              </div>
+            </div>
+
+            <!-- 현재 카테고리 알림 바 -->
+            <div class="bg-white/90 border border-[#1f1b18]/30 rounded-lg p-2.5 mb-4 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-xs text-[#777] font-sans">현재 뽑는 부위:</span>
+                <h3 id="category-title" class="font-hand text-2xl font-bold text-[#2563EB]">
+                  1단계 &lt;얼굴형&gt; (파란 사인펜)
+                </h3>
+              </div>
+              <div class="text-[11px] font-sans text-right text-[#555]">
+                <span class="inline-block w-2 h-2 rounded-full bg-red-500 animate-ping mr-1"></span>
+                <span>볼펜 질주 중 (80ms)</span>
+              </div>
+            </div>
+
+            <!-- 5개 파츠 카드 슬롯 그리드 -->
+            <div class="grid grid-cols-5 gap-1.5 sm:gap-2 mb-4">
+              <!-- Slot 0 -->
+              <div id="slot-0" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
+                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">①번</div>
+                <div id="preview-svg-0" class="w-full aspect-square flex items-center justify-center"></div>
+                <div id="label-0" class="text-[10px] font-hand text-gray-700 truncate mt-1">동글 찐빵</div>
+              </div>
+              <!-- Slot 1 -->
+              <div id="slot-1" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
+                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">②번</div>
+                <div id="preview-svg-1" class="w-full aspect-square flex items-center justify-center"></div>
+                <div id="label-1" class="text-[10px] font-hand text-gray-700 truncate mt-1">각진 네모</div>
+              </div>
+              <!-- Slot 2 -->
+              <div id="slot-2" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
+                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">③번</div>
+                <div id="preview-svg-2" class="w-full aspect-square flex items-center justify-center"></div>
+                <div id="label-2" class="text-[10px] font-hand text-gray-700 truncate mt-1">역삼각형</div>
+              </div>
+              <!-- Slot 3 -->
+              <div id="slot-3" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
+                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">④번</div>
+                <div id="preview-svg-3" class="w-full aspect-square flex items-center justify-center"></div>
+                <div id="label-3" class="text-[10px] font-hand text-gray-700 truncate mt-1">볼록 땅콩</div>
+              </div>
+              <!-- Slot 4 -->
+              <div id="slot-4" class="slot-card bg-white/90 border-2 border-dashed border-[#888] rounded-lg p-1.5 text-center transition-all duration-75 relative">
+                <div class="text-[11px] font-hand font-bold text-[#555] mb-1">⑤번</div>
+                <div id="preview-svg-4" class="w-full aspect-square flex items-center justify-center"></div>
+                <div id="label-4" class="text-[10px] font-hand text-gray-700 truncate mt-1">식빵 모양</div>
+              </div>
+            </div>
+
+            <!-- 볼펜 지시봉 애니메이션 안내 -->
+            <div class="text-center py-1">
+              <div class="inline-flex items-center space-x-2 bg-yellow-100/90 px-3 py-1 rounded-full border border-yellow-300 text-xs font-hand text-yellow-900">
+                <span>🖋️ 모나미 볼펜이 눈 깜짝할 새 왔다 갔다 하는 중! 타이밍을 노리세요!</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 공책 하단 조작 컨트롤러 -->
+          <div class="pt-4 border-t-2 border-[#1f1b18]/20 space-y-2.5">
+            <!-- 메인 스톱 버튼 -->
+            <button
+              id="btn-stop"
+              class="w-full py-4 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white font-serif-kr font-black text-xl sm:text-2xl shadow-lg border-2 border-[#7F1D1D] active:scale-95 transition-all flex items-center justify-center space-x-2"
+            >
+              <span>✋ 멈춰! (클릭 또는 스페이스바)</span>
+            </button>
+
+            <!-- 보조 버튼 그룹 -->
+            <div class="flex items-center justify-between gap-2 text-xs font-hand text-base">
+              <button 
+                id="btn-quick-random"
+                type="button"
+                class="px-3 py-1.5 rounded-lg border border-[#888] bg-white hover:bg-[#ede8dc] text-[#333] transition-colors"
+              >
+                🎲 운명에 맡기기 (5단계 1초 랜덤)
+              </button>
+
+              <button 
+                id="btn-reset"
+                type="button"
+                class="px-3 py-1.5 rounded-lg border border-[#dc2626]/40 bg-red-50 hover:bg-red-100 text-[#b91c1c] font-bold transition-colors"
+              >
+                😭 선도부한테 빌어서 재촬영하기 (초기화)
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- [우측 5컬럼] 실시간 발급 카드 (학생증/도서대출증) & 폼      -->
+      <!-- ======================================================== -->
+      <section class="lg:col-span-5 space-y-4">
+
+        <!-- 카드 탭 스위처: [학생증 모드] vs [도서대출카드 모드] -->
+        <div class="flex items-center bg-[#e8e4dc] p-1 rounded-xl border border-[#1f1b18]/30 font-hand text-lg font-bold">
+          <button 
+            id="tab-mode-student"
+            class="flex-1 py-1.5 rounded-lg bg-white text-[#1f1b18] shadow-sm transition-all text-center"
+          >
+            🪪 학생증 모드
+          </button>
+          <button 
+            id="tab-mode-library"
+            class="flex-1 py-1.5 rounded-lg text-[#666] hover:text-[#111] transition-all text-center"
+          >
+            📖 도서대출카드 모드
+          </button>
+        </div>
+
+        <!-- 캡처 대상: 실시간 발급 카드 영역 -->
+        <div id="card-capture-area" class="bg-white border-2 border-[#1f1b18] rounded-xl p-4 sm:p-5 shadow-2xl space-y-3 relative overflow-hidden">
+          
+          <!-- 카드 헤더 바 -->
+          <div class="border-b-2 border-[#1f1b18] pb-2 flex items-center justify-between">
+            <div class="flex items-center space-x-1.5">
+              <span class="w-3 h-3 rounded-full bg-[#b82828]"></span>
+              <span class="font-mono text-[9px] tracking-widest text-[#777]">PLANET 2026-1</span>
+            </div>
+            <div id="card-badge-title" class="font-serif-kr text-[11px] sm:text-xs font-bold text-[#1f1b18]">
+              2026 플래닛의 새학기 공식 학생증
+            </div>
+          </div>
+
+          <!-- 카드 본문: [증명사진 란] + [인적사항 란] -->
+          <div class="grid grid-cols-12 gap-3 items-center">
+            
+            <!-- 증명사진 란: 5겹 SVG 합체 캔버스 -->
+            <div class="col-span-5">
+              <div class="aspect-[3/4] w-full grid-notebook border-2 border-[#1f1b18] rounded-lg relative overflow-hidden flex items-center justify-center shadow-inner">
+                
+                <!-- 레이어 0: 얼굴형 (파랑) -->
+                <svg id="canvas-face" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#2563EB]"></svg>
+                <!-- 레이어 1: 눈 (초록) -->
+                <svg id="canvas-eyes" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#16A34A]"></svg>
+                <!-- 레이어 2: 코 (주황) -->
+                <svg id="canvas-nose" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#EA580C]"></svg>
+                <!-- 레이어 3: 입 (분홍) -->
+                <svg id="canvas-mouth" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#DB2777]"></svg>
+                <!-- 레이어 4: 몸통 & 소품 (보라) -->
+                <svg id="canvas-body" viewBox="0 0 200 200" class="absolute inset-0 w-full h-full doodle-path stroke-[#7C3AED]"></svg>
+
+                <!-- 아직 안 뽑았을 때 안내 텍스트 -->
+                <div id="empty-photo-guide" class="text-center p-2 font-hand text-xs text-[#888] select-none">
+                  왼쪽 공책에서<br/>볼펜 멈춰를 눌러<br/>얼굴을 뽑아줘!
+                </div>
+              </div>
+              <div class="text-center mt-1 font-hand text-[11px] text-[#777]">증명사진 (5겹 사인펜)</div>
+            </div>
+
+            <!-- 우측 인적사항 란 -->
+            <div class="col-span-7 space-y-1.5 font-serif-kr text-xs text-[#2c2621]">
+              
+              <!-- 학생증 모드 뷰 -->
+              <div id="view-student-info" class="space-y-1">
+                <div>
+                  <span class="text-[10px] text-[#777] font-sans">성명:</span>
+                  <div id="card-name" class="font-bold text-sm sm:text-base text-[#111]">김플래닛</div>
+                </div>
+                <div>
+                  <span class="text-[10px] text-[#777] font-sans">참여 과정:</span>
+                  <div id="card-session" class="font-medium text-[#b82828] text-[11px]">1부(새학기) + 2부(수학여행)</div>
+                </div>
+                <div>
+                  <span class="text-[10px] text-[#777] font-sans">기증 도서 힌트:</span>
+                  <div id="card-book" class="text-[10px] text-[#444] line-clamp-1 italic">인생 소설 1권 준비 중</div>
+                </div>
+                <div class="pt-0.5">
+                  <span class="text-[10px] text-[#777] font-sans">등교 일자:</span>
+                  <div class="font-mono text-[10px] text-[#333]">2026. 12. 19. (토) 10:00</div>
+                </div>
+              </div>
+
+              <!-- 도서대출카드 모드 뷰 (도서관 레트로 표) -->
+              <div id="view-library-info" class="hidden space-y-1 font-mono text-[10px]">
+                <div class="border border-[#1f1b18] text-center p-1 bg-[#fdfbf7] rounded">
+                  <div class="font-bold text-[11px] font-serif-kr text-[#1f1b18]">독서학교 도서대출증</div>
+                  <div class="text-[9px] text-[#888]">NO. 2026-PLANET-BOOK</div>
+                </div>
+                <div class="border border-[#1f1b18] text-[9px] text-center">
+                  <div class="grid grid-cols-2 bg-[#eae5d8] font-bold border-b border-[#1f1b18] p-0.5">
+                    <span>대출일자</span>
+                    <span>반납예정</span>
+                  </div>
+                  <div class="grid grid-cols-2 p-0.5 text-red-600 font-bold">
+                    <span>2026.12.19</span>
+                    <span>평생 반납금지</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 아바타 조합 코드 -->
+              <div class="pt-1 border-t border-dashed border-[#ddd]">
+                <span class="text-[9px] text-[#888] font-mono">AVATAR_CODE:</span>
+                <div id="card-avatar-code" class="font-mono font-bold text-[10px] text-[#2563EB]">F0-E0-N0-M0-B0</div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- 카드 하단 결재 직인 스탬프 -->
+          <div class="pt-2 border-t border-[#1f1b18]/20 flex items-center justify-between">
+            <div class="font-mono text-[9px] text-[#888]">PLANET READING SCHOOL ★</div>
+            <div class="seal-stamp text-[10px] px-2 py-0.5 rounded">
+              플래닛독서학교장
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 이미지 다운로드 버튼 -->
+        <button
+          id="btn-download-card"
+          type="button"
+          class="w-full py-2.5 rounded-lg bg-[#2e5238] hover:bg-[#23402c] text-white font-serif-kr font-bold text-xs sm:text-sm shadow flex items-center justify-center space-x-1.5 transition-all"
+        >
+          <span>📸 내 학생증 이미지 저장하기 (PNG)</span>
+        </button>
+
+        <!-- 참가 신청 실시간 연동 폼 -->
+        <form id="rsvp-form" class="bg-white border-2 border-[#1f1b18] rounded-xl p-4 shadow-md space-y-3 font-serif-kr">
+          
+          <div class="border-b border-[#1f1b18]/20 pb-1.5">
+            <h4 class="font-bold text-xs sm:text-sm text-[#1f1b18] flex items-center space-x-1">
+              <span>✍️ 가정통신문 회신서 (참가 신청)</span>
+            </h4>
+            <p class="text-[10px] text-[#777] font-sans mt-0.5">입력하신 정보가 위의 학생증에 실시간 반영됩니다.</p>
+          </div>
+
+          <!-- 성함 -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
+              성함 (이름) <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="input-name"
+              type="text" 
+              required
+              value="김플래닛"
+              placeholder="실명을 입력해 주세요"
+              class="w-full text-xs p-2 border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
+            />
+          </div>
+
+          <!-- 연락처 -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
+              휴대폰 번호 <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="input-phone"
+              type="tel" 
+              required
+              value="010-1234-5678"
+              placeholder="010-0000-0000"
+              class="w-full text-xs p-2 font-mono border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
+            />
+          </div>
+
+          <!-- 참석 세션 선택 (라디오 카드) -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1f1b18] mb-1">
+              참석 세션 선택 <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+              
+              <label class="cursor-pointer">
+                <input type="radio" name="session" value="both" checked class="peer sr-only" />
+                <div class="p-2 border-2 rounded peer-checked:border-[#b82828] peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
+                  <div class="font-bold text-[#111]">1+2부 전체</div>
+                  <div class="text-red-600 font-mono font-bold">80,000원</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="session" value="s1" class="peer sr-only" />
+                <div class="p-2 border-2 rounded peer-checked:border-[#b82828] peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
+                  <div class="font-bold text-[#111]">1부만 (새학기)</div>
+                  <div class="text-red-600 font-mono font-bold">45,000원</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="session" value="s2" class="peer sr-only" />
+                <div class="p-2 border-2 rounded peer-checked:border-[#b82828] peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
+                  <div class="font-bold text-[#111]">2부만 (수학여행)</div>
+                  <div class="text-red-600 font-mono font-bold">35,000원</div>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- 선물할 도서 힌트 -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
+              선물할 도서 제목 또는 힌트 <span class="text-[#888] font-normal">(선택)</span>
+            </label>
+            <input 
+              id="input-book"
+              type="text" 
+              placeholder="예: 삶의 쉼표가 되어준 소설 1권"
+              class="w-full text-xs p-2 border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
+            />
+          </div>
+
+          <!-- 메모 -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1f1b18] mb-0.5">
+              운영진에게 남기는 메모 / 건의사항 <span class="text-[#888] font-normal">(선택)</span>
+            </label>
+            <textarea 
+              id="input-memo"
+              rows="2"
+              placeholder="못 먹는 음식(알레르기)이나 전하고 싶은 한마디"
+              class="w-full text-xs p-2 border border-[#ccc] rounded focus:border-[#b82828] focus:outline-none"
+            ></textarea>
+          </div>
+
+          <!-- 폼 제출 버튼 -->
+          <button
+            type="submit"
+            class="w-full py-3 rounded-lg bg-[#b82828] hover:bg-[#961e1e] text-white font-bold text-sm shadow-md transition-all active:scale-98"
+          >
+            📮 플래닛 독서학교 참가 신청서 제출하기
+          </button>
+
+        </form>
+
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 5단계 SVG 파츠 정의 & 로직 스크립트                       -->
+  <!-- ======================================================== -->
+  <script>
+    // 5단계 SVG 경로 데이터 (viewBox: 0 0 200 200, 낙서풍)
+    const PARTS_DATA = {
+      // 1단계: 얼굴형 (파란 사인펜 #2563EB, Y: 30~155)
+      face: {
+        category: "얼굴형",
+        colorName: "파란 사인펜",
+        colorHex: "#2563EB",
+        options: [
+          { name: "동글 찐빵", path: "M 100 35 C 145 35 168 65 168 105 C 168 145 145 155 100 155 C 55 155 32 145 32 105 C 32 65 55 35 100 35 Z" },
+          { name: "각진 네모턱", path: "M 50 42 L 150 42 C 160 42 165 55 162 90 L 158 140 C 158 152 148 155 135 155 L 65 155 C 52 155 42 152 42 140 L 38 90 C 35 55 40 42 50 42 Z" },
+          { name: "뾰족 역삼각", path: "M 40 45 C 80 40 120 40 160 45 C 165 75 145 120 100 158 C 55 120 35 75 40 45 Z" },
+          { name: "볼록 땅콩", path: "M 100 35 C 135 35 155 55 150 78 C 145 92 135 96 148 112 C 162 130 148 155 100 155 C 52 155 38 130 52 112 C 65 96 55 92 50 78 C 45 55 65 35 100 35 Z" },
+          { name: "식빵 모양", path: "M 60 40 C 80 32 100 42 100 42 C 100 42 120 32 140 40 C 160 48 165 75 158 95 C 165 115 162 150 145 155 L 55 155 C 38 150 35 115 42 95 C 35 75 40 48 60 40 Z" }
+        ]
+      },
+
+      // 2단계: 눈 (초록 사인펜 #16A34A, Y: 70~85)
+      eyes: {
+        category: "눈",
+        colorName: "초록 사인펜",
+        colorHex: "#16A34A",
+        options: [
+          // ① 순정만화 눈 (큰 타원 + 별/하이라이트)
+          { name: "순정만화 눈", path: "M 65 72 C 78 72 82 85 75 88 C 68 90 60 85 65 72 Z M 72 75 A 2 2 0 1 0 72 79 A 2 2 0 1 0 72 75 M 135 72 C 148 72 152 85 145 88 C 138 90 130 85 135 72 Z M 142 75 A 2 2 0 1 0 142 79 A 2 2 0 1 0 142 75" },
+          // ② 맑은 눈의 광인 (땡그란 원 + 점)
+          { name: "맑눈광", path: "M 70 78 A 8 8 0 1 1 70 77.9 M 70 78 A 2 2 0 1 1 70 77.9 M 130 78 A 8 8 0 1 1 130 77.9 M 130 78 A 2 2 0 1 1 130 77.9" },
+          // ③ 팬더 다크서클 (처진 눈 + 아래 음영)
+          { name: "밤샘 팬더", path: "M 60 82 C 70 75 80 82 82 84 M 58 87 C 68 95 82 92 84 86 M 140 82 C 130 75 120 82 118 84 M 142 87 C 132 95 118 92 116 86 M 68 80 A 2 2 0 1 1 68 79.9 M 132 80 A 2 2 0 1 1 132 79.9" },
+          // ④ 뱅글뱅글 뿔테안경 (안경테 + 소용돌이)
+          { name: "뱅글 뿔테", path: "M 55 78 A 12 12 0 1 1 55 77.9 M 145 78 A 12 12 0 1 1 145 77.9 M 92 78 L 108 78 M 67 78 C 65 75 62 76 62 78 C 62 80 66 81 68 79 M 133 78 C 135 75 138 76 138 78 C 138 80 134 81 132 79" },
+          // ⑤ 새침 반달 눈 (웃는 반달)
+          { name: "새침 반달", path: "M 60 76 C 70 68 82 76 82 82 M 140 76 C 130 68 118 76 118 82 M 85 70 L 90 68 M 115 70 L 110 68" }
+        ]
+      },
+
+      // 3단계: 코 (주황 사인펜 #EA580C, Y: 100~115)
+      nose: {
+        category: "코",
+        colorName: "주황 사인펜",
+        colorHex: "#EA580C",
+        options: [
+          // ① 돼지코
+          { name: "돼지코", path: "M 90 106 C 90 101 110 101 110 106 C 110 114 90 114 90 106 Z M 95 106 A 2 2 0 1 1 95 105.9 M 105 106 A 2 2 0 1 1 105 105.9" },
+          // ② 피노키오 뾰족코
+          { name: "피노키오 코", path: "M 98 98 L 122 108 L 98 110" },
+          // ③ 콧물 한 줄기 코
+          { name: "콧물 줄줄", path: "M 96 102 C 104 100 106 108 96 109 M 104 108 C 104 116 107 118 105 120 C 103 121 101 118 101 114" },
+          // ④ 복스러운 주먹코
+          { name: "복 주먹코", path: "M 93 103 C 90 109 97 114 100 114 C 103 114 110 109 107 103 M 92 108 C 96 109 104 109 108 108" },
+          // ⑤ L자 콧대
+          { name: "L자 콧대", path: "M 98 98 L 98 110 L 106 110" }
+        ]
+      },
+
+      // 4단계: 입 (분홍/빨간 사인펜 #DB2777, Y: 128~145)
+      mouth: {
+        category: "입",
+        colorName: "빨간 사인펜",
+        colorHex: "#DB2777",
+        options: [
+          // ① 개구쟁이 씩 웃는 입
+          { name: "씨익 미소", path: "M 80 132 C 90 144 110 144 122 130 M 78 130 L 82 134 M 124 128 L 120 132" },
+          // ② 두꺼운 명란젓 입술
+          { name: "명란젓 입술", path: "M 82 134 C 92 128 108 128 118 134 C 112 142 88 142 82 134 Z M 82 134 C 92 146 108 146 118 134" },
+          // ③ '3' 모양 삐죽 입
+          { name: "'3' 모양 입", path: "M 88 135 C 94 130 98 134 100 137 C 102 134 106 130 112 135" },
+          // ④ 장미꽃 물고 있는 입
+          { name: "장미 물기", path: "M 86 135 C 95 140 105 140 114 135 M 110 136 L 135 132 M 135 132 C 142 126 142 138 135 136 Z M 125 134 L 127 138" },
+          // ⑤ 이빨 보이는 함박웃음
+          { name: "함박 건치", path: "M 78 130 C 88 146 112 146 122 130 Z M 78 133 L 122 133 M 92 130 L 92 142 M 108 130 L 108 142" }
+        ]
+      },
+
+      // 5단계: 몸통 & 소품 (보라 사인펜 #7C3AED, Y: 155~195)
+      body: {
+        category: "몸통 & 소품",
+        colorName: "보라 사인펜",
+        colorHex: "#7C3AED",
+        options: [
+          // ① 프레피 니트조끼 (V넥)
+          { name: "프레피 조끼", path: "M 65 155 L 50 195 L 150 195 L 135 155 M 82 155 L 100 178 L 118 155 M 100 178 L 100 195" },
+          // ② 근육질 헐크 어깨
+          { name: "헐크 어깨", path: "M 68 155 C 40 152 20 165 15 195 M 132 155 C 160 152 180 165 185 195 M 78 175 C 100 185 122 175 122 175" },
+          // ③ 두꺼운 벽돌책 든 손
+          { name: "벽돌책 독서", path: "M 65 155 L 50 195 L 150 195 L 135 155 M 75 165 L 125 165 L 125 195 L 75 195 Z M 100 165 L 100 195 M 70 178 C 76 172 82 178 78 186 M 130 178 C 124 172 118 178 122 186" },
+          // ④ 줄무늬 수학여행 파자마
+          { name: "수학여행 파자마", path: "M 65 155 L 45 195 L 155 195 L 135 155 M 58 168 L 142 168 M 52 182 L 148 182 M 90 155 L 100 162 L 110 155" },
+          // ⑤ 커피잔 든 손
+          { name: "따아 커피잔", path: "M 65 155 L 50 195 L 150 195 L 135 155 M 120 172 L 140 172 L 138 190 L 122 190 Z M 140 176 C 145 176 146 186 140 186 M 126 168 C 128 163 126 160 128 156 M 134 168 C 136 163 134 160 136 156" }
+        ]
+      }
+    };
+
+    const STEP_KEYS = ['face', 'eyes', 'nose', 'mouth', 'body'];
+
+    // 상태 관리
+    let currentStepIndex = 0; // 0: face, 1: eyes, 2: nose, 3: mouth, 4: body
+    let activeSlot = 0;      // 0..4 빠르게 왔다갔다
+    let timerId = null;
+    let selectedResults = [null, null, null, null, null]; // 각 단계별 당첨 인덱스 (0..4)
+
+    // DOM 요소 캐시
+    const categoryTitleEl = document.getElementById('category-title');
+    const currentStepBadgeEl = document.getElementById('current-step-badge');
+    const emptyGuideEl = document.getElementById('empty-photo-guide');
+    const cardAvatarCodeEl = document.getElementById('card-avatar-code');
+
+    // 1. 공책 슬롯 UI 렌더링 함수
+    function renderStepSlots(stepIdx) {
+      const key = STEP_KEYS[stepIdx];
+      const stepData = PARTS_DATA[key];
+
+      categoryTitleEl.textContent = `${stepIdx + 1}단계 <${stepData.category}> (${stepData.colorName})`;
+      categoryTitleEl.style.color = stepData.colorHex;
+      currentStepBadgeEl.textContent = `${stepIdx + 1}/5단계`;
+
+      stepData.options.forEach((opt, idx) => {
+        const svgContainer = document.getElementById(`preview-svg-${idx}`);
+        const labelEl = document.getElementById(`label-${idx}`);
+        labelEl.textContent = opt.name;
+
+        svgContainer.innerHTML = `
+          <svg viewBox="0 0 200 200" class="w-full h-full doodle-path" style="stroke: ${stepData.colorHex}">
+            <path d="${opt.path}" />
+          </svg>
+        `;
+      });
+    }
+
+    // 2. 볼펜 왔다갔다 (80ms~100ms) 애니메이션 타이머
+    function startPenSweep() {
+      if (timerId) clearInterval(timerId);
+      
+      let direction = 1; // 1: 우측으로, -1: 좌측으로
+      timerId = setInterval(() => {
+        // 기존 active 제거
+        const prevSlotEl = document.getElementById(`slot-${activeSlot}`);
+        if (prevSlotEl) prevSlotEl.classList.remove('active-slot');
+
+        // 슬롯 번호 좌우 왕복
+        activeSlot += direction;
+        if (activeSlot >= 4) {
+          activeSlot = 4;
+          direction = -1;
+        } else if (activeSlot <= 0) {
+          activeSlot = 0;
+          direction = 1;
+        }
+
+        const nextSlotEl = document.getElementById(`slot-${activeSlot}`);
+        if (nextSlotEl) nextSlotEl.classList.add('active-slot');
+      }, 90);
+    }
+
+    // 3. 스톱 버튼 클릭 처리 ("볼펜 멈춰!")
+    function handleStop() {
+      if (currentStepIndex >= STEP_KEYS.length) return; // 이미 완성됨
+
+      const key = STEP_KEYS[currentStepIndex];
+      const chosenOptionIdx = activeSlot;
+      selectedResults[currentStepIndex] = chosenOptionIdx;
+
+      // 증명사진 캔버스에 해당 레이어 path 적용
+      const layerSvg = document.getElementById(`canvas-${key}`);
+      const chosenPath = PARTS_DATA[key].options[chosenOptionIdx].path;
+      layerSvg.innerHTML = `<path d="${chosenPath}" />`;
+
+      // 안내 문구 숨김
+      emptyGuideEl.style.display = 'none';
+
+      // 찰칵 미니 컨페티
+      confetti({
+        particleCount: 15,
+        spread: 40,
+        origin: { y: 0.7 }
+      });
+
+      // 아바타 코드 갱신
+      updateAvatarCode();
+
+      // 다음 단계로 전진
+      currentStepIndex++;
+      if (currentStepIndex < STEP_KEYS.length) {
+        renderStepSlots(currentStepIndex);
+      } else {
+        // 5단계 완성!
+        clearInterval(timerId);
+        timerId = null;
+        categoryTitleEl.textContent = "🎉 5단계 완성! 멋진 아바타가 탄생했습니다!";
+        categoryTitleEl.style.color = "#16A34A";
+        currentStepBadgeEl.textContent = "완성 (5/5)";
+        
+        // 전체 축하 컨페티
+        confetti({
+          particleCount: 60,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+
+        // 멈춰 버튼 텍스트 변경
+        document.getElementById('btn-stop').innerHTML = "<span>✨ 아바타 완성 완료! (재촬영 가능)</span>";
+        document.getElementById('btn-stop').classList.replace('bg-[#DC2626]', 'bg-[#16A34A]');
+        document.getElementById('btn-stop').classList.replace('hover:bg-[#B91C1C]', 'hover:bg-[#15803D]');
+      }
+    }
+
+    // 아바타 코드 생성: F0-E0-N0-M0-B0
+    function updateAvatarCode() {
+      const prefix = ['F', 'E', 'N', 'M', 'B'];
+      const code = selectedResults
+        .map((r, i) => `${prefix[i]}${r !== null ? r + 1 : '?'}`)
+        .join('-');
+      cardAvatarCodeEl.textContent = `AVATAR_CODE: ${code}`;
+    }
+
+    // 4. 선도부한테 빌어서 재촬영하기 (초기화)
+    function handleReset() {
+      currentStepIndex = 0;
+      activeSlot = 0;
+      selectedResults = [null, null, null, null, null];
+
+      STEP_KEYS.forEach(key => {
+        document.getElementById(`canvas-${key}`).innerHTML = '';
+      });
+
+      emptyGuideEl.style.display = 'block';
+      updateAvatarCode();
+
+      const btnStop = document.getElementById('btn-stop');
+      btnStop.innerHTML = "<span>✋ 멈춰! (클릭 또는 스페이스바)</span>";
+      btnStop.classList.remove('bg-[#16A34A]', 'hover:bg-[#15803D]');
+      btnStop.classList.add('bg-[#DC2626]', 'hover:bg-[#B91C1C]');
+
+      renderStepSlots(0);
+      startPenSweep();
+    }
+
+    // 5. 1초 올랜덤 뽑기
+    function handleQuickRandom() {
+      selectedResults = [
+        Math.floor(Math.random() * 5),
+        Math.floor(Math.random() * 5),
+        Math.floor(Math.random() * 5),
+        Math.floor(Math.random() * 5),
+        Math.floor(Math.random() * 5)
+      ];
+
+      STEP_KEYS.forEach((key, i) => {
+        const path = PARTS_DATA[key].options[selectedResults[i]].path;
+        document.getElementById(`canvas-${key}`).innerHTML = `<path d="${path}" />`;
+      });
+
+      emptyGuideEl.style.display = 'none';
+      updateAvatarCode();
+      currentStepIndex = 5;
+
+      clearInterval(timerId);
+      timerId = null;
+      categoryTitleEl.textContent = "🎲 운명 랜덤 뽑기 완료!";
+      categoryTitleEl.style.color = "#16A34A";
+      currentStepBadgeEl.textContent = "완성 (5/5)";
+
+      confetti({ particleCount: 50, spread: 70 });
+    }
+
+    // 6. 폼 입력 실시간 반영
+    const inputName = document.getElementById('input-name');
+    const inputBook = document.getElementById('input-book');
+    const cardName = document.getElementById('card-name');
+    const cardBook = document.getElementById('card-book');
+    const cardSession = document.getElementById('card-session');
+
+    inputName.addEventListener('input', (e) => {
+      cardName.textContent = e.target.value.trim() || '김플래닛';
+    });
+
+    inputBook.addEventListener('input', (e) => {
+      cardBook.textContent = e.target.value.trim() || '선물할 책 준비 중';
+    });
+
+    document.querySelectorAll('input[name="session"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.value === 'both') {
+          cardSession.textContent = '1부(새학기) + 2부(수학여행)';
+        } else if (e.target.value === 's1') {
+          cardSession.textContent = '1부(새학기)만 참석';
+        } else {
+          cardSession.textContent = '2부(수학여행)만 참석';
+        }
+      });
+    });
+
+    // 7. 카드 탭 전환: [학생증 모드] vs [도서대출카드 모드]
+    const tabStudent = document.getElementById('tab-mode-student');
+    const tabLibrary = document.getElementById('tab-mode-library');
+    const viewStudent = document.getElementById('view-student-info');
+    const viewLibrary = document.getElementById('view-library-info');
+    const cardBadgeTitle = document.getElementById('card-badge-title');
+
+    tabStudent.addEventListener('click', () => {
+      tabStudent.classList.add('bg-white', 'text-[#1f1b18]', 'shadow-sm');
+      tabStudent.classList.remove('text-[#666]');
+      tabLibrary.classList.remove('bg-white', 'text-[#1f1b18]', 'shadow-sm');
+      tabLibrary.classList.add('text-[#666]');
+
+      viewStudent.classList.remove('hidden');
+      viewLibrary.classList.add('hidden');
+      cardBadgeTitle.textContent = '2026 플래닛의 새학기 공식 학생증';
+    });
+
+    tabLibrary.addEventListener('click', () => {
+      tabLibrary.classList.add('bg-white', 'text-[#1f1b18]', 'shadow-sm');
+      tabLibrary.classList.remove('text-[#666]');
+      tabStudent.classList.remove('bg-white', 'text-[#1f1b18]', 'shadow-sm');
+      tabStudent.classList.add('text-[#666]');
+
+      viewLibrary.classList.remove('hidden');
+      viewStudent.classList.add('hidden');
+      cardBadgeTitle.textContent = '플래닛 도서관 공식 도서대출증';
+    });
+
+    // 8. html2canvas 학생증 PNG 다운로드
+    document.getElementById('btn-download-card').addEventListener('click', () => {
+      const cardEl = document.getElementById('card-capture-area');
+      
+      html2canvas(cardEl, {
+        scale: 3,
+        backgroundColor: '#ffffff'
+      }).then(canvas => {
+        const link = document.createElement('a');
+        const nameVal = inputName.value.trim() || '학우';
+        link.download = `2026_플래닛_학생증_${nameVal}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }).catch(err => {
+        console.error('Download error:', err);
+        alert('이미지 저장 중 오류가 발생했습니다. 화면을 캡처해 주세요!');
+      });
+    });
+
+    // 9. 폼 제출 시 아바타 코드 패키징 전송
+    document.getElementById('rsvp-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        name: inputName.value.trim(),
+        phone: document.getElementById('input-phone').value.trim(),
+        session: document.querySelector('input[name="session"]:checked').value,
+        book: inputBook.value.trim(),
+        memo: document.getElementById('input-memo').value.trim(),
+        avatarCode: cardAvatarCodeEl.textContent.replace('AVATAR_CODE: ', '')
+      };
+
+      console.log('Submitted Payload:', payload);
+      alert(`🎉 참가 신청이 접수되었습니다!\n\n• 성함: ${payload.name}\n• 세션: ${payload.session}\n• 아바타 코드: ${payload.avatarCode}\n\n화면의 [📸 내 학생증 이미지 저장하기]를 눌러 학생증을 저장하세요!`);
+    });
+
+    // 10. 스페이스바 및 버튼 이벤트 등록
+    document.getElementById('btn-stop').addEventListener('click', handleStop);
+    document.getElementById('btn-reset').addEventListener('click', handleReset);
+    document.getElementById('btn-quick-random').addEventListener('click', handleQuickRandom);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        handleStop();
+      }
+    });
+
+    // 초기 실행
+    renderStepSlots(0);
+    startPenSweep();
+  </script>
+
+</body>
+</html>
