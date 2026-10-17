@@ -79,12 +79,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     localStorage.setItem('planet_rsvps', JSON.stringify(updated));
   };
 
-  // 비밀번호 인증
+  // 비밀번호 인증 (GitHub Secrets / 환경변수 VITE_ADMIN_PASSWORD 참조)
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPassword = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'planet2026';
+    const correctPassword = (import.meta.env.VITE_ADMIN_PASSWORD as string) || '';
     const trimmed = passwordInput.trim();
-    if (trimmed === correctPassword || trimmed === 'planet2026' || trimmed.replace(/\s+/g, '') === '플래닛연말준비2026') {
+    if (correctPassword && trimmed === correctPassword) {
       setIsAuthenticated(true);
       sessionStorage.setItem('planet_admin_auth', 'true');
       setPasswordError(false);

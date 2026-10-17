@@ -3,14 +3,21 @@ import confetti from 'canvas-confetti';
 import { toPng } from 'html-to-image';
 import { 
   Download, Shuffle, Eraser, 
-  Scissors, AlertCircle, Copy, CheckCircle2
+  Scissors, AlertCircle, Copy, CheckCircle2,
+  Search, Loader2, Inbox, RefreshCw
 } from 'lucide-react';
 import { STAGES } from './pencilData';
 import { EVENT_CONFIG } from '../constants/eventConfig';
 import { sanitizeText, validatePhone, formatPhone } from '../utils/validation';
+import { maskPhone } from '../utils/masking';
 
 interface PencilSketchRsvpProps {
   onSuccess?: () => void;
+}
+
+interface ValidationErrorInfo {
+  reason: string;
+  action: string;
 }
 
 export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess }) => {
@@ -35,10 +42,19 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
   const [bookHint, setBookHint] = useState('');
   const [memo, setMemo] = useState('');
   const [privacyAgreed, setPrivacyAgreed] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 4대 화면 상태 (로딩 / 정상 / 빈 결과 / 오류) 및 잘못된 입력 안내 상태
+  const [validationError, setValidationError] = useState<ValidationErrorInfo | null>(null);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [serverErrorInfo, setServerErrorInfo] = useState<ValidationErrorInfo | null>(null);
+  const [simulateErrorMode, setSimulateErrorMode] = useState(false);
   const [submittedData, setSubmittedData] = useState<any>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
+
+  // 발급 학생증 조회 (빈 결과 / 로딩 / 정상 상태 시연 및 재조회 기능)
+  const [lookupQuery, setLookupQuery] = useState('');
+  const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'empty' | 'success'>('idle');
+  const [lookupResults, setLookupResults] = useState<any[]>([]);
 
   // 1. 공책 위 볼펜/연필 좌우 왕복 애니메이션 (90ms)
   useEffect(() => {
@@ -163,29 +179,40 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
   // 폰 번호 입력 포맷팅
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhone(formatPhone(e.target.value));
-    if (errorMessage) setErrorMessage('');
+    if (validationError) setValidationError(null);
   };
 
-  // 참가 신청 폼 제출
+  // 참가 신청 폼 제출 (잘못된 입력 안내 + 로딩/정상/오류 상태 처리)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanName = sanitizeText(name, 20);
 
+    // 1. 잘못된 입력 검증 (이유 + 할 일 명시)
     if (!cleanName || cleanName.length < 2) {
-      setErrorMessage('성함을 2자 이상 바르게 입력해 주세요.');
+      setValidationError({
+        reason: '성함이 입력되지 않았거나 2글자 미만입니다.',
+        action: '성함 입력란에 2자 이상의 실명(예: 김플래닛)을 입력한 후 다시 제출 버튼을 눌러주세요.'
+      });
       return;
     }
     if (!validatePhone(phone)) {
-      setErrorMessage('휴대폰 번호(010-0000-0000) 형식을 확인해 주세요.');
+      setValidationError({
+        reason: `휴대폰 번호 형식이 올바르지 않습니다 (현재 입력값: "${phone || '미입력'}").`,
+        action: '010-1234-5678 형식으로 숫자 11자리를 정확히 입력한 뒤 다시 제출해 주세요.'
+      });
       return;
     }
     if (!privacyAgreed) {
-      setErrorMessage('개인정보 수집 및 행사 안내 목적 이용에 동의해 주세요.');
+      setValidationError({
+        reason: '필수 개인정보 수집 및 이용 동의 항목이 체크되지 않았습니다.',
+        action: '제출 버튼 바로 위에 있는 "[필수] 개인정보 수집 동의" 체크박스를 선택한 후 다시 제출해 주세요.'
+      });
       return;
     }
 
-    setErrorMessage('');
-    setIsSubmitting(true);
+    setValidationError(null);
+    setServerErrorInfo(null);
+    setSubmitStatus('loading');
 
     const s1 = selectedSession === 'both' || selectedSession === 'session1';
     const s2 = selectedSession === 'both' || selectedSession === 'session2';
@@ -205,6 +232,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
       action: 'register',
       name: cleanName,
       phone: phone,
+      maskedPhone: maskPhone(phone),
       session: sessionLabel,
       team: team,
       grade: grade,
@@ -215,10 +243,24 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
       studentNumber: studentNumber,
       avatarCode: avatarCode,
       avatarRecipe: recipeNames.join(' / '),
+      selectedIndices: selectedIndices,
       submittedAt: new Date().toISOString()
     };
 
     try {
+      // 시각적 로딩 상태 확인을 위한 최소 대기 시간 (600ms)
+      await new Promise(resolve => setTimeout(resolve, 600));
+
+      // 로컬 스토리지 안전 백업 저장
+      const existingRsvps = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
+      existingRsvps.push(payload);
+      localStorage.setItem('planet_rsvps', JSON.stringify(existingRsvps));
+
+      // 오류 시뮬레이션 모드 또는 오프라인 상태 체크
+      if (simulateErrorMode || !navigator.onLine) {
+        throw new Error(simulateErrorMode ? 'SIMULATED_SERVER_ERROR' : 'NETWORK_OFFLINE');
+      }
+
       if (EVENT_CONFIG.googleScriptUrl && EVENT_CONFIG.googleScriptUrl !== 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec') {
         await fetch(EVENT_CONFIG.googleScriptUrl, {
           method: 'POST',
@@ -227,10 +269,6 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
           body: JSON.stringify(payload)
         });
       }
-
-      const existingRsvps = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
-      existingRsvps.push(payload);
-      localStorage.setItem('planet_rsvps', JSON.stringify(existingRsvps));
 
       confetti({
         particleCount: 120,
@@ -247,15 +285,68 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
           day: 'numeric'
         })
       });
+      setSubmitStatus('success');
 
       if (onSuccess) onSuccess();
 
     } catch (err) {
       console.error(err);
-      setErrorMessage('접수 처리 중 일시적인 오류가 발생했습니다. 다시 시도해 주세요.');
-    } finally {
-      setIsSubmitting(false);
+      setSubmitStatus('error');
+      setServerErrorInfo({
+        reason: !navigator.onLine
+          ? '현재 인터넷(네트워크) 연결이 끊어져 외부 구글 시트 서버로 신청서를 전송하지 못했습니다.'
+          : '외부 구글 시트 서버 응답 지연 또는 일시적인 통신 오류가 발생했습니다.',
+        action: '1) 네트워크 연결 상태를 확인하거나 [오류 테스트 체크 해제] 후 아래 [다시 제출하기] 버튼을 눌러주세요. 2) 입력하신 정보는 브라우저 임시 보관함에 안전하게 백업되었으므로 좌측의 [완성된 학생증 이미지 저장하기]는 지금 바로 이용 가능합니다.'
+      });
     }
+  };
+
+  // 발급된 학생증 / 신청 내역 조회 핸들러 (로딩 ➔ 빈 결과 / 정상 상태 전환)
+  const handleLookup = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const q = sanitizeText(lookupQuery, 20).trim();
+    setLookupStatus('loading');
+
+    await new Promise(resolve => setTimeout(resolve, 400));
+
+    try {
+      const saved: any[] = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
+      const matched = q
+        ? saved.filter(
+            item =>
+              (item.name && item.name.includes(q)) ||
+              (item.phone && item.phone.includes(q)) ||
+              (item.studentNumber && item.studentNumber.toLowerCase().includes(q.toLowerCase()))
+          )
+        : [];
+
+      if (matched.length === 0) {
+        setLookupResults([]);
+        setLookupStatus('empty');
+      } else {
+        setLookupResults(matched.reverse());
+        setLookupStatus('success');
+      }
+    } catch {
+      setLookupResults([]);
+      setLookupStatus('empty');
+    }
+  };
+
+  // 조회된 학생증 정보를 현재 프리뷰 카드로 복원
+  const handleRestoreRecord = (rec: any) => {
+    setName(rec.name || '');
+    setTeam(rec.team || '미들썸머반');
+    setGrade(rec.grade || '2학년 (기존)');
+    if (rec.bookTitle && rec.bookTitle !== '(선물 책 준비 중)') {
+      setBookHint(rec.bookTitle);
+    }
+    if (Array.isArray(rec.selectedIndices) && rec.selectedIndices.length === 6) {
+      setSelectedIndices(rec.selectedIndices);
+      setIsPlaying(false);
+    }
+    setCardMode('id');
+    cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   const recipeNames = selectedIndices.map((val, sIdx) => val !== null ? STAGES[sIdx].items[val].name : '미정');
@@ -360,18 +451,20 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
           })}
         </div>
 
-        {/* 현재 단계의 6가지 연필 드로잉 파츠가 나열되는 판 */}
+        {/* 현재 단계의 6가지 연필 드로잉 파츠가 나열되는 판 (키보드 Tab 이동 및 선택 지원) */}
         {currentStageData && (
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2.5 my-3">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2.5 my-3" role="group" aria-label={`${STAGES[currentStage]?.title} 파츠 선택`}>
             {currentStageData.items.map((item, idx) => {
               const isPenHere = activeIndex === idx;
               const isSelected = selectedIndices[currentStage] === idx;
               const svgContent = item.svg || item.frontSvg || '';
               return (
-                <div
+                <button
                   key={idx}
+                  type="button"
+                  aria-pressed={isSelected}
                   onClick={() => handleSelectPart(idx)}
-                  className={`border-2 rounded p-1 sm:p-2 cursor-pointer transition flex flex-col items-center justify-between min-h-[90px] sm:min-h-[115px] bg-white/70 select-none ${
+                  className={`border-2 rounded p-1 sm:p-2 cursor-pointer transition flex flex-col items-center justify-between min-h-[90px] sm:min-h-[115px] bg-white/70 select-none text-left ${
                     isPenHere ? 'pen-active' : 'border-stone-300 hover:border-stone-500'
                   } ${isSelected ? 'ring-2 ring-stone-900 bg-amber-50/50' : ''}`}
                 >
@@ -386,7 +479,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                   <span className="text-[11px] font-hand font-bold text-stone-800 text-center leading-tight truncate w-full mt-1">
                     {idx + 1}. {item.name}
                   </span>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -394,7 +487,11 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
 
         {/* 연필 상태 메시지 & 컨트롤 버튼 */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-dashed border-stone-400">
-          <div className="font-hand text-sm sm:text-base font-bold text-stone-700 flex items-center gap-1.5">
+          <div
+            role="status"
+            aria-live="polite"
+            className="font-hand text-sm sm:text-base font-bold text-stone-700 flex items-center gap-1.5"
+          >
             <span className="inline-block animate-bounce">✏️</span>
             <span>
               {isPlaying 
@@ -442,12 +539,13 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
 
         {/* 좌측: 실시간 학생증 & 대출증 프리뷰 (5칸) */}
-        <div className="md:col-span-5 flex flex-col items-center w-full">
+        <div className="md:col-span-5 flex flex-col items-center w-full min-w-0">
           
           {/* 카드 모드 전환 탭 */}
           <div className="flex w-full mb-2 border-2 border-black rounded overflow-hidden text-xs font-bold font-hwp-title">
             <button
               type="button"
+              aria-pressed={cardMode === 'id'}
               onClick={() => setCardMode('id')}
               className={`flex-1 py-2 transition ${
                 cardMode === 'id' ? 'bg-stone-800 text-white' : 'bg-stone-200 text-stone-700 hover:bg-stone-300'
@@ -457,6 +555,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
             </button>
             <button
               type="button"
+              aria-pressed={cardMode === 'library'}
               onClick={() => setCardMode('library')}
               className={`flex-1 py-2 transition ${
                 cardMode === 'library' ? 'bg-stone-800 text-white' : 'bg-stone-200 text-stone-700 hover:bg-stone-300'
@@ -467,7 +566,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
           </div>
 
           {/* 캡처 대상 카드 영역 */}
-          <div ref={cardRef} className="w-full bg-[#faf8f2] border-2 border-black p-4 shadow-md relative text-[#292524]">
+          <div ref={cardRef} className="w-full bg-[#faf8f2] border-2 border-black p-3 sm:p-4 shadow-md relative text-[#292524] overflow-hidden">
             
             {/* [모드 1] 플래닛독서학교 학생증 */}
             {cardMode === 'id' && (
@@ -475,13 +574,13 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                 <div className="border-b-2 border-black pb-1.5 mb-3 flex justify-between items-end">
                   <div>
                     <div className="text-[10px] font-bold text-stone-500 tracking-widest font-sans">PLANET BOOK SCHOOL</div>
-                    <div className="font-hwp-title font-black text-lg text-black leading-none mt-0.5">학 생 증</div>
+                    <div className="font-hwp-title font-black text-base sm:text-lg text-black leading-none mt-0.5">학 생 증</div>
                   </div>
                   <span className="text-[10px] font-hwp-body border border-black px-1.5 py-0.5 bg-stone-100">제2026-1호</span>
                 </div>
 
                 {/* 증명사진(연필 일러스트 합체) + 학적 정보 */}
-                <div className="grid grid-cols-12 gap-3 items-center">
+                <div className="grid grid-cols-12 gap-2.5 sm:gap-3 items-center">
                   {/* 합체된 연필 일러스트 아바타 캔버스 */}
                   <div className="col-span-5 sketch-paper border-2 border-stone-800 aspect-[4/5] relative flex items-center justify-center overflow-hidden shadow-inner">
                     <svg viewBox="0 0 200 220" className="w-full h-full" filter="url(#pencil-sketch)">
@@ -517,24 +616,24 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                   </div>
 
                   {/* 우측 학생 정보 표 */}
-                  <div className="col-span-7 text-xs font-hwp-body space-y-1.5">
+                  <div className="col-span-7 text-xs font-hwp-body space-y-1.5 min-w-0">
                     <div className="border-b border-stone-400 pb-0.5">
                       <span className="text-stone-500 font-bold block text-[10px]">성 명 (학우명)</span>
-                      <span className="font-bold text-sm text-black">{name.trim() || '김플래닛'}</span>
+                      <span className="font-bold text-sm text-black truncate block">{name.trim() || '김플래닛'}</span>
                     </div>
-                    <div className="border-b border-stone-400 pb-0.5 flex justify-between">
-                      <div>
+                    <div className="border-b border-stone-400 pb-0.5 flex justify-between gap-1">
+                      <div className="min-w-0">
                         <span className="text-stone-500 font-bold block text-[10px]">소 속 반</span>
-                        <span className="font-bold text-stone-900 text-xs">{team}</span>
+                        <span className="font-bold text-stone-900 text-[11px] sm:text-xs truncate block">{team}</span>
                       </div>
-                      <div>
+                      <div className="min-w-0 text-right">
                         <span className="text-stone-500 font-bold block text-[10px]">학 년</span>
-                        <span className="font-bold text-stone-900 text-xs">{grade.split(' ')[0]}</span>
+                        <span className="font-bold text-stone-900 text-[11px] sm:text-xs">{grade.split(' ')[0]}</span>
                       </div>
                     </div>
                     <div className="border-b border-stone-400 pb-0.5">
                       <span className="text-stone-500 font-bold block text-[10px]">수강 과정</span>
-                      <span className="font-bold text-stone-900 text-[11px]">
+                      <span className="font-bold text-stone-900 text-[11px] break-keep">
                         {selectedSession === 'both' ? '1부 새학기 + 2부 수학여행' : selectedSession === 'session1' ? '1부 새학기' : '2부 수학여행'}
                       </span>
                     </div>
@@ -551,12 +650,12 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                 </div>
 
                 {/* 하단 직인 날인 & 바코드 */}
-                <div className="mt-3 pt-2 border-t border-black flex justify-between items-center">
+                <div className="mt-3 pt-2 border-t border-black flex justify-between items-center gap-2">
                   <div className="text-[10px] font-hwp-body text-stone-600 leading-tight">
                     개학일: <b>2026. 12. 19. (토)</b><br />
                     위 사람은 본교 어른이임을 증명함.
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
                     <span className="font-hwp-body font-bold text-xs text-black">플래닛독서학교장</span>
                     <div className="stamp-seal w-9 h-9 text-[9px] flex items-center justify-center leading-tight text-center p-0.5">
                       플래닛<br />학교장인
@@ -581,11 +680,11 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                   </div>
                   <div className="grid grid-cols-12 border-b border-black">
                     <div className="col-span-4 bg-stone-200 font-bold p-1.5 border-r border-black">기증 학우</div>
-                    <div className="col-span-8 p-1.5 font-bold">{name.trim() || '김플래닛'}</div>
+                    <div className="col-span-8 p-1.5 font-bold truncate">{name.trim() || '김플래닛'}</div>
                   </div>
                   <div className="grid grid-cols-12">
                     <div className="col-span-4 bg-stone-200 font-bold p-1.5 border-r border-black">블라인드 힌트</div>
-                    <div className="col-span-8 p-1.5 text-red-900 font-bold">{bookHint.trim() || '삶의 쉼표가 되어준 소설 1권'}</div>
+                    <div className="col-span-8 p-1.5 text-red-900 font-bold break-words">{bookHint.trim() || '삶의 쉼표가 되어준 소설 1권'}</div>
                   </div>
                 </div>
 
@@ -651,7 +750,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
         </div>
 
         {/* 우측: 절취선 참가 신청서 입력 폼 (7칸) */}
-        <div className="md:col-span-7 w-full bg-white/70 border-2 border-black p-4 sm:p-5 shadow-sm">
+        <div className="md:col-span-7 w-full bg-white/70 border-2 border-black p-4 sm:p-5 shadow-sm min-w-0">
           <div className="text-center border-b-2 border-dashed border-stone-500 pb-2 mb-4">
             <span className="text-xs font-mono text-stone-500">------------ (절 취 선) ------------</span>
             <h3 className="font-bold text-sm sm:text-base text-black mt-1 font-hwp-title">
@@ -659,40 +758,50 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
             </h3>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3.5 text-xs sm:text-sm font-hwp-body">
+          <form onSubmit={handleSubmit} noValidate className="space-y-3.5 text-xs sm:text-sm font-hwp-body">
             
             {/* 성함 */}
             <div>
-              <label className="block font-bold text-stone-800 mb-1">성함 (이름) <span className="text-red-600">*</span></label>
+              <label htmlFor="rsvp-name" className="block font-bold text-stone-800 mb-1">
+                성함 (이름) <span className="text-red-600">*</span>
+              </label>
               <input
+                id="rsvp-name"
                 type="text"
-                required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="실명을 입력해 주세요 (예: 김플래닛)"
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (validationError) setValidationError(null);
+                }}
+                placeholder="실명을 입력해 주세요 (예: 김플래닛, 2자 이상)"
                 className="w-full border-2 border-stone-800 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-stone-700 font-sans text-sm"
               />
             </div>
 
             {/* 휴대폰 번호 */}
             <div>
-              <label className="block font-bold text-stone-800 mb-1">휴대폰 번호 <span className="text-red-600">*</span></label>
+              <label htmlFor="rsvp-phone" className="block font-bold text-stone-800 mb-1">
+                휴대폰 번호 <span className="text-red-600">*</span>
+              </label>
               <input
+                id="rsvp-phone"
                 type="tel"
-                required
                 value={phone}
                 onChange={handlePhoneChange}
-                placeholder="010-0000-0000"
+                placeholder="010-0000-0000 (숫자 11자리)"
                 maxLength={13}
                 className="w-full border-2 border-stone-800 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-stone-700 font-sans text-sm"
               />
             </div>
 
             {/* 소속반 & 학년 선택 */}
-            <div className="grid grid-cols-2 gap-2.5 font-sans">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-sans">
               <div>
-                <label className="block font-bold text-stone-800 mb-1 font-serif">소속반 <span className="text-red-600">*</span></label>
+                <label htmlFor="rsvp-team" className="block font-bold text-stone-800 mb-1 font-serif">
+                  소속반 <span className="text-red-600">*</span>
+                </label>
                 <select
+                  id="rsvp-team"
                   value={team}
                   onChange={(e) => setTeam(e.target.value)}
                   className="w-full border-2 border-stone-800 bg-white px-2.5 py-2 font-sans text-xs focus:outline-none focus:ring-2 focus:ring-stone-700"
@@ -705,8 +814,11 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
               </div>
 
               <div>
-                <label className="block font-bold text-stone-800 mb-1 font-serif">학년 (구분) <span className="text-red-600">*</span></label>
+                <label htmlFor="rsvp-grade" className="block font-bold text-stone-800 mb-1 font-serif">
+                  학년 (구분) <span className="text-red-600">*</span>
+                </label>
                 <select
+                  id="rsvp-grade"
                   value={grade}
                   onChange={(e) => setGrade(e.target.value)}
                   className="w-full border-2 border-stone-800 bg-white px-2.5 py-2 font-sans text-xs focus:outline-none focus:ring-2 focus:ring-stone-700"
@@ -719,10 +831,12 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
               </div>
             </div>
 
-            {/* 참석 세션 선택 */}
-            <div>
-              <label className="block font-bold text-stone-800 mb-1">참석 세션 선택 <span className="text-red-600">*</span></label>
-              <div className="grid grid-cols-3 gap-2 font-sans">
+            {/* 참석 세션 선택 (키보드 Tab 초점 표시 지원 & 모바일 가로 넘침 방지) */}
+            <fieldset>
+              <legend className="block font-bold text-stone-800 mb-1">
+                참석 세션 선택 <span className="text-red-600">*</span>
+              </legend>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-sans">
                 <label className="cursor-pointer">
                   <input
                     type="radio"
@@ -732,7 +846,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                     onChange={() => setSelectedSession('both')}
                     className="peer sr-only"
                   />
-                  <div className="border-2 border-stone-400 peer-checked:border-stone-900 peer-checked:bg-stone-200 p-2 text-center rounded transition">
+                  <div className="border-2 border-stone-400 peer-checked:border-stone-900 peer-checked:bg-stone-200 peer-focus-visible:ring-2 peer-focus-visible:ring-[#b82828] p-2 text-center rounded transition">
                     <div className="font-bold text-xs text-stone-900">1부 + 2부 전체</div>
                     <div className="text-[10px] text-stone-600">새학기 &amp; 수학여행</div>
                     <div className="font-black text-xs text-red-800 mt-1">{feeInfo.both}</div>
@@ -748,7 +862,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                     onChange={() => setSelectedSession('session1')}
                     className="peer sr-only"
                   />
-                  <div className="border-2 border-stone-400 peer-checked:border-stone-900 peer-checked:bg-stone-200 p-2 text-center rounded transition">
+                  <div className="border-2 border-stone-400 peer-checked:border-stone-900 peer-checked:bg-stone-200 peer-focus-visible:ring-2 peer-focus-visible:ring-[#b82828] p-2 text-center rounded transition">
                     <div className="font-bold text-xs text-stone-900">1부만 참석</div>
                     <div className="text-[10px] text-stone-600">새학기 본파티(낮)</div>
                     <div className="font-black text-xs text-red-800 mt-1">{feeInfo.session1}</div>
@@ -764,21 +878,22 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                     onChange={() => setSelectedSession('session2')}
                     className="peer sr-only"
                   />
-                  <div className="border-2 border-stone-400 peer-checked:border-stone-900 peer-checked:bg-stone-200 p-2 text-center rounded transition">
+                  <div className="border-2 border-stone-400 peer-checked:border-stone-900 peer-checked:bg-stone-200 peer-focus-visible:ring-2 peer-focus-visible:ring-[#b82828] p-2 text-center rounded transition">
                     <div className="font-bold text-xs text-stone-900">2부만 참석</div>
                     <div className="text-[10px] text-stone-600">수학여행 뒤풀이</div>
                     <div className="font-black text-xs text-red-800 mt-1">{feeInfo.session2}</div>
                   </div>
                 </label>
               </div>
-            </div>
+            </fieldset>
 
             {/* 선물할 도서 제목 또는 힌트 */}
             <div>
-              <label className="block font-bold text-stone-800 mb-1">
+              <label htmlFor="rsvp-bookhint" className="block font-bold text-stone-800 mb-1">
                 선물할 도서 제목 또는 한 줄 힌트 <span className="text-stone-500 font-normal">(대출카드 인쇄용)</span>
               </label>
               <input
+                id="rsvp-bookhint"
                 type="text"
                 value={bookHint}
                 onChange={(e) => setBookHint(e.target.value)}
@@ -789,8 +904,11 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
 
             {/* 운영진에게 남기는 메모 */}
             <div>
-              <label className="block font-bold text-stone-800 mb-1">운영진에게 남기는 메모 / 건의사항 (선택)</label>
+              <label htmlFor="rsvp-memo" className="block font-bold text-stone-800 mb-1">
+                운영진에게 남기는 메모 / 건의사항 (선택)
+              </label>
               <textarea
+                id="rsvp-memo"
                 rows={2}
                 value={memo}
                 onChange={(e) => setMemo(e.target.value)}
@@ -799,47 +917,131 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
               />
             </div>
 
-            {/* 개인정보 수집 동의 */}
-            <label className="flex items-start space-x-2 pt-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={privacyAgreed}
-                onChange={(e) => setPrivacyAgreed(e.target.checked)}
-                className="mt-0.5 rounded border-stone-600 text-stone-900 focus:ring-stone-600"
-              />
-              <span className="text-[11px] text-stone-600 leading-tight font-sans">
-                [필수] 원활한 행사 진행 및 학생증 발급을 위한 개인정보 수집에 동의합니다.
-              </span>
-            </label>
+            {/* 개인정보 수집 동의 및 보안 안내 */}
+            <div className="p-2.5 bg-stone-100 border border-stone-300 rounded space-y-1.5 font-sans">
+              <label className="flex items-start space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={privacyAgreed}
+                  onChange={(e) => {
+                    setPrivacyAgreed(e.target.checked);
+                    if (validationError) setValidationError(null);
+                  }}
+                  className="mt-0.5 rounded border-stone-600 text-stone-900 focus:ring-stone-600"
+                />
+                <span className="text-[11px] font-bold text-stone-800 leading-tight">
+                  [필수] 행사 참석 확인 및 학생증 발급을 위한 최소 개인정보 수집·이용에 동의합니다.
+                </span>
+              </label>
+              <p className="text-[10px] text-stone-500 pl-5 leading-normal">
+                • 수집 항목: 성함, 연락처(화면 표시 시 중간 번호 마스킹 보호), 소속반, 참석 세션<br />
+                • 보유 및 파기: 2026. 12. 19. 연말모임 종료 후 즉시 파기
+              </p>
+            </div>
 
-            {/* 에러 메시지 */}
-            {errorMessage && (
-              <div className="p-2.5 bg-red-100 border border-red-400 text-red-800 text-xs rounded flex items-center space-x-1.5">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{errorMessage}</span>
+            {/* 통신 오류 대응 시뮬레이션 토글 (검증 테스트용) */}
+            <div className="flex items-center justify-end">
+              <label className="inline-flex items-center space-x-1.5 text-[11px] font-sans text-stone-500 cursor-pointer hover:text-stone-800">
+                <input
+                  type="checkbox"
+                  checked={simulateErrorMode}
+                  onChange={(e) => setSimulateErrorMode(e.target.checked)}
+                  className="rounded border-stone-400"
+                />
+                <span>⚡ 서버 통신 실패(오류 상태) 대응 테스트</span>
+              </label>
+            </div>
+
+            {/* [상태 안내 1] 잘못된 입력 안내 (이유 + 할 일) */}
+            {validationError && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="p-3 bg-red-50 border-2 border-red-600 text-red-900 text-xs rounded space-y-1 font-sans"
+              >
+                <div className="font-bold flex items-center space-x-1.5 text-red-700">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>[잘못된 입력 안내] 제출을 완료할 수 없습니다</span>
+                </div>
+                <p className="pl-5"><strong>• 이유:</strong> {validationError.reason}</p>
+                <p className="pl-5"><strong>• 할 일:</strong> {validationError.action}</p>
+              </div>
+            )}
+
+            {/* [상태 안내 2] 로딩 상태 (제출 처리 중) */}
+            {submitStatus === 'loading' && (
+              <div
+                role="status"
+                aria-live="polite"
+                className="p-3 bg-amber-50 border-2 border-amber-600 text-amber-900 text-xs rounded flex items-center space-x-2.5 font-sans"
+              >
+                <Loader2 className="w-4 h-4 animate-spin text-amber-700 flex-shrink-0" />
+                <div>
+                  <div className="font-bold">[로딩 상태] 참가 신청서 접수 및 고유 학번 발급 중...</div>
+                  <div className="text-[11px] text-amber-800">플래닛 독서학교 서버와 통신하고 있습니다. 잠시만 기다려 주세요.</div>
+                </div>
+              </div>
+            )}
+
+            {/* [상태 안내 3] 오류 상태 (통신 실패 시 이유 + 할 일 + 재시도 버튼) */}
+            {submitStatus === 'error' && serverErrorInfo && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="p-3.5 bg-red-50 border-2 border-red-700 text-red-900 text-xs rounded space-y-2 font-sans"
+              >
+                <div className="font-bold flex items-center space-x-1.5 text-red-800 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>⚠️ [오류 상태] 원격 구글 시트 전송에 실패했습니다</span>
+                </div>
+                <p><strong>• 실패 이유:</strong> {serverErrorInfo.reason}</p>
+                <p><strong>• 해야 할 일:</strong> {serverErrorInfo.action}</p>
+                <div className="pt-1 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      setSimulateErrorMode(false);
+                      handleSubmit(e as any);
+                    }}
+                    className="px-3 py-1.5 bg-red-800 hover:bg-red-900 text-white font-bold rounded text-xs inline-flex items-center space-x-1"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>오류 해제 후 다시 제출하기</span>
+                  </button>
+                </div>
               </div>
             )}
 
             {/* 제출 버튼 */}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={submitStatus === 'loading'}
               className="w-full bg-stone-900 hover:bg-black text-white font-bold py-3 px-4 border-2 border-black shadow-md transition text-sm flex items-center justify-center space-x-2 disabled:opacity-50"
             >
               <Scissors className="w-4 h-4" />
-              <span>{isSubmitting ? '신청서 접수 중...' : '✂️ 절취선 뜯어서 가정통신문 참가 신청서 제출하기'}</span>
+              <span>
+                {submitStatus === 'loading'
+                  ? '신청서 접수 중...'
+                  : '✂️ 절취선 뜯어서 가정통신문 참가 신청서 제출하기'}
+              </span>
             </button>
           </form>
         </div>
       </div>
 
-      {/* 제출 완료 안내 카드 */}
-      {submittedData && (
-        <div className="mt-6 bg-[#292524] text-stone-100 border-2 border-black p-5 rounded-sm shadow-xl font-sans animate-fadeIn">
-          <div className="flex items-center justify-between border-b border-stone-700 pb-3 mb-3">
+      {/* [상태 안내 4] 정상 상태: 제출 완료 안내 카드 (개인정보 마스킹 적용) */}
+      {submitStatus === 'success' && submittedData && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-6 bg-[#292524] text-stone-100 border-2 border-black p-4 sm:p-5 rounded-sm shadow-xl font-sans animate-fadeIn"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-700 pb-3 mb-3">
             <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              <span className="font-bold text-base text-emerald-400">가정통신문 참가 신청이 정상 접수되었습니다!</span>
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+              <span className="font-bold text-sm sm:text-base text-emerald-400">
+                [정상 완료] 가정통신문 참가 신청이 접수되었습니다!
+              </span>
             </div>
             <span className="text-xs font-mono bg-stone-800 px-2.5 py-1 rounded border border-stone-600 text-amber-300">
               학번: {submittedData.studentNumber}
@@ -849,6 +1051,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono mb-4">
             <div className="space-y-1 text-stone-300">
               <div>• 접수 학우: <span className="text-white font-bold">{submittedData.name}</span> ({submittedData.team} / {submittedData.grade})</div>
+              <div>• 보호 연락처: <span className="text-stone-200">{submittedData.maskedPhone || maskPhone(submittedData.phone)}</span></div>
               <div>• 선택 세션: <span className="text-white">{submittedData.session}</span></div>
               <div>• 아바타 코드: <span className="text-amber-400 font-bold">{submittedData.avatarCode}</span></div>
               <div>• 연필 레시피: <span className="text-stone-400">{submittedData.avatarRecipe}</span></div>
@@ -882,12 +1085,119 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
             </div>
           </div>
 
-          <div className="text-[11px] text-stone-400 border-t border-stone-800 pt-2 flex items-center justify-between">
-            <span>※ 위 [완성된 학생증 이미지 저장하기] 버튼으로 나만의 학생증을 다운로드해 단톡방에 인증해 보세요!</span>
+          <div className="text-[11px] text-stone-400 border-t border-stone-800 pt-2 flex flex-wrap items-center justify-between gap-1">
+            <span>※ 위 [완성된 학생증/대출증 이미지 저장하기] 버튼으로 나만의 학생증을 다운로드해 보세요!</span>
             <span>2026. 12. 19. (토) 교실에서 만나요</span>
           </div>
         </div>
       )}
+
+      {/* ======================================================= */}
+      {/* 4. 발급된 학생증 · 신청 내역 조회 (빈 결과 / 로딩 / 정상 상태 확인) */}
+      {/* ======================================================= */}
+      <div className="mt-7 bg-white/80 border-2 border-stone-800 p-4 sm:p-5 rounded-sm shadow-sm font-sans">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-300 pb-2.5 mb-3">
+          <div>
+            <h4 className="font-bold text-sm text-stone-900 flex items-center gap-1.5">
+              <Search className="w-4 h-4 text-stone-700" />
+              <span>발급된 학생증 및 참가 신청 내역 조회</span>
+            </h4>
+            <p className="text-[11px] text-stone-600 mt-0.5">
+              신청하신 성함 또는 학번으로 접수 상태와 발급된 학생증 레시피를 다시 불러올 수 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleLookup} className="flex flex-col sm:flex-row gap-2">
+          <label htmlFor="lookup-input" className="sr-only">조회할 성함 또는 학번 입력</label>
+          <input
+            id="lookup-input"
+            type="text"
+            value={lookupQuery}
+            onChange={(e) => setLookupQuery(e.target.value)}
+            placeholder="조회할 성함 또는 학번 입력 (예: 김플래닛, 미등록 이름 입력 시 빈 결과 안내)"
+            className="flex-1 border-2 border-stone-800 bg-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-stone-700"
+          />
+          <button
+            type="submit"
+            disabled={lookupStatus === 'loading'}
+            className="bg-stone-800 hover:bg-black text-white font-bold px-4 py-2 text-xs sm:text-sm border-2 border-black transition flex items-center justify-center gap-1.5 disabled:opacity-50"
+          >
+            <Search className="w-3.5 h-3.5" />
+            <span>신청 내역 조회</span>
+          </button>
+        </form>
+
+        {/* 조회 로딩 상태 */}
+        {lookupStatus === 'loading' && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mt-3 p-3 bg-stone-100 border border-stone-400 rounded text-xs text-stone-800 flex items-center gap-2"
+          >
+            <Loader2 className="w-4 h-4 animate-spin text-stone-700" />
+            <span>[로딩 상태] 입력하신 성함으로 발급된 학생증 기록을 조회하고 있습니다...</span>
+          </div>
+        )}
+
+        {/* 조회 빈 결과 상태 (Empty State: 이유 + 할 일 안내) */}
+        {lookupStatus === 'empty' && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mt-3 p-3.5 bg-stone-100 border-2 border-dashed border-stone-400 rounded text-xs text-stone-800 space-y-1"
+          >
+            <div className="font-bold text-stone-900 flex items-center gap-1.5">
+              <Inbox className="w-4 h-4 text-stone-600" />
+              <span>📭 [빈 결과 상태] 조회된 참가 신청(학생증) 내역이 없습니다</span>
+            </div>
+            <p className="pl-5 text-stone-700">
+              <strong>• 이유:</strong> 검색어(<strong>&quot;{lookupQuery.trim() || '미입력'}&quot;</strong>)와 일치하는 참가 신청 기록을 찾을 수 없습니다.
+            </p>
+            <p className="pl-5 text-stone-700">
+              <strong>• 할 일:</strong> 검색어 철자를 다시 확인하시거나, 아직 신청 전이라면 위 <strong>[참가 신청서]</strong> 양식을 작성해 먼저 제출해 주세요.
+            </p>
+          </div>
+        )}
+
+        {/* 조회 정상 결과 상태 */}
+        {lookupStatus === 'success' && lookupResults.length > 0 && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mt-3 space-y-2"
+          >
+            <div className="text-xs font-bold text-emerald-800">
+              ✅ [정상 상태] 총 {lookupResults.length}건의 학생증 발급 내역이 확인되었습니다.
+            </div>
+            {lookupResults.map((rec, i) => (
+              <div
+                key={i}
+                className="p-3 bg-stone-50 border border-stone-400 rounded flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+              >
+                <div className="space-y-0.5">
+                  <div className="font-bold text-stone-900">
+                    {rec.name} <span className="text-stone-500 font-normal">({rec.team} / {rec.grade})</span>
+                    <span className="ml-2 font-mono text-[11px] text-red-800 bg-red-50 px-1.5 py-0.5 rounded border border-red-200">
+                      {rec.studentNumber}
+                    </span>
+                  </div>
+                  <div className="text-stone-600 text-[11px]">
+                    연락처: {rec.maskedPhone || maskPhone(rec.phone || '')} · 세션: {rec.session} · 아바타 코드: <b>{rec.avatarCode}</b>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRestoreRecord(rec)}
+                  className="px-3 py-1.5 bg-stone-800 hover:bg-black text-white font-bold rounded text-[11px] whitespace-nowrap self-start sm:self-center"
+                >
+                  🪪 이 학생증 프리뷰로 불러오기
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
     </div>
   );

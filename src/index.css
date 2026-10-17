@@ -157,3 +157,21 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #497255;
 }
+
+/* 모바일 가로 넘침 방지 및 키보드 접근성(Focus Visible) 전역 규칙 */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #b82828 !important;
+  outline-offset: 2px !important;
+}
+

@@ -226,7 +226,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
 
           {/* 탭 네비게이션 & (데스크톱일 때 QR버튼) */}
           <div className="flex items-center justify-between md:justify-end space-x-1 sm:space-x-2 overflow-x-auto scrollbar-none pb-0.5 -mx-1 px-1">
-            <nav className="flex items-center space-x-1 sm:space-x-2">
+            <nav aria-label="가정통신문 주요 메뉴" className="flex items-center space-x-1 sm:space-x-2">
               {[
                 { id: 'letter', label: '가정통신문' },
                 { id: 'timeline', label: '일과표 안내' },
@@ -235,6 +235,8 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
               ].map((tab) => (
                 <button
                   key={tab.id}
+                  type="button"
+                  aria-current={activeTab === tab.id ? 'page' : undefined}
                   onClick={() => setActiveTab(tab.id as TabType)}
                   className={`px-2 py-1 sm:px-2.5 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif whitespace-nowrap transition-all ${
                     activeTab === tab.id
@@ -332,37 +334,37 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
                 </p>
               </div>
 
-              {/* 표: 일시 / 프로그램 / 장소 / 대상 */}
-              <div className="overflow-x-auto -mx-1 sm:mx-0">
-                <table className="min-w-[420px] sm:min-w-full border-collapse border-2 border-[#1f1b18] text-xs sm:text-sm font-serif text-center">
+              {/* 표: 일시 / 프로그램 / 장소 / 대상 (모바일 폭 가로 넘침 방지) */}
+              <div className="w-full overflow-hidden">
+                <table className="w-full border-collapse border-2 border-[#1f1b18] text-[11px] sm:text-sm font-serif text-center break-keep">
                   <thead>
                     <tr className="bg-[#ede8dc] font-bold">
-                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">일시</th>
-                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">프로그램</th>
-                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">장소</th>
-                      <th className="border border-[#1f1b18] p-2 sm:p-2.5">대상</th>
+                      <th className="border border-[#1f1b18] p-1.5 sm:p-2.5">일시</th>
+                      <th className="border border-[#1f1b18] p-1.5 sm:p-2.5">프로그램</th>
+                      <th className="border border-[#1f1b18] p-1.5 sm:p-2.5">장소</th>
+                      <th className="border border-[#1f1b18] p-1.5 sm:p-2.5">대상</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="bg-white/80">
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-mono text-[11px] sm:text-xs">
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3 font-mono text-[10px] sm:text-xs">
                         2026. 12. 19. (토)<br />10:00 ~ 17:00
                       </td>
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-bold text-[#b82828]">
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3 font-bold text-[#b82828]">
                         플래닛 연말파티<br />「플래닛의 새학기」
                       </td>
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">공간나인 강남점</td>
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">플래닛 멤버<br />누구나</td>
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">공간나인 강남점</td>
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">플래닛 멤버<br />누구나</td>
                     </tr>
                     <tr className="bg-white/80">
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-mono text-[11px] sm:text-xs">
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3 font-mono text-[10px] sm:text-xs">
                         2026. 12. 19. (토)<br />18:00 ~ LATE
                       </td>
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3 font-bold text-[#2e5238]">
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3 font-bold text-[#2e5238]">
                         연말파티 뒷풀이<br />「플래닛의 수학여행」
                       </td>
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">강남 프라이빗 파티룸<br /><span className="text-[10px] text-[#777]">(추후 지정)</span></td>
-                      <td className="border border-[#1f1b18] p-2.5 sm:p-3">연말파티 참여자<br />中 희망자</td>
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">강남 프라이빗 파티룸<br /><span className="text-[10px] text-[#777]">(추후 지정)</span></td>
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">연말파티 참여자<br />中 희망자</td>
                     </tr>
                   </tbody>
                 </table>

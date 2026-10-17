@@ -40,7 +40,7 @@ export interface EventConfig {
 }
 
 export const EVENT_CONFIG: EventConfig = {
-  isTeaserMode: true, // true: 칠판 티저 모드, false: 가정통신문 정식 오픈
+  isTeaserMode: false, // false: 가정통신문 정식 오픈 (공개 URL 접속 시 핵심 흐름 즉시 이용 가능)
   eventTitle: "2026 플래닛 독서학교 연말모임",
   subTitle: "플래닛의 새학기 & 수학여행",
   noticeNumber: "제2026-1호",
@@ -94,11 +94,8 @@ export const EVENT_CONFIG: EventConfig = {
     inquiryEmail: "contact@planet-school.org",
   },
   
-  // 배포된 Google Apps Script Web App URL (.env.local 우선 참조 및 중복 접두사 자동 보정)
-  googleScriptUrl: (
-    (import.meta.env.VITE_GOOGLE_SCRIPT_URL as string) ||
-    "https://script.google.com/macros/s/AKfycbyurcnXKwK20GfOkeRYiBR9DKcQORWvnsiHYgUWtYcDWh06C3uqPjzHQEGEQB3DJ5Yj/exec"
-  ).replace(
+  // 배포된 Google Apps Script Web App URL (.env.local 및 GitHub Secrets에서만 주입)
+  googleScriptUrl: ((import.meta.env.VITE_GOOGLE_SCRIPT_URL as string) || "").replace(
     /^https:\/\/script\.google\.com\/macros\/s\/https:\/\/script\.google\.com\/macros\/s\//,
     "https://script.google.com/macros/s/"
   )
