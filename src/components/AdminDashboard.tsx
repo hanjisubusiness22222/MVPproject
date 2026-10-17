@@ -41,12 +41,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onGoToSettlement,
   onGoToAvatarStudio 
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem('planet_admin_auth') === 'true';
-  });
-  const [passwordInput, setPasswordInput] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
-
   const [records, setRecords] = useState<RsvpRecord[]>(() => {
     const saved = localStorage.getItem('planet_rsvps');
     if (saved) {
@@ -77,20 +71,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const saveRecords = (updated: RsvpRecord[]) => {
     setRecords(updated);
     localStorage.setItem('planet_rsvps', JSON.stringify(updated));
-  };
-
-  // 비밀번호 인증 (GitHub Secrets / 환경변수 VITE_ADMIN_PASSWORD 참조)
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    const correctPassword = (import.meta.env.VITE_ADMIN_PASSWORD as string) || '';
-    const trimmed = passwordInput.trim();
-    if (correctPassword && trimmed === correctPassword) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('planet_admin_auth', 'true');
-      setPasswordError(false);
-    } else {
-      setPasswordError(true);
-    }
   };
 
   // 입금 상태 토글
@@ -161,66 +141,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const pendingCount = totalCount - completedCount;
   const totalExpectedFee = records.reduce((sum, r) => sum + r.fee, 0);
   const totalPaidFee = records.filter(r => r.paymentStatus === '입금 완료').reduce((sum, r) => sum + r.fee, 0);
-
-  // 비밀번호 잠금 화면
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#fcfbf9] text-[#1f1b18] flex items-center justify-center p-4">
-        <div className="bg-white border-2 border-[#1f1b18] rounded-2xl max-w-sm w-full p-8 shadow-2xl space-y-6 text-center">
-          
-          <div className="w-16 h-16 rounded-full bg-[#f8f6f0] border border-[#e2ddd3] flex items-center justify-center mx-auto text-[#1f1b18] shadow-inner">
-            <Lock className="w-8 h-8 text-[#b82828]" />
-          </div>
-
-          <div className="space-y-1">
-            <div className="text-[10px] font-mono text-[#b82828] font-bold tracking-widest uppercase">
-              PLANET COMMITTEE ONLY
-            </div>
-            <h2 className="font-serif text-xl font-bold text-[#1f1b18]">
-              운영위원회 관리자 로그인
-            </h2>
-            <p className="text-xs text-[#666] font-serif">
-              신청자 명단 및 회비 정산 관리를 위해 비밀번호를 입력해 주세요.
-            </p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-3">
-            <input 
-              type="password" 
-              autoFocus
-              value={passwordInput} 
-              onChange={e => {
-                setPasswordInput(e.target.value);
-                if (passwordError) setPasswordError(false);
-              }}
-              placeholder="관리자 비밀번호 입력"
-              className="w-full border border-[#d5cfc4] rounded-lg p-2.5 text-center text-sm font-serif tracking-widest focus:outline-none focus:border-[#b82828]"
-            />
-            {passwordError && (
-              <p className="text-xs text-[#b82828] font-serif">
-                비밀번호가 일치하지 않습니다.
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className="w-full py-2.5 rounded-lg bg-[#b82828] hover:bg-[#961e1e] text-white font-serif font-bold text-sm shadow transition-all"
-            >
-              대시보드 열기
-            </button>
-          </form>
-
-          <button
-            onClick={onBack}
-            className="text-xs text-[#777] hover:text-[#111] font-serif underline"
-          >
-            ← 메인 화면으로 돌아가기
-          </button>
-
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#fcfbf9] text-[#1f1b18] font-sans pb-16">

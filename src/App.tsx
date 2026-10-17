@@ -13,11 +13,11 @@ type ViewMode = 'teaser' | 'main' | 'seat' | 'admin' | 'settlement' | 'avatarStu
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const hash = window.location.hash.toLowerCase();
-    const isAuth = sessionStorage.getItem('planet_admin_auth') === 'true';
-    if (hash === '#seat') return isAuth ? 'seat' : 'admin';
-    if (hash === '#settlement') return isAuth ? 'settlement' : 'admin';
-    if (hash === '#avatar-studio' || hash === '#idcard') return isAuth ? 'avatarStudio' : 'admin';
+    if (hash === '#seat') return 'seat';
+    if (hash === '#settlement') return 'settlement';
+    if (hash === '#avatar-studio' || hash === '#idcard') return 'avatarStudio';
     if (hash === '#admin') return 'admin';
+    if (hash === '#teaser') return 'teaser';
     return EVENT_CONFIG.isTeaserMode ? 'teaser' : 'main';
   });
 
@@ -25,10 +25,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.toLowerCase();
-      const isAuth = sessionStorage.getItem('planet_admin_auth') === 'true';
-      if (hash === '#seat') setViewMode(isAuth ? 'seat' : 'admin');
-      else if (hash === '#settlement') setViewMode(isAuth ? 'settlement' : 'admin');
-      else if (hash === '#avatar-studio' || hash === '#idcard') setViewMode(isAuth ? 'avatarStudio' : 'admin');
+      if (hash === '#seat') setViewMode('seat');
+      else if (hash === '#settlement') setViewMode('settlement');
+      else if (hash === '#avatar-studio' || hash === '#idcard') setViewMode('avatarStudio');
       else if (hash === '#admin') setViewMode('admin');
       else if (hash === '#teaser') setViewMode('teaser');
       else if (hash === '#main') setViewMode('main');
@@ -39,12 +38,6 @@ export const App: React.FC = () => {
   }, []);
 
   const changeView = (mode: ViewMode) => {
-    const isAuth = sessionStorage.getItem('planet_admin_auth') === 'true';
-    if ((mode === 'seat' || mode === 'settlement' || mode === 'avatarStudio') && !isAuth) {
-      setViewMode('admin');
-      window.location.hash = 'admin';
-      return;
-    }
     setViewMode(mode);
     window.location.hash = mode;
   };
