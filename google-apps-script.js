@@ -55,6 +55,12 @@ function doPost(e) {
     var bookTitle = data.bookTitle || data.bookHint || '(미정)';
     var fee = data.fee || data.totalFee || 0;
     var paymentStatus = data.paymentStatus || '입금 대기';
+    var team = data.team || '';
+    var grade = data.grade || '';
+    var studentNumber = data.studentNumber || '';
+    var avatarCode = data.avatarCode || '';
+    var memo = data.memo || '';
+    var submittedAt = data.submittedAt || new Date().toLocaleString('ko-KR');
 
     // 필수 항목 누락 시 처리
     if (!name || !phone) {
@@ -62,14 +68,20 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 3. 구글 시트 행 추가: [이름, 연락처, 참석세션, 도서제목, 회비, 회비납부여부]
+    // 3. 구글 시트 행 추가: [이름, 연락처, 참석세션, 도서제목, 회비, 회비납부여부, 소속반, 학년, 학번, 아바타코드, 메모, 신청일시]
     sheet.appendRow([
       name,
       phone,
       session,
       bookTitle,
       fee,
-      paymentStatus
+      paymentStatus,
+      team,
+      grade,
+      studentNumber,
+      avatarCode,
+      memo,
+      submittedAt
     ]);
 
     // 성공 응답 반환

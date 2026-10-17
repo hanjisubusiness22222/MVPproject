@@ -113,7 +113,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
         await fetch(EVENT_CONFIG.googleScriptUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
       }
@@ -230,7 +230,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
               {[
                 { id: 'letter', label: '가정통신문' },
                 { id: 'timeline', label: '일과표 안내' },
-                { id: 'lookbook', label: '용의복장 룩북' },
+                { id: 'lookbook', label: '드레스 코드 룩북' },
                 { id: 'rsvp', label: '참가 신청(회신서)' }
               ].map((tab) => (
                 <button
@@ -375,7 +375,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
                 </div>
                 <ol className="list-decimal list-inside space-y-1.5 text-[#2c2621] leading-relaxed">
                   <li><strong>참여 비용:</strong> 1부 45,000원 / 2부 35,000원 (회신서 제출 후 계좌 입금)</li>
-                  <li><strong>용의복장:</strong> 학생다운 프레피룩 복장 (※ 용의복장은 선택 참여)</li>
+                  <li><strong>드레스 코드:</strong> 학생다운 프레피룩 복장 (※ 드레스 코드는 선택 참여)</li>
                   <li><strong>준비물:</strong> 학우에게 선물할 도서 1권 이상, 필기구, 꺾이지 않는 텐션과 열린 마음</li>
                 </ol>
               </div>
@@ -556,14 +556,14 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
         )}
 
         {/* ========================================================= */}
-        {/* TAB 3: 용의복장 룩북 (컨셉제안3 프레피 룩에 긱 시크 한 방울) */}
+        {/* TAB 3: 드레스 코드 룩북 (컨셉제안3 프레피 룩에 긱 시크 한 방울) */}
         {/* ========================================================= */}
         {activeTab === 'lookbook' && (
           <div className="space-y-6 animate-fadeIn">
             
             <div className="text-center space-y-1 mb-4">
               <h2 className="font-serif text-2xl font-bold text-[#1f1b18]">
-                용의복장 안내: 프레피 룩에 긱 시크 한 방울
+                드레스 코드 안내: 프레피 룩에 긱 시크 한 방울
               </h2>
               <p className="text-xs font-serif text-[#666]">
                 교복을 연상시키는 단정한 프레피 스타일에 긱 시크 안경을 더한 추천 코디입니다.
@@ -605,7 +605,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
             </div>
 
             <div className="p-4 rounded-lg bg-[#f8f6f0] border border-[#e0dad0] text-xs font-serif text-[#666]">
-              * 용의복장은 필수가 아닌 <strong>선택 참여</strong>입니다. 소장하고 계신 편안한 셔츠나 니트만 입고 오셔도 대환영입니다!
+              * 드레스 코드는 필수가 아닌 <strong>선택 참여</strong>입니다. 소장하고 계신 편안한 셔츠나 니트만 입고 오셔도 대환영입니다!
             </div>
 
             <div className="text-center pt-2">
