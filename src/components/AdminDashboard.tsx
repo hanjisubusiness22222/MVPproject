@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, ShieldCheck, Download, Search, CheckCircle2, 
   Clock, Users, DollarSign, BookOpen, Lock, Unlock, 
-  RefreshCw, Plus, Trash2, Check, X, Receipt
+  RefreshCw, Plus, Trash2, Check, X, Receipt, ExternalLink
 } from 'lucide-react';
 import { EVENT_CONFIG } from '../constants/eventConfig';
+import { fetchGoogleSheetRecords, GOOGLE_SHEET_VIEW_URL } from '../utils/googleSheetSync';
 import planetLogo from '../assets/planet-logo.png';
 
 interface RsvpRecord {
@@ -17,15 +18,16 @@ interface RsvpRecord {
   fee: number;
   paymentStatus: '입금 완료' | '입금 대기';
   submittedAt?: string;
+  source?: 'sheet' | 'local';
 }
 
-// 초기 샘플 RSVP 명단
+// 초기 샘플 RSVP 명단 (구글 시트 응답 전 초기 표시용)
 const INITIAL_RECORDS: RsvpRecord[] = [
-  { studentNumber: '2026-PLANET-1001', name: '김하늘', phone: '010-1234-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 80000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20' },
-  { studentNumber: '2026-PLANET-1002', name: '이준호', phone: '010-2345-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 45000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10' },
-  { studentNumber: '2026-PLANET-1003', name: '박서연', phone: '010-3456-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05' },
-  { studentNumber: '2026-PLANET-1004', name: '정민우', phone: '010-4567-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 35000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40' },
-  { studentNumber: '2026-PLANET-1005', name: '최지우', phone: '010-5678-9012', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '물고기는 존재하지 않는다', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 17:15' }
+  { studentNumber: '2026-PLANET-1001', name: '김하늘', phone: '010-1234-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 80000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1002', name: '이준호', phone: '010-2345-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 45000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1003', name: '박서연', phone: '010-3456-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1004', name: '정민우', phone: '010-4567-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 35000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1005', name: '최지우', phone: '010-5678-9012', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '물고기는 존재하지 않는다', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 17:15', source: 'sheet' }
 ];
 
 interface AdminDashboardProps {
@@ -41,31 +43,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onGoToSettlement,
   onGoToAvatarStudio 
 }) => {
-  const [records, setRecords] = useState<RsvpRecord[]>(() => {
-    const saved = localStorage.getItem('planet_rsvps');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((item: any) => ({
-            studentNumber: item.studentNumber || `2026-PLANET-${Math.floor(1000 + Math.random() * 9000)}`,
-            name: item.name || '',
-            phone: item.phone || '',
-            session: item.session || item.sessionLabel || '1부+2부 전체 참석',
-            bookTitle: item.bookTitle || item.bookHint || '(선물 책 준비 중)',
-            fee: item.fee || item.totalFee || 80000,
-            paymentStatus: item.paymentStatus || '입금 대기',
-            submittedAt: item.submittedAt ? new Date(item.submittedAt).toLocaleDateString('ko-KR') : '2026-10-24'
-          }));
-        }
-      } catch {}
-    }
-    return INITIAL_RECORDS;
-  });
+  const [records, setRecords] = useState<RsvpRecord[]>(INITIAL_RECORDS);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string>('');
+  const [sheetRowCount, setSheetRowCount] = useState<number>(0);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'pending'>('all');
   const [sessionFilter, setSessionFilter] = useState<'all' | 'both' | 's1' | 's2'>('all');
+
+  // 구글 시트(gid=1206999111) 실시간 동기화 함수
+  const handleSyncFromGoogleSheet = async () => {
+    setIsSyncing(true);
+    try {
+      const { records: synced, fromSheetCount, syncedAt } = await fetchGoogleSheetRecords();
+      if (synced.length > 0) {
+        setRecords(synced);
+        setSheetRowCount(fromSheetCount);
+        setLastSyncedAt(syncedAt);
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    handleSyncFromGoogleSheet();
+  }, []);
 
   // 저장 함수
   const saveRecords = (updated: RsvpRecord[]) => {
@@ -211,6 +215,41 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* 메인 통계 & 리스트 */}
       <main className="max-w-6xl mx-auto px-2.5 sm:px-4 py-4 sm:py-8 pb-24 sm:pb-16 space-y-5 sm:space-y-6">
+
+        {/* 구글 스프레드시트 실시간 연동 상태 바 */}
+        <div className="bg-[#f0f7f2] border border-[#b8d8be] rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="space-y-0.5">
+            <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#1f3d27]">
+              <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
+              <span>구글 스프레드시트 실시간 연동 중 (시트 GID: 1206999111)</span>
+            </div>
+            <p className="text-[11px] text-[#3c6347] font-sans">
+              시트 원본 데이터 {sheetRowCount}건 동기화 완료 {lastSyncedAt ? `(최근 갱신: ${lastSyncedAt})` : ''}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleSyncFromGoogleSheet}
+              disabled={isSyncing}
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#e6f2e9] border border-[#2e5238] text-[#2e5238] text-xs font-serif font-bold flex items-center space-x-1.5 transition-all shadow-xs disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>{isSyncing ? '시트 동기화 중...' : '시트 새로고침'}</span>
+            </button>
+
+            <a
+              href={GOOGLE_SHEET_VIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-lg bg-[#2e5238] hover:bg-[#23402c] text-white text-xs font-serif font-bold flex items-center space-x-1.5 transition-all shadow-xs"
+            >
+              <span>연결된 구글 시트 열기</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
         
         {/* 통계 요약 카드 4종 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

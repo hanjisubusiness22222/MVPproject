@@ -10,6 +10,7 @@ import { STAGES } from './pencilData';
 import { EVENT_CONFIG } from '../constants/eventConfig';
 import { sanitizeText, validatePhone, formatPhone } from '../utils/validation';
 import { maskPhone } from '../utils/masking';
+import { fetchGoogleSheetRecords } from '../utils/googleSheetSync';
 
 interface PencilSketchRsvpProps {
   onSuccess?: () => void;
@@ -301,18 +302,20 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
     }
   };
 
-  // 발급된 학생증 / 신청 내역 조회 핸들러 (로딩 ➔ 빈 결과 / 정상 상태 전환)
+  // 발급된 학생증 / 신청 내역 조회 핸들러 (구글 시트 gid=1206999111 실시간 연동 ➔ 로딩 / 빈 결과 / 정상 상태 전환)
   const handleLookup = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const q = sanitizeText(lookupQuery, 20).trim();
     setLookupStatus('loading');
 
-    await new Promise(resolve => setTimeout(resolve, 400));
-
     try {
-      const saved: any[] = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
+      const [{ records: syncedRecords }] = await Promise.all([
+        fetchGoogleSheetRecords(),
+        new Promise(resolve => setTimeout(resolve, 350))
+      ]);
+
       const matched = q
-        ? saved.filter(
+        ? syncedRecords.filter(
             item =>
               (item.name && item.name.includes(q)) ||
               (item.phone && item.phone.includes(q)) ||
@@ -324,7 +327,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
         setLookupResults([]);
         setLookupStatus('empty');
       } else {
-        setLookupResults(matched.reverse());
+        setLookupResults(matched);
         setLookupStatus('success');
       }
     } catch {
