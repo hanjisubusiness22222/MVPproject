@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, Shuffle, Users, Maximize2, Minimize2, 
-  Download, Plus, Trash2
+  Download, Plus, Trash2, RefreshCw, CheckCircle2, ExternalLink
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { toPng } from 'html-to-image';
+import { fetchGoogleSheetRecords, GOOGLE_SHEET_VIEW_URL } from '../utils/googleSheetSync';
 import planetLogo from '../assets/planet-logo.png';
 
 interface Participant {
@@ -12,6 +13,8 @@ interface Participant {
   name: string;
   gender: 'M' | 'F';
   type: 'senior' | 'new';
+  studentNumber?: string;
+  session?: string;
   seatIndex?: number;
 }
 
@@ -53,23 +56,10 @@ interface ClassroomSeatShuffleProps {
 }
 
 export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBack }) => {
-  const [participants, setParticipants] = useState<Participant[]>(() => {
-    const savedRsvps = localStorage.getItem('planet_rsvps');
-    if (savedRsvps) {
-      try {
-        const parsed = JSON.parse(savedRsvps);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((item: { name: string }, idx: number) => ({
-            id: `rsvp_${idx}`,
-            name: item.name,
-            gender: (idx % 2 === 0 ? 'F' : 'M') as 'M' | 'F',
-            type: (Math.floor(idx / 2) % 2 === 0 ? 'senior' : 'new') as 'senior' | 'new'
-          }));
-        }
-      } catch {}
-    }
-    return DEFAULT_PARTICIPANTS;
-  });
+  const [participants, setParticipants] = useState<Participant[]>(DEFAULT_PARTICIPANTS);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState('');
+  const [isUsingSheetList, setIsUsingSheetList] = useState(true);
 
   const [seats, setSeats] = useState<(Participant | null)[]>(new Array(24).fill(null));
   const [isShuffling, setIsShuffling] = useState(false);
@@ -79,6 +69,33 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
   const [isCapturing, setIsCapturing] = useState(false);
 
   const classroomRef = useRef<HTMLDivElement>(null);
+
+  // 구글 시트 신청자 명단(gid=1206999111) + 로컬 신청자 실시간 동기화
+  const handleSyncApplicantsToSeats = async () => {
+    setIsSyncing(true);
+    try {
+      const { records, syncedAt } = await fetchGoogleSheetRecords();
+      if (records.length > 0) {
+        const mapped: Participant[] = records.map((rec, idx) => ({
+          id: rec.studentNumber || `rsvp_${idx}`,
+          name: rec.name,
+          gender: (idx % 2 === 0 ? 'F' : 'M') as 'M' | 'F',
+          type: (rec.grade && rec.grade.includes('1학년') ? 'new' : Math.floor(idx / 2) % 2 === 0 ? 'senior' : 'new') as 'senior' | 'new',
+          studentNumber: rec.studentNumber,
+          session: rec.session
+        }));
+        setParticipants(mapped);
+        setLastSyncedAt(syncedAt);
+        setIsUsingSheetList(true);
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    handleSyncApplicantsToSeats();
+  }, []);
 
   // 드럼롤 사운드 (Web Audio API 가속 비트)
   const playDrumrollSound = () => {
@@ -338,9 +355,47 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
         </div>
       </header>
 
-      {/* 상단 좌석 현황 바 */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-end text-[10px] sm:text-[11px] text-[#777] font-mono border-b border-[#e8e4dc]">
-        <div>총 24석 (1·2·3분단 각 8석)</div>
+      {/* 상단 구글 시트 신청자 명단 실시간 연동 바 */}
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border-b border-[#e8e4dc] bg-[#f0f7f2]">
+        <div className="flex items-center space-x-2 text-[#1f3d27] font-serif">
+          <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
+          <span className="font-bold">
+            {isUsingSheetList
+              ? `구글 시트 신청자 명단 연동 중 (${participants.length}명)`
+              : `24인 시연용 샘플 명단 사용 중 (${participants.length}명)`}
+          </span>
+          {lastSyncedAt && (
+            <span className="text-[11px] text-[#3c6347] font-sans">
+              (동기화: {lastSyncedAt})
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSyncApplicantsToSeats}
+            disabled={isSyncing}
+            className="px-2.5 py-1 rounded bg-white hover:bg-[#e6f2e9] border border-[#2e5238] text-[#2e5238] text-[11px] font-serif font-bold flex items-center space-x-1 transition-all shadow-xs disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? '불러오는 중...' : '신청자 명단 새로고침'}</span>
+          </button>
+
+          <a
+            href={GOOGLE_SHEET_VIEW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-2.5 py-1 rounded bg-[#2e5238] hover:bg-[#23402c] text-white text-[11px] font-serif font-bold flex items-center space-x-1 transition-all shadow-xs"
+          >
+            <span>신청자 시트 열기</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+
+          <span className="text-[10px] sm:text-[11px] text-[#555] font-mono hidden sm:inline">
+            • 총 24석 (1·2·3분단 각 8석)
+          </span>
+        </div>
       </div>
 
       {/* 메인 교실 배치도 영역 (캡처 대상) */}
@@ -533,14 +588,28 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
               ))}
             </div>
 
-            <div className="pt-2 border-t border-[#e2ddd3] flex justify-between items-center text-xs font-serif">
+            <div className="pt-2 border-t border-[#e2ddd3] flex flex-wrap justify-between items-center gap-2 text-xs font-serif">
+              <div className="flex items-center gap-3">
+                <button 
+                  type="button"
+                  onClick={handleSyncApplicantsToSeats}
+                  className="text-[#2e5238] font-bold hover:underline"
+                >
+                  🔄 신청자 명단(시트) 동기화
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setParticipants(DEFAULT_PARTICIPANTS);
+                    setIsUsingSheetList(false);
+                  }}
+                  className="text-[#777] hover:text-[#111] underline"
+                >
+                  24인 샘플 복원
+                </button>
+              </div>
               <button 
-                onClick={() => setParticipants(DEFAULT_PARTICIPANTS)}
-                className="text-[#777] hover:text-[#111] underline"
-              >
-                기본 24인 명단 복원
-              </button>
-              <button 
+                type="button"
                 onClick={() => setShowManageModal(false)}
                 className="px-4 py-2 rounded bg-[#1f1b18] text-white font-bold"
               >
