@@ -1,36 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Receipt, 
   ArrowLeft, 
   CheckCircle2, 
   Download, 
   Printer, 
-  Building2, 
-  Coffee, 
-  Gift, 
-  Award, 
-  Moon, 
-  UtensilsCrossed, 
-  Package, 
-  HelpCircle,
-  FileText,
-  Calendar,
+  RefreshCw,
+  ExternalLink,
   X
 } from 'lucide-react';
+import {
+  fetchGoogleSheetSettlements,
+  GOOGLE_SHEET_VIEW_URL,
+  GOOGLE_SHEET_RECEIPT_TAB_NAME,
+  SyncedSettlementItem
+} from '../utils/googleSheetSync';
 
-interface SettlementItem {
-  id: string;
-  category: 'income' | 'expense_session1' | 'expense_session2' | 'expense_common';
-  title: string;
-  detail: string;
-  vendor: string;
-  date: string;
-  amount: number;
-  paymentMethod: string;
-  receiptNumber: string;
-  receiptType: '신용카드 매출전표' | '현금영수증' | '전자세금계산서' | '계좌이체 영수증';
-  itemsBreakdown: { name: string; qty: number; unitPrice: number }[];
-}
+type SettlementItem = SyncedSettlementItem;
 
 const SETTLEMENT_DATA: SettlementItem[] = [
   // 수입
@@ -207,51 +193,97 @@ interface SettlementReportProps {
 
 export const SettlementReport: React.FC<SettlementReportProps> = ({
   onBack,
-  onGoToSeat,
-  onGoToTeaser
+  onGoToSeat
 }) => {
+  const [settlementItems, setSettlementItems] = useState<SettlementItem[]>(SETTLEMENT_DATA);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isConnectedToSheet, setIsConnectedToSheet] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'income' | 'expense_session1' | 'expense_session2' | 'expense_common'>('all');
   const [activeReceipt, setActiveReceipt] = useState<SettlementItem | null>(null);
 
+  // 구글 시트('영수증' 탭) 동기화 함수
+  const handleSyncReceiptsFromSheet = async () => {
+    setIsSyncing(true);
+    try {
+      const { items, isFromSheet, syncedAt } = await fetchGoogleSheetSettlements(SETTLEMENT_DATA);
+      setSettlementItems(items);
+      setIsConnectedToSheet(isFromSheet);
+      setLastSyncedAt(syncedAt);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    handleSyncReceiptsFromSheet();
+  }, []);
+
   // 재정 합계 계산
-  const totalIncome = SETTLEMENT_DATA
+  const totalIncome = settlementItems
     .filter(i => i.category === 'income')
     .reduce((sum, i) => sum + i.amount, 0);
 
-  const totalExpense = SETTLEMENT_DATA
+  const totalExpense = settlementItems
     .filter(i => i.category !== 'income')
     .reduce((sum, i) => sum + i.amount, 0);
 
   const balance = totalIncome - totalExpense;
 
   const filteredItems = selectedCategory === 'all'
-    ? SETTLEMENT_DATA
-    : SETTLEMENT_DATA.filter(i => i.category === selectedCategory);
+    ? settlementItems
+    : settlementItems.filter(i => i.category === selectedCategory);
 
   const formatWon = (num: number) => {
     return '₩' + num.toLocaleString('ko-KR');
   };
 
-  // CSV 다운로드 기능
+  // 구글 시트 업로드용 샘플 CSV 다운로드 (10개 컬럼 전체 포함)
   const handleExportCSV = () => {
-    const headers = ['구분', '항목명', '세부내용', '거래처', '결제일자', '금액(원)', '결제수단', '영수증번호'];
-    const rows = SETTLEMENT_DATA.map(item => [
-      item.category === 'income' ? '수입' : '지출',
-      `"${item.title.replace(/"/g, '""')}"`,
-      `"${item.detail.replace(/"/g, '""')}"`,
-      `"${item.vendor.replace(/"/g, '""')}"`,
-      item.date,
-      item.amount,
-      item.paymentMethod,
-      item.receiptNumber
-    ]);
+    const headers = [
+      '구분',
+      '항목명',
+      '세부내용',
+      '거래처',
+      '결제일자',
+      '금액(원)',
+      '결제수단',
+      '영수증종류',
+      '증빙번호',
+      '품목상세'
+    ];
+    const rows = settlementItems.map(item => {
+      const catLabel =
+        item.category === 'income'
+          ? '수입'
+          : item.category === 'expense_session1'
+            ? '1부지출'
+            : item.category === 'expense_session2'
+              ? '2부지출'
+              : '공통지출';
+      const breakdownStr = item.itemsBreakdown
+        .map(b => `${b.name}:${b.qty}:${b.unitPrice}`)
+        .join(' | ');
+      return [
+        catLabel,
+        `"${item.title.replace(/"/g, '""')}"`,
+        `"${item.detail.replace(/"/g, '""')}"`,
+        `"${item.vendor.replace(/"/g, '""')}"`,
+        item.date,
+        item.amount,
+        `"${item.paymentMethod.replace(/"/g, '""')}"`,
+        item.receiptType,
+        item.receiptNumber,
+        `"${breakdownStr.replace(/"/g, '""')}"`
+      ];
+    });
 
     const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `2026_플래닛_독서학교_학생회비_결산보고서_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `구글시트_업로드용_영수증정산_샘플.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -355,6 +387,54 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
           </div>
         </div>
 
+        {/* 구글 시트('영수증' 탭) 실시간 연동 안내 배너 */}
+        <div className="mb-6 p-3.5 rounded-xl bg-[#f0f7f2] border border-[#b8d8be] flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
+          <div className="space-y-0.5">
+            <div className="text-xs sm:text-sm font-serif font-bold text-[#1f3d27] flex items-center space-x-1.5">
+              <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
+              <span>
+                {isConnectedToSheet
+                  ? `구글 시트 '${GOOGLE_SHEET_RECEIPT_TAB_NAME}' 탭 실시간 연동 완료 (${settlementItems.length}건)`
+                  : `구글 시트 '${GOOGLE_SHEET_RECEIPT_TAB_NAME}' 탭 연동 대기 중 (현재 샘플 데이터 ${settlementItems.length}건 표시)`}
+              </span>
+            </div>
+            <p className="text-[11px] text-[#3c6347] font-sans">
+              실물 영수증 사진 없이 구글 스프레드시트 내 <b>&apos;{GOOGLE_SHEET_RECEIPT_TAB_NAME}&apos;</b> 시트 탭의 행 데이터만으로 디지털 영수증 전표가 자동 생성됩니다. {lastSyncedAt ? `(확인 시각: ${lastSyncedAt})` : ''}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleSyncReceiptsFromSheet}
+              disabled={isSyncing}
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#e6f2e9] border border-[#2e5238] text-[#2e5238] text-xs font-serif font-bold flex items-center space-x-1 transition-all shadow-xs disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>{isSyncing ? '동기화 중...' : '시트 새로고침'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#ede8dc] border border-[#1f1b18] text-[#1f1b18] text-xs font-serif font-bold flex items-center space-x-1 transition-all shadow-xs"
+            >
+              <Download className="w-3.5 h-3.5 text-[#b82828]" />
+              <span>업로드용 샘플 CSV</span>
+            </button>
+
+            <a
+              href={GOOGLE_SHEET_VIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-lg bg-[#2e5238] hover:bg-[#23402c] text-white text-xs font-serif font-bold flex items-center space-x-1 transition-all shadow-xs"
+            >
+              <span>구글 시트 열기</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+
         {/* 투명 정산 원칙 선언 배너 */}
         <div className="mb-8 p-4 rounded-lg bg-[#f8f6f0] border-l-4 border-[#2e5238] text-xs font-serif leading-relaxed text-[#333] space-y-1">
           <div className="font-bold text-[#1b3323] flex items-center space-x-1.5 text-sm">
@@ -394,7 +474,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
               {formatWon(totalExpense)}
             </div>
             <p className="text-[11px] font-serif text-[#777] mt-1">
-              대관료 2건, 다과 2건, 굿즈/상패 등 7건
+              대관료, 다과, 굿즈/상패 등 총 {settlementItems.filter(i => i.category !== 'income').length}건
             </p>
           </div>
 
@@ -408,7 +488,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
               {formatWon(balance)}
             </div>
             <p className="text-[11px] font-serif text-[#2e5238] mt-1 font-semibold">
-              ✓ 차액 0원 완전 일치 (수익금 0원)
+              ✓ 차액 {formatWon(balance)} (투명 결산)
             </p>
           </div>
 
@@ -424,7 +504,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
                 : 'bg-white hover:bg-[#ede8dc] text-[#555] border border-[#e0dad0]'
             }`}
           >
-            전체 내역 ({SETTLEMENT_DATA.length})
+            전체 내역 ({settlementItems.length})
           </button>
           <button
             onClick={() => setSelectedCategory('income')}
@@ -434,7 +514,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
                 : 'bg-white hover:bg-[#ede8dc] text-[#555] border border-[#e0dad0]'
             }`}
           >
-            수입 내역 ({SETTLEMENT_DATA.filter(i => i.category === 'income').length})
+            수입 내역 ({settlementItems.filter(i => i.category === 'income').length})
           </button>
           <button
             onClick={() => setSelectedCategory('expense_session1')}
@@ -444,7 +524,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
                 : 'bg-white hover:bg-[#ede8dc] text-[#555] border border-[#e0dad0]'
             }`}
           >
-            1부 새학기 지출 ({SETTLEMENT_DATA.filter(i => i.category === 'expense_session1').length})
+            1부 새학기 지출 ({settlementItems.filter(i => i.category === 'expense_session1').length})
           </button>
           <button
             onClick={() => setSelectedCategory('expense_session2')}
@@ -454,7 +534,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
                 : 'bg-white hover:bg-[#ede8dc] text-[#555] border border-[#e0dad0]'
             }`}
           >
-            2부 수학여행 지출 ({SETTLEMENT_DATA.filter(i => i.category === 'expense_session2').length})
+            2부 수학여행 지출 ({settlementItems.filter(i => i.category === 'expense_session2').length})
           </button>
           <button
             onClick={() => setSelectedCategory('expense_common')}
@@ -464,7 +544,7 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
                 : 'bg-white hover:bg-[#ede8dc] text-[#555] border border-[#e0dad0]'
             }`}
           >
-            공통 물품 지출 ({SETTLEMENT_DATA.filter(i => i.category === 'expense_common').length})
+            공통 물품 지출 ({settlementItems.filter(i => i.category === 'expense_common').length})
           </button>
         </div>
 

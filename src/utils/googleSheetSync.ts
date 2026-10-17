@@ -139,3 +139,144 @@ export async function fetchGoogleSheetRecords(): Promise<{
     })
   };
 }
+
+export interface SyncedSettlementItem {
+  id: string;
+  category: 'income' | 'expense_session1' | 'expense_session2' | 'expense_common';
+  title: string;
+  detail: string;
+  vendor: string;
+  date: string;
+  amount: number;
+  paymentMethod: string;
+  receiptNumber: string;
+  receiptType: '신용카드 매출전표' | '현금영수증' | '전자세금계산서' | '계좌이체 영수증';
+  itemsBreakdown: { name: string; qty: number; unitPrice: number }[];
+}
+
+export const GOOGLE_SHEET_RECEIPT_TAB_NAME = '영수증';
+export const GOOGLE_SHEET_RECEIPT_GVIZ_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(GOOGLE_SHEET_RECEIPT_TAB_NAME)}`;
+
+/**
+ * 구글 스프레드시트의 '영수증' 시트 탭에서 실시간으로 정산/영수증 내역을 불러옵니다.
+ * - 시트 컬럼 순서: [구분, 항목명, 세부내용, 거래처, 결제일자, 금액(원), 결제수단, 영수증종류, 증빙번호, 품목상세]
+ */
+export async function fetchGoogleSheetSettlements(
+  fallbackItems: SyncedSettlementItem[]
+): Promise<{
+  items: SyncedSettlementItem[];
+  isFromSheet: boolean;
+  syncedAt: string;
+}> {
+  const syncedAt = new Date().toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  try {
+    const response = await fetch(`${GOOGLE_SHEET_RECEIPT_GVIZ_URL}&_t=${Date.now()}`, {
+      cache: 'no-store'
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const text = await response.text();
+    const jsonStart = text.indexOf('{');
+    const jsonEnd = text.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) {
+      return { items: fallbackItems, isFromSheet: false, syncedAt };
+    }
+
+    const json = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+    const cols = json?.table?.cols || [];
+    const rows = json?.table?.rows || [];
+
+    // 만약 '영수증' 탭이 아직 없어서 기본 첫 번째 탭(학번, 성명...)이 반환된 경우 fallback 반환
+    const firstColLabel = String(cols[0]?.label ?? '').trim();
+    if (firstColLabel === '학번') {
+      return { items: fallbackItems, isFromSheet: false, syncedAt };
+    }
+
+    const parsedItems: SyncedSettlementItem[] = [];
+
+    rows.forEach((row: any, idx: number) => {
+      const c = row?.c || [];
+      const rawCat = String(c[0]?.v ?? c[0]?.f ?? '').trim();
+      const title = String(c[1]?.v ?? c[1]?.f ?? '').trim();
+      if (!title || title === '항목명' || rawCat === '구분') return;
+
+      let category: SyncedSettlementItem['category'] = 'expense_common';
+      if (rawCat.includes('수입') || rawCat === 'income') category = 'income';
+      else if (rawCat.includes('1부') || rawCat === 'expense_session1') category = 'expense_session1';
+      else if (rawCat.includes('2부') || rawCat === 'expense_session2') category = 'expense_session2';
+      else category = 'expense_common';
+
+      const detail = String(c[2]?.v ?? c[2]?.f ?? '').trim();
+      const vendor = String(c[3]?.v ?? c[3]?.f ?? '플래닛 지정 거래처').trim();
+      const date = String(c[4]?.f ?? c[4]?.v ?? '2026-12-19').trim();
+      const rawAmount = c[5]?.v ?? c[5]?.f ?? 0;
+      const amount =
+        typeof rawAmount === 'number'
+          ? rawAmount
+          : Number(String(rawAmount).replace(/[^0-9]/g, '')) || 0;
+      const paymentMethod = String(c[6]?.v ?? c[6]?.f ?? '신용카드 (일시불)').trim();
+      const rawReceiptType = String(c[7]?.v ?? c[7]?.f ?? '신용카드 매출전표').trim();
+      const receiptType: SyncedSettlementItem['receiptType'] =
+        rawReceiptType === '현금영수증' ||
+        rawReceiptType === '전자세금계산서' ||
+        rawReceiptType === '계좌이체 영수증'
+          ? rawReceiptType
+          : '신용카드 매출전표';
+      const receiptNumber = String(c[8]?.v ?? c[8]?.f ?? `REC-2026-${100 + idx}`).trim();
+      const rawBreakdown = String(c[9]?.v ?? c[9]?.f ?? '').trim();
+
+      let itemsBreakdown: { name: string; qty: number; unitPrice: number }[] = [];
+      if (rawBreakdown) {
+        itemsBreakdown = rawBreakdown
+          .split('|')
+          .map(part => {
+            const segs = part.split(':').map(s => s.trim());
+            if (segs.length >= 3) {
+              const qty = Number(segs[1].replace(/[^0-9]/g, '')) || 1;
+              const unitPrice = Number(segs[2].replace(/[^0-9]/g, '')) || amount;
+              return { name: segs[0], qty, unitPrice };
+            }
+            return { name: segs[0] || title, qty: 1, unitPrice: amount };
+          })
+          .filter(b => b.name);
+      }
+      if (itemsBreakdown.length === 0) {
+        itemsBreakdown = [{ name: title, qty: 1, unitPrice: amount }];
+      }
+
+      parsedItems.push({
+        id: `SHEET-${idx + 1}`,
+        category,
+        title,
+        detail,
+        vendor,
+        date,
+        amount,
+        paymentMethod,
+        receiptNumber,
+        receiptType,
+        itemsBreakdown
+      });
+    });
+
+    if (parsedItems.length === 0) {
+      return { items: fallbackItems, isFromSheet: false, syncedAt };
+    }
+
+    return {
+      items: parsedItems,
+      isFromSheet: true,
+      syncedAt
+    };
+  } catch (err) {
+    console.warn('구글 시트 영수증 탭 조회 전 기본 샘플 데이터 표시:', err);
+    return { items: fallbackItems, isFromSheet: false, syncedAt };
+  }
+}
+
