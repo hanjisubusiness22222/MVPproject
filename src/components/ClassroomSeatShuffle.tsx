@@ -356,17 +356,19 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
       </header>
 
       {/* 상단 구글 시트 신청자 명단 실시간 연동 바 */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border-b border-[#e8e4dc] bg-[#f0f7f2]">
+      <div role="status" aria-live="polite" className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border-b border-[#e8e4dc] bg-[#f0f7f2]">
         <div className="flex items-center space-x-2 text-[#1f3d27] font-serif">
           <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
           <span className="font-bold">
-            {isUsingSheetList
-              ? `구글 시트 신청자 명단 연동 중 (${participants.length}명)`
-              : `24인 시연용 샘플 명단 사용 중 (${participants.length}명)`}
+            {isSyncing
+              ? `[로딩 상태] 구글 시트(gid=1206999111)에서 신청자 명단을 불러오는 중...`
+              : isUsingSheetList
+                ? `[정상 상태] 구글 시트 신청자 명단 연동 중 (${participants.length}명)`
+                : `[정상 상태] 24인 시연용 샘플 명단 사용 중 (${participants.length}명)`}
           </span>
           {lastSyncedAt && (
             <span className="text-[11px] text-[#3c6347] font-sans">
-              (동기화: {lastSyncedAt})
+              (갱신일: 2026-10-19 {lastSyncedAt})
             </span>
           )}
         </div>

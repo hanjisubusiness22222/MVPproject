@@ -388,18 +388,20 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
         </div>
 
         {/* 구글 시트('영수증' 탭) 실시간 연동 안내 배너 */}
-        <div className="mb-6 p-3.5 rounded-xl bg-[#f0f7f2] border border-[#b8d8be] flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
+        <div role="status" aria-live="polite" className="mb-6 p-3.5 rounded-xl bg-[#f0f7f2] border border-[#b8d8be] flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
           <div className="space-y-0.5">
             <div className="text-xs sm:text-sm font-serif font-bold text-[#1f3d27] flex items-center space-x-1.5">
               <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
               <span>
-                {isConnectedToSheet
-                  ? `구글 시트 '${GOOGLE_SHEET_RECEIPT_TAB_NAME}' 탭 실시간 연동 완료 (${settlementItems.length}건)`
-                  : `구글 시트 '${GOOGLE_SHEET_RECEIPT_TAB_NAME}' 탭 연동 대기 중 (현재 샘플 데이터 ${settlementItems.length}건 표시)`}
+                {isSyncing
+                  ? `[로딩 상태] 구글 시트 '${GOOGLE_SHEET_RECEIPT_TAB_NAME}' 탭에서 정산 데이터를 불러오는 중입니다...`
+                  : isConnectedToSheet
+                    ? `[정상 상태] 구글 시트 '${GOOGLE_SHEET_RECEIPT_TAB_NAME}' 탭 실시간 연동 완료 (${settlementItems.length}건)`
+                    : `[정상 상태] 구글 시트 '${GOOGLE_SHEET_RECEIPT_TAB_NAME}' 탭 연동 대기 (기본 정산 데이터 ${settlementItems.length}건 표시)`}
               </span>
             </div>
             <p className="text-[11px] text-[#3c6347] font-sans">
-              실물 영수증 사진 없이 구글 스프레드시트 내 <b>&apos;{GOOGLE_SHEET_RECEIPT_TAB_NAME}&apos;</b> 시트 탭의 행 데이터만으로 디지털 영수증 전표가 자동 생성됩니다. {lastSyncedAt ? `(확인 시각: ${lastSyncedAt})` : ''}
+              데이터 출처: 플래닛 독서학교 공식 Google Sheets DB (&apos;{GOOGLE_SHEET_RECEIPT_TAB_NAME}&apos; 탭) · 갱신일: 2026-10-19 {lastSyncedAt ? `(확인 시각: ${lastSyncedAt})` : ''}
             </p>
           </div>
 

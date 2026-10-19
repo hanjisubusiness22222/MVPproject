@@ -21,17 +21,41 @@ export const GOOGLE_SHEET_VIEW_URL = `https://docs.google.com/spreadsheets/d/${G
 export const GOOGLE_SHEET_GVIZ_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json&gid=${GOOGLE_SHEET_GID}`;
 
 /**
+ * 개인정보 보호를 위해 전화번호 가운데 자리를 마스킹합니다 (예: 010-****-5678)
+ */
+export function maskPhoneNumber(phone: string): string {
+  if (!phone) return '010-****-0000';
+  const digits = phone.replace(/[^0-9]/g, '');
+  if (digits.length === 11) {
+    return `${digits.slice(0, 3)}-****-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `${digits.slice(0, 3)}-***-${digits.slice(6)}`;
+  }
+  return phone.replace(/(\d{2,3})-?(\d{3,4})-?(\d{4})/, '$1-****-$3');
+}
+
+/**
  * 구글 스프레드시트(gid=1206999111)에서 실시간으로 신청자 명단을 불러오고
  * 브라우저 로컬 신청 데이터와 병합하여 반환합니다.
  */
-export async function fetchGoogleSheetRecords(): Promise<{
+export async function fetchGoogleSheetRecords(options?: { simulateError?: boolean }): Promise<{
   records: SyncedRsvpRecord[];
   fromSheetCount: number;
   syncedAt: string;
+  hasError?: boolean;
+  errorReason?: string;
+  errorAction?: string;
 }> {
   const sheetRecords: SyncedRsvpRecord[] = [];
+  let hasError = false;
+  let errorReason = '';
+  let errorAction = '';
 
   try {
+    if (options?.simulateError) {
+      throw new Error('SIMULATED_NETWORK_ERROR');
+    }
     const response = await fetch(`${GOOGLE_SHEET_GVIZ_URL}&_t=${Date.now()}`, {
       cache: 'no-store'
     });
@@ -76,6 +100,9 @@ export async function fetchGoogleSheetRecords(): Promise<{
     }
   } catch (err) {
     console.warn('구글 시트 실시간 조회 실패, 로컬 캐시로 대체합니다:', err);
+    hasError = true;
+    errorReason = '구글 스프레드시트(gid=1206999111) 서버와의 실시간 통신에 실패했거나 네트워크 연결이 불안정합니다.';
+    errorAction = '우측 상단 [구글 시트 새로고침] 버튼을 눌러 다시 시도하시거나, 인터넷 연결 상태를 확인해 주세요. (현재 브라우저 로컬 캐시 데이터를 임시로 표시합니다)';
   }
 
   // 로컬 스토리지에 저장된 신규 신청 데이터 병합 (중복 학번 제외)
@@ -136,7 +163,10 @@ export async function fetchGoogleSheetRecords(): Promise<{
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
-    })
+    }),
+    hasError,
+    errorReason,
+    errorAction
   };
 }
 

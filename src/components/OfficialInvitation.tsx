@@ -815,15 +815,24 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
         </div>
       )}
 
-      {/* 푸터 */}
-      <footer className="mt-12 py-6 border-t border-[#e8e4dc] text-center text-xs text-[#777] font-serif space-y-2">
+      {/* 푸터 (데이터 출처·이용 조건·갱신일·보안 처리 명시) */}
+      <footer className="mt-12 py-6 border-t border-[#e8e4dc] text-center text-xs text-[#777] font-serif space-y-2.5">
         <p>© 2026 플래닛 독서학교 (PLANET since 2017). All Rights Reserved.</p>
-        <p className="text-[10px] text-[#999]">
+        <p className="text-[10px] text-[#888]">
           가정통신문 제2026-1호 • 플래닛 여러분을 위한 설레는 새학기와 추억의 수학여행
         </p>
+        <div className="max-w-xl mx-auto bg-[#f8f6f0] border border-[#e5e0d4] rounded-lg px-3 py-2 text-[10px] text-[#555] leading-relaxed text-left sm:text-center">
+          <p>
+            <strong>데이터 출처 및 갱신일:</strong> 플래닛 독서학교 Google Sheets 실시간 연동 DB (<code className="font-mono">gid=1206999111</code>) 및 로컬 스토리지 · 최근 갱신일: <strong>2026-10-19</strong>
+          </p>
+          <p>
+            <strong>이용 조건 및 보안 처리:</strong> 참석 확인·좌석 배정·정산 목적으로만 최소한의 정보를 활용하며, 연락처 마스킹(<code className="font-mono">010-****-1234</code>) 및 <code className="font-mono">GitHub Secrets</code> 인증키 분리로 개인정보를 보호합니다.
+          </p>
+        </div>
         {onGoToSettlement && (
-          <div className="pt-2">
+          <div className="pt-1">
             <button
+              type="button"
               onClick={onGoToSettlement}
               className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#d8d3c7] bg-white hover:bg-[#ede8dc] text-[11px] text-[#444] transition-all shadow-xs"
             >

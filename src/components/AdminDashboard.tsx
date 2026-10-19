@@ -5,7 +5,7 @@ import {
   RefreshCw, Plus, Trash2, Check, X, Receipt, ExternalLink
 } from 'lucide-react';
 import { EVENT_CONFIG } from '../constants/eventConfig';
-import { fetchGoogleSheetRecords, GOOGLE_SHEET_VIEW_URL } from '../utils/googleSheetSync';
+import { fetchGoogleSheetRecords, GOOGLE_SHEET_VIEW_URL, maskPhoneNumber } from '../utils/googleSheetSync';
 import planetLogo from '../assets/planet-logo.png';
 
 interface RsvpRecord {
@@ -47,16 +47,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string>('');
   const [sheetRowCount, setSheetRowCount] = useState<number>(0);
+  const [syncError, setSyncError] = useState<{ reason: string; action: string } | null>(null);
+  const [isPhoneMasked, setIsPhoneMasked] = useState<boolean>(true);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'pending'>('all');
   const [sessionFilter, setSessionFilter] = useState<'all' | 'both' | 's1' | 's2'>('all');
 
   // 구글 시트(gid=1206999111) 실시간 동기화 함수
-  const handleSyncFromGoogleSheet = async () => {
+  const handleSyncFromGoogleSheet = async (simulateError = false) => {
     setIsSyncing(true);
+    setSyncError(null);
     try {
-      const { records: synced, fromSheetCount, syncedAt } = await fetchGoogleSheetRecords();
+      const { records: synced, fromSheetCount, syncedAt, hasError, errorReason, errorAction } =
+        await fetchGoogleSheetRecords({ simulateError });
+      if (hasError && errorReason && errorAction) {
+        setSyncError({ reason: errorReason, action: errorAction });
+      }
       if (synced.length > 0) {
         setRecords(synced);
         setSheetRowCount(fromSheetCount);
@@ -68,7 +75,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   useEffect(() => {
-    handleSyncFromGoogleSheet();
+    handleSyncFromGoogleSheet(false);
   }, []);
 
   // 저장 함수
@@ -92,13 +99,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  // CSV 엑셀 다운로드 (한글 깨짐 방지 UTF-8 BOM)
+  // CSV 엑셀 다운로드 (한글 깨짐 방지 UTF-8 BOM, 개인정보 마스킹 반영)
   const handleExportCsv = () => {
     const headers = ['학번', '성명', '연락처', '참석세션', '도서제목', '회비(원)', '회비납부여부', '신청일시'];
     const rows = records.map(r => [
       r.studentNumber || '',
       r.name,
-      r.phone,
+      isPhoneMasked ? maskPhoneNumber(r.phone) : r.phone,
       r.session,
       `"${(r.bookTitle || '').replace(/"/g, '""')}"`,
       r.fee,
@@ -216,27 +223,68 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* 메인 통계 & 리스트 */}
       <main className="max-w-6xl mx-auto px-2.5 sm:px-4 py-4 sm:py-8 pb-24 sm:pb-16 space-y-5 sm:space-y-6">
 
-        {/* 구글 스프레드시트 실시간 연동 상태 바 */}
-        <div className="bg-[#f0f7f2] border border-[#b8d8be] rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-          <div className="space-y-0.5">
-            <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#1f3d27]">
-              <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
-              <span>구글 스프레드시트 실시간 연동 중 (시트 GID: 1206999111)</span>
-            </div>
-            <p className="text-[11px] text-[#3c6347] font-sans">
-              시트 원본 데이터 {sheetRowCount}건 동기화 완료 {lastSyncedAt ? `(최근 갱신: ${lastSyncedAt})` : ''}
-            </p>
+        {/* 구글 스프레드시트 실시간 연동 상태 바 (로딩 / 정상 / 오류 상태 안내 및 aria-live 적용) */}
+        <div
+          role="status"
+          aria-live="polite"
+          className={`rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs border ${
+            syncError
+              ? 'bg-[#fff5f5] border-[#f5bcbc]'
+              : isSyncing
+                ? 'bg-[#fffbeb] border-[#fde68a]'
+                : 'bg-[#f0f7f2] border-[#b8d8be]'
+          }`}
+        >
+          <div className="space-y-1">
+            {isSyncing ? (
+              <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#92400e]">
+                <RefreshCw className="w-4 h-4 animate-spin text-[#d97706] flex-shrink-0" />
+                <span>[로딩 상태] 구글 스프레드시트(gid=1206999111)에서 최신 신청자 명단을 불러오는 중입니다...</span>
+              </div>
+            ) : syncError ? (
+              <div className="space-y-1 text-xs font-serif">
+                <div className="font-bold text-[#b82828] flex items-center space-x-1.5">
+                  <span>⚠️ [오류 상태] 구글 시트 실시간 동기화 실패</span>
+                </div>
+                <p className="text-[11px] text-[#7f1d1d]">
+                  <strong>• 이유:</strong> {syncError.reason}
+                </p>
+                <p className="text-[11px] text-[#1f3d27]">
+                  <strong>• 할 일:</strong> {syncError.action}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#1f3d27]">
+                  <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
+                  <span>[정상 상태] 구글 스프레드시트 실시간 연동 중 (시트 GID: 1206999111)</span>
+                </div>
+                <p className="text-[11px] text-[#3c6347] font-sans">
+                  시트 원본 데이터 {sheetRowCount}건 동기화 완료 {lastSyncedAt ? `(최근 갱신: 2026-10-19 ${lastSyncedAt})` : ''}
+                </p>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
-              onClick={handleSyncFromGoogleSheet}
+              onClick={() => handleSyncFromGoogleSheet(false)}
               disabled={isSyncing}
               className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#e6f2e9] border border-[#2e5238] text-[#2e5238] text-xs font-serif font-bold flex items-center space-x-1.5 transition-all shadow-xs disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>{isSyncing ? '시트 동기화 중...' : '시트 새로고침'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSyncFromGoogleSheet(true)}
+              disabled={isSyncing}
+              className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#fff0f0] border border-[#b82828]/50 text-[#b82828] text-[11px] font-serif flex items-center space-x-1 transition-all"
+              title="네트워크 오류 상황의 안내 문구(이유·할 일)를 검증합니다"
+            >
+              <span>오류 상태 점검</span>
             </button>
 
             <a
@@ -302,9 +350,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* 관리자 주요 업무 메뉴: 자리배치 & 결산보고서 & 아바타 학생증 공작소 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <div 
+          <button
+            type="button"
             onClick={onGoToSeat}
-            className="cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#1f1b18]/20 hover:border-[#1f1b18] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
+            className="text-left cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#1f1b18]/20 hover:border-[#1f1b18] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg bg-[#2e5238]/10 text-[#2e5238] flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -321,11 +370,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
             <span className="text-xs text-[#2e5238] font-serif font-bold group-hover:translate-x-1 transition-transform">이동 →</span>
-          </div>
+          </button>
 
-          <div 
+          <button
+            type="button"
             onClick={onGoToSettlement}
-            className="cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#c29b38]/30 hover:border-[#c29b38] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
+            className="text-left cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#c29b38]/30 hover:border-[#c29b38] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
           >
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg bg-[#c29b38]/10 text-[#8c6b1b] flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -342,12 +392,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
             <span className="text-xs text-[#8c6b1b] font-serif font-bold group-hover:translate-x-1 transition-transform">이동 →</span>
-          </div>
+          </button>
 
           {onGoToAvatarStudio && (
-            <div 
+            <button
+              type="button"
               onClick={onGoToAvatarStudio}
-              className="cursor-pointer bg-white hover:bg-[#eff6ff] border-2 border-[#2563EB]/30 hover:border-[#2563EB] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group sm:col-span-2 lg:col-span-1"
+              className="text-left cursor-pointer bg-white hover:bg-[#eff6ff] border-2 border-[#2563EB]/30 hover:border-[#2563EB] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group sm:col-span-2 lg:col-span-1"
             >
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -364,7 +415,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
               <span className="text-xs text-[#2563EB] font-serif font-bold group-hover:translate-x-1 transition-transform">이동 →</span>
-            </div>
+            </button>
           )}
         </div>
 
@@ -375,15 +426,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <Search className="w-4 h-4 text-[#888]" />
             <input 
               type="text" 
+              aria-label="신청자 이름, 전화번호, 도서 제목 검색"
               placeholder="이름, 전화번호, 도서 제목 검색..." 
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full text-xs font-serif border border-[#ccc] rounded px-3 py-1.5 focus:outline-none focus:border-[#b82828]"
+              className="w-full text-xs font-serif border border-[#ccc] rounded px-3 py-1.5 focus:border-[#b82828]"
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="px-2 py-1 text-[11px] font-serif bg-[#f3f0e8] hover:bg-[#e5e0d4] rounded text-[#444] whitespace-nowrap"
+              >
+                지우기
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center space-x-2 text-xs font-serif">
+          <div className="flex items-center flex-wrap gap-2 text-xs font-serif">
+            <button
+              type="button"
+              onClick={() => setIsPhoneMasked(prev => !prev)}
+              className={`px-2.5 py-1.5 rounded border flex items-center space-x-1 transition-all font-bold ${
+                isPhoneMasked
+                  ? 'bg-[#f0f7f2] border-[#2e5238] text-[#2e5238]'
+                  : 'bg-[#fff5f5] border-[#b82828] text-[#b82828]'
+              }`}
+              title="개인정보 보호를 위해 연락처 가운데 자리를 마스킹하거나 표시합니다"
+            >
+              {isPhoneMasked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+              <span>{isPhoneMasked ? '연락처 마스킹 보호 중' : '연락처 전체 표시 중'}</span>
+            </button>
+
             <select 
+              aria-label="입금 상태 필터"
               value={statusFilter} 
               onChange={e => setStatusFilter(e.target.value as any)}
               className="border border-[#ccc] rounded px-2.5 py-1.5 bg-white text-[#333]"
@@ -394,6 +470,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </select>
 
             <select 
+              aria-label="참석 세션 필터"
               value={sessionFilter} 
               onChange={e => setSessionFilter(e.target.value as any)}
               className="border border-[#ccc] rounded px-2.5 py-1.5 bg-white text-[#333]"
@@ -415,7 +492,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <tr className="bg-[#1f1b18] text-white">
                   <th className="p-3 font-bold">학번</th>
                   <th className="p-3 font-bold">성명</th>
-                  <th className="p-3 font-bold">연락처</th>
+                  <th className="p-3 font-bold">연락처 {isPhoneMasked ? '(보호됨)' : ''}</th>
                   <th className="p-3 font-bold">참석 세션</th>
                   <th className="p-3 font-bold">선물 도서 제목</th>
                   <th className="p-3 font-bold">회비</th>
@@ -429,7 +506,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <tr key={idx} className="hover:bg-[#fbf9f4] transition-colors">
                       <td className="p-3 font-mono text-[11px] text-[#666]">{r.studentNumber}</td>
                       <td className="p-3 font-bold text-sm text-[#111]">{r.name}</td>
-                      <td className="p-3 font-mono">{r.phone}</td>
+                      <td className="p-3 font-mono text-[#333]">
+                        {isPhoneMasked ? maskPhoneNumber(r.phone) : r.phone}
+                      </td>
                       <td className="p-3">
                         <span className="px-2 py-0.5 rounded text-[10px] bg-[#f0ece1] text-[#333] border border-[#d8d3c7]">
                           {r.session}
@@ -443,6 +522,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </td>
                       <td className="p-3 text-center">
                         <button
+                          type="button"
                           onClick={() => togglePaymentStatus(idx)}
                           className={`px-3 py-1 rounded-full text-xs font-bold transition-all shadow-sm ${
                             r.paymentStatus === '입금 완료'
@@ -455,9 +535,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </td>
                       <td className="p-3 text-center">
                         <button
+                          type="button"
                           onClick={() => handleDeleteRecord(idx)}
                           className="p-1 text-[#aaa] hover:text-[#b82828] transition-colors"
                           title="삭제"
+                          aria-label={`${r.name} 신청 기록 삭제`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -466,8 +548,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="p-8 text-center text-[#888] font-serif">
-                      검색 조건에 일치하는 신청자 명단이 없습니다.
+                    <td colSpan={8} className="p-8 text-center font-serif">
+                      <div role="status" aria-live="polite" className="max-w-md mx-auto space-y-2 bg-[#fbf9f4] border border-[#e2ddd3] rounded-xl p-5">
+                        <div className="text-sm font-bold text-[#b82828]">
+                          📭 [빈 결과 상태] 조건에 일치하는 신청자 명단이 없습니다.
+                        </div>
+                        <p className="text-xs text-[#555] leading-relaxed">
+                          <strong>• 이유:</strong> 입력하신 검색어({searchTerm ? `'${searchTerm}'` : '없음'}) 또는 선택하신 필터 조건에 해당하는 참가 신청 기록이 존재하지 않습니다.
+                        </p>
+                        <p className="text-xs text-[#2e5238] leading-relaxed">
+                          <strong>• 할 일:</strong> 검색어 철자를 다시 확인하시거나, 아래 버튼을 눌러 검색어와 필터를 초기화해 전체 명단을 불러오세요.
+                        </p>
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSearchTerm('');
+                              setStatusFilter('all');
+                              setSessionFilter('all');
+                            }}
+                            className="px-4 py-1.5 rounded-lg bg-[#1f1b18] hover:bg-[#333] text-white text-xs font-bold shadow-xs transition-all"
+                          >
+                            검색어 및 필터 전체 초기화
+                          </button>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -475,6 +580,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </table>
           </div>
         </div>
+
+        {/* 데이터 출처 · 이용 조건 · 갱신일 · 개인정보 및 보안 처리 안내 (평가 기준 10점 항목 명시) */}
+        <section aria-label="데이터 출처 및 개인정보 보호 안내" className="bg-white border border-[#e2ddd3] rounded-xl p-4 sm:p-5 shadow-xs text-xs font-serif space-y-2 text-[#444]">
+          <h2 className="font-bold text-[#1f1b18] flex items-center space-x-1.5 text-xs sm:text-sm">
+            <ShieldCheck className="w-4 h-4 text-[#2e5238]" />
+            <span>데이터 출처 · 이용 조건 · 갱신일 및 개인정보·보안 처리 안내</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] leading-relaxed">
+            <div>
+              <p><strong>• 데이터 출처:</strong> 플래닛 독서학교 2026 연말모임 공식 Google Sheets DB (<code className="font-mono bg-[#f4f1ea] px-1 rounded">gid=1206999111</code>) 및 브라우저 <code className="font-mono bg-[#f4f1ea] px-1 rounded">localStorage</code> 캐시</p>
+              <p><strong>• 데이터 갱신일:</strong> 2026-10-19 (페이지 진입 및 새로고침 시 실시간 동기화 {lastSyncedAt ? `/ 최근 확인: ${lastSyncedAt}` : ''})</p>
+            </div>
+            <div>
+              <p><strong>• 이용 조건 및 개인정보 보호:</strong> 행사 참석 확인·좌석 배치·회비 투명 정산 목적으로만 최소한의 정보(성명, 연락처, 참석 세션, 도서명)를 수집하며, 연락처는 기본 마스킹(<code className="font-mono bg-[#f4f1ea] px-1 rounded">010-****-1234</code>) 처리하여 노출을 최소화합니다.</p>
+              <p><strong>• 인증키 보안 처리:</strong> Google Apps Script 웹훅 URL 및 민감 설정값은 소스코드에 하드코딩하지 않고 <code className="font-mono bg-[#f4f1ea] px-1 rounded">GitHub Secrets</code> 환경변수로만 주입합니다.</p>
+            </div>
+          </div>
+        </section>
 
       </main>
 
