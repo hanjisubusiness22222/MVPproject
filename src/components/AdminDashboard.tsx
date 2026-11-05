@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, ShieldCheck, Download, Search, CheckCircle2, 
-  Clock, Users, DollarSign, BookOpen, Lock, Unlock, 
-  RefreshCw, Plus, Trash2, Check, X, Receipt, ExternalLink
+  Clock, Users, DollarSign, Lock, 
+  RefreshCw, Trash2, Receipt
 } from 'lucide-react';
-import { EVENT_CONFIG } from '../constants/eventConfig';
-import { fetchGoogleSheetRecords, GOOGLE_SHEET_VIEW_URL, maskPhoneNumber } from '../utils/googleSheetSync';
+import {
+  fetchGoogleSheetRecords,
+  maskNameValue,
+  maskPhoneNumber,
+  matchesMaskedName
+} from '../utils/googleSheetSync';
 import planetLogo from '../assets/planet-logo.png';
 
 interface RsvpRecord {
@@ -21,13 +25,12 @@ interface RsvpRecord {
   source?: 'sheet' | 'local';
 }
 
-// 초기 샘플 RSVP 명단 (구글 시트 응답 전 초기 표시용)
+// 초기 RSVP 명단 (서버 마스킹 정책에 따라 성명·연락처가 가려진 형태로만 유지)
 const INITIAL_RECORDS: RsvpRecord[] = [
-  { studentNumber: '2026-PLANET-1001', name: '김하늘', phone: '010-1234-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 80000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1002', name: '이준호', phone: '010-2345-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 45000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1003', name: '박서연', phone: '010-3456-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1004', name: '정민우', phone: '010-4567-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 35000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1005', name: '최지우', phone: '010-5678-9012', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '물고기는 존재하지 않는다', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 17:15', source: 'sheet' }
+  { studentNumber: '2026-PLANET-1001', name: '박*민', phone: '010-****-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 80000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1002', name: '송*호', phone: '010-****-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 45000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1003', name: '이*진', phone: '010-****-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1004', name: '정*석', phone: '010-****-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 35000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', source: 'sheet' }
 ];
 
 interface AdminDashboardProps {
@@ -99,13 +102,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  // CSV 엑셀 다운로드 (한글 깨짐 방지 UTF-8 BOM, 개인정보 마스킹 반영)
+  // CSV 엑셀 다운로드 (한글 깨짐 방지 UTF-8 BOM, 서버 마스킹 정책에 따라 성명·연락처 모두 마스킹 유지)
   const handleExportCsv = () => {
-    const headers = ['학번', '성명', '연락처', '참석세션', '도서제목', '회비(원)', '회비납부여부', '신청일시'];
+    const headers = ['학번', '성명(마스킹)', '연락처(마스킹)', '참석세션', '도서제목', '회비(원)', '회비납부여부', '신청일시'];
     const rows = records.map(r => [
       r.studentNumber || '',
-      r.name,
-      isPhoneMasked ? maskPhoneNumber(r.phone) : r.phone,
+      maskNameValue(r.name),
+      maskPhoneNumber(r.phone),
       r.session,
       `"${(r.bookTitle || '').replace(/"/g, '""')}"`,
       r.fee,
@@ -125,7 +128,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // 필터링된 기록
   const filteredRecords = records.filter(r => {
-    const matchesSearch = r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = !searchTerm.trim() ||
+                          matchesMaskedName(r.name, searchTerm) ||
                           r.phone.includes(searchTerm) ||
                           (r.bookTitle && r.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()));
     
@@ -239,12 +243,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {isSyncing ? (
               <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#92400e]">
                 <RefreshCw className="w-4 h-4 animate-spin text-[#d97706] flex-shrink-0" />
-                <span>[로딩 상태] 구글 스프레드시트(gid=1206999111)에서 최신 신청자 명단을 불러오는 중입니다...</span>
+                <span>[로딩 상태] 비공개 구글 시트 보안 서버에서 마스킹된 신청자 명단을 불러오는 중입니다...</span>
               </div>
             ) : syncError ? (
               <div className="space-y-1 text-xs font-serif">
                 <div className="font-bold text-[#b82828] flex items-center space-x-1.5">
-                  <span>⚠️ [오류 상태] 구글 시트 실시간 동기화 실패</span>
+                  <span>⚠️ [오류 상태] 구글 시트 보안 서버 동기화 실패</span>
                 </div>
                 <p className="text-[11px] text-[#7f1d1d]">
                   <strong>• 이유:</strong> {syncError.reason}
@@ -257,10 +261,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <>
                 <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#1f3d27]">
                   <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
-                  <span>[정상 상태] 구글 스프레드시트 실시간 연동 중 (시트 GID: 1206999111)</span>
+                  <span>[정상 상태] 비공개 구글 시트 보안 서버 연동 중 (원본 시트 공유 차단 · 서버 마스킹 적용)</span>
                 </div>
                 <p className="text-[11px] text-[#3c6347] font-sans">
-                  시트 원본 데이터 {sheetRowCount}건 동기화 완료 {lastSyncedAt ? `(최근 갱신: 2026-10-19 ${lastSyncedAt})` : ''}
+                  서버에서 이름(박*민)과 연락처(010-****-1234)를 가린 데이터 {sheetRowCount}건 수신 완료 {lastSyncedAt ? `(최근 갱신: ${lastSyncedAt})` : ''}
                 </p>
               </>
             )}
@@ -274,7 +278,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#e6f2e9] border border-[#2e5238] text-[#2e5238] text-xs font-serif font-bold flex items-center space-x-1.5 transition-all shadow-xs disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span>{isSyncing ? '시트 동기화 중...' : '시트 새로고침'}</span>
+              <span>{isSyncing ? '동기화 중...' : '보안 서버 새로고침'}</span>
             </button>
 
             <button
@@ -286,16 +290,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               <span>오류 상태 점검</span>
             </button>
-
-            <a
-              href={GOOGLE_SHEET_VIEW_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-lg bg-[#2e5238] hover:bg-[#23402c] text-white text-xs font-serif font-bold flex items-center space-x-1.5 transition-all shadow-xs"
-            >
-              <span>연결된 구글 시트 열기</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
           </div>
         </div>
         
@@ -444,19 +438,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           <div className="flex items-center flex-wrap gap-2 text-xs font-serif">
-            <button
-              type="button"
-              onClick={() => setIsPhoneMasked(prev => !prev)}
-              className={`px-2.5 py-1.5 rounded border flex items-center space-x-1 transition-all font-bold ${
-                isPhoneMasked
-                  ? 'bg-[#f0f7f2] border-[#2e5238] text-[#2e5238]'
-                  : 'bg-[#fff5f5] border-[#b82828] text-[#b82828]'
-              }`}
-              title="개인정보 보호를 위해 연락처 가운데 자리를 마스킹하거나 표시합니다"
+            <span
+              className="px-2.5 py-1.5 rounded border bg-[#f0f7f2] border-[#2e5238] text-[#2e5238] flex items-center space-x-1 font-bold"
+              title="구글 시트 공유가 비공개로 전환되었으며, 서버에서 성명(박*민)과 연락처(010-****-1234)를 마스킹한 데이터만 내보냅니다"
             >
-              {isPhoneMasked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-              <span>{isPhoneMasked ? '연락처 마스킹 보호 중' : '연락처 전체 표시 중'}</span>
-            </button>
+              <Lock className="w-3.5 h-3.5" />
+              <span>서버 마스킹 보호 중 (성명·연락처 가림)</span>
+            </span>
 
             <select 
               aria-label="입금 상태 필터"
@@ -491,8 +479,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <thead>
                 <tr className="bg-[#1f1b18] text-white">
                   <th className="p-3 font-bold">학번</th>
-                  <th className="p-3 font-bold">성명</th>
-                  <th className="p-3 font-bold">연락처 {isPhoneMasked ? '(보호됨)' : ''}</th>
+                  <th className="p-3 font-bold">성명 (마스킹)</th>
+                  <th className="p-3 font-bold">연락처 (마스킹)</th>
                   <th className="p-3 font-bold">참석 세션</th>
                   <th className="p-3 font-bold">선물 도서 제목</th>
                   <th className="p-3 font-bold">회비</th>
@@ -505,9 +493,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   filteredRecords.map((r, idx) => (
                     <tr key={idx} className="hover:bg-[#fbf9f4] transition-colors">
                       <td className="p-3 font-mono text-[11px] text-[#666]">{r.studentNumber}</td>
-                      <td className="p-3 font-bold text-sm text-[#111]">{r.name}</td>
+                      <td className="p-3 font-bold text-sm text-[#111]">{maskNameValue(r.name)}</td>
                       <td className="p-3 font-mono text-[#333]">
-                        {isPhoneMasked ? maskPhoneNumber(r.phone) : r.phone}
+                        {maskPhoneNumber(r.phone)}
                       </td>
                       <td className="p-3">
                         <span className="px-2 py-0.5 rounded text-[10px] bg-[#f0ece1] text-[#333] border border-[#d8d3c7]">
@@ -539,7 +527,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           onClick={() => handleDeleteRecord(idx)}
                           className="p-1 text-[#aaa] hover:text-[#b82828] transition-colors"
                           title="삭제"
-                          aria-label={`${r.name} 신청 기록 삭제`}
+                          aria-label={`${maskNameValue(r.name)} 신청 기록 삭제`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -589,12 +577,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] leading-relaxed">
             <div>
-              <p><strong>• 데이터 출처:</strong> 플래닛 독서학교 2026 연말모임 공식 Google Sheets DB (<code className="font-mono bg-[#f4f1ea] px-1 rounded">gid=1206999111</code>) 및 브라우저 <code className="font-mono bg-[#f4f1ea] px-1 rounded">localStorage</code> 캐시</p>
-              <p><strong>• 데이터 갱신일:</strong> 2026-10-19 (페이지 진입 및 새로고침 시 실시간 동기화 {lastSyncedAt ? `/ 최근 확인: ${lastSyncedAt}` : ''})</p>
+              <p><strong>• 데이터 출처:</strong> 플래닛 독서학교 2026 연말모임 비공개 Google Sheets DB (외부 직접 공유 차단, 보안 서버 API 경유) 및 브라우저 캐시</p>
+              <p><strong>• 데이터 갱신일:</strong> 2026-11-05 (페이지 진입 및 새로고침 시 보안 서버 동기화 {lastSyncedAt ? `/ 최근 확인: ${lastSyncedAt}` : ''})</p>
             </div>
             <div>
-              <p><strong>• 이용 조건 및 개인정보 보호:</strong> 행사 참석 확인·좌석 배치·회비 투명 정산 목적으로만 최소한의 정보(성명, 연락처, 참석 세션, 도서명)를 수집하며, 연락처는 기본 마스킹(<code className="font-mono bg-[#f4f1ea] px-1 rounded">010-****-1234</code>) 처리하여 노출을 최소화합니다.</p>
-              <p><strong>• 인증키 보안 처리:</strong> Google Apps Script 웹훅 URL 및 민감 설정값은 소스코드에 하드코딩하지 않고 <code className="font-mono bg-[#f4f1ea] px-1 rounded">GitHub Secrets</code> 환경변수로만 주입합니다.</p>
+              <p><strong>• 이용 조건 및 개인정보 보호:</strong> 원본 구글 시트 공유를 비공개로 차단하고, 서버에서 성명(<code className="font-mono bg-[#f4f1ea] px-1 rounded">박*민</code>)과 연락처(<code className="font-mono bg-[#f4f1ea] px-1 rounded">010-****-1234</code>)를 가린(마스킹) 정보만 클라이언트로 내보냅니다.</p>
+              <p><strong>• 인증키 보안 처리:</strong> Google Apps Script 웹훅 URL 및 민감 설정값은 소스코드에 하드코딩하지 않고 <code className="font-mono bg-[#f4f1ea] px-1 rounded">GitHub Secrets</code> / 서버 환경변수로만 관리합니다.</p>
             </div>
           </div>
         </section>

@@ -10,7 +10,13 @@ import { STAGES } from './pencilData';
 import { EVENT_CONFIG } from '../constants/eventConfig';
 import { sanitizeText, validatePhone, formatPhone } from '../utils/validation';
 import { maskPhone } from '../utils/masking';
-import { fetchGoogleSheetRecords } from '../utils/googleSheetSync';
+import {
+  fetchGoogleSheetRecords,
+  submitRsvpToGoogleSheet,
+  matchesMaskedName,
+  maskNameValue,
+  maskPhoneNumber
+} from '../utils/googleSheetSync';
 
 interface PencilSketchRsvpProps {
   onSuccess?: () => void;
@@ -252,24 +258,38 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
       // 시각적 로딩 상태 확인을 위한 최소 대기 시간 (600ms)
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      // 로컬 스토리지 안전 백업 저장
-      const existingRsvps = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
-      existingRsvps.push(payload);
-      localStorage.setItem('planet_rsvps', JSON.stringify(existingRsvps));
-
-      // 오류 시뮬레이션 모드 또는 오프라인 상태 체크
+      // 1. 오류 시뮬레이션 모드 또는 오프라인 상태 체크
       if (simulateErrorMode || !navigator.onLine) {
         throw new Error(simulateErrorMode ? 'SIMULATED_SERVER_ERROR' : 'NETWORK_OFFLINE');
       }
 
-      if (EVENT_CONFIG.googleScriptUrl && EVENT_CONFIG.googleScriptUrl !== 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec') {
-        await fetch(EVENT_CONFIG.googleScriptUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
+      // 2. 실제 비공개 구글 시트 서버에 저장 요청 및 실제 저장 여부(savedToSheet) 검증
+      const sheetResult = await submitRsvpToGoogleSheet(payload);
+
+      if (!sheetResult.savedToSheet) {
+        // 실제 구글 시트에 저장되지 않은 경우 절대 '접수되었습니다(success)'를 띄우지 않고 실패(error) 안내
+        setSubmitStatus('error');
+        setServerErrorInfo({
+          reason:
+            sheetResult.reason ||
+            '비공개 구글 시트 서버에 신청 데이터가 실제로 저장되지 않았습니다.',
+          action:
+            sheetResult.action ||
+            '1) 실제 시트 저장이 확인되지 않았으므로 신청 완료로 처리되지 않았습니다. 2) 관리자는 비공개 구글 시트의 Apps Script 웹앱 배포 URL(VITE_GOOGLE_SCRIPT_URL) 설정을 확인한 후 [다시 제출하기]를 눌러주세요.'
         });
+        return;
       }
+
+      // 3. 실제 구글 시트 저장이 확인된 경우에만 로컬 백업(마스킹 적용) 및 접수 완료 표시
+      const maskedPayload = {
+        ...payload,
+        studentNumber: sheetResult.studentNumber || payload.studentNumber,
+        name: maskNameValue(payload.name),
+        phone: maskPhoneNumber(payload.phone)
+      };
+      const existingRsvps = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
+      existingRsvps.push(maskedPayload);
+      localStorage.setItem('planet_rsvps', JSON.stringify(existingRsvps));
 
       confetti({
         particleCount: 120,
@@ -279,7 +299,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
       });
 
       setSubmittedData({
-        ...payload,
+        ...maskedPayload,
         displayDate: new Date().toLocaleDateString('ko-KR', {
           year: 'numeric',
           month: 'long',
@@ -295,14 +315,14 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
       setSubmitStatus('error');
       setServerErrorInfo({
         reason: !navigator.onLine
-          ? '현재 인터넷(네트워크) 연결이 끊어져 외부 구글 시트 서버로 신청서를 전송하지 못했습니다.'
-          : '외부 구글 시트 서버 응답 지연 또는 일시적인 통신 오류가 발생했습니다.',
-        action: '1) 네트워크 연결 상태를 확인하거나 [오류 테스트 체크 해제] 후 아래 [다시 제출하기] 버튼을 눌러주세요. 2) 입력하신 정보는 브라우저 임시 보관함에 안전하게 백업되었으므로 좌측의 [완성된 학생증 이미지 저장하기]는 지금 바로 이용 가능합니다.'
+          ? '현재 인터넷(네트워크) 연결이 끊어져 비공개 구글 시트 서버에 신청서를 저장하지 못했습니다.'
+          : '비공개 구글 시트 서버 통신 실패로 인해 실제 시트에 신청 내역이 저장되지 않았습니다.',
+        action: '1) 실제 구글 시트에 저장되지 않았으므로 신청 접수가 완료되지 않았습니다. 2) 네트워크 연결 상태를 확인하거나 [오류 테스트 체크 해제] 후 아래 [다시 제출하기] 버튼을 눌러주세요.'
       });
     }
   };
 
-  // 발급된 학생증 / 신청 내역 조회 핸들러 (구글 시트 gid=1206999111 실시간 연동 ➔ 로딩 / 빈 결과 / 정상 상태 전환)
+  // 발급된 학생증 / 신청 내역 조회 핸들러 (서버에서 마스킹된 정보만 받아 조회 ➔ 로딩 / 빈 결과 / 정상 상태 전환)
   const handleLookup = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const q = sanitizeText(lookupQuery, 20).trim();
@@ -317,7 +337,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
       const matched = q
         ? syncedRecords.filter(
             item =>
-              (item.name && item.name.includes(q)) ||
+              matchesMaskedName(item.name, q) ||
               (item.phone && item.phone.includes(q)) ||
               (item.studentNumber && item.studentNumber.toLowerCase().includes(q.toLowerCase()))
           )
@@ -986,7 +1006,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
               </div>
             )}
 
-            {/* [상태 안내 3] 오류 상태 (통신 실패 시 이유 + 할 일 + 재시도 버튼) */}
+            {/* [상태 안내 3] 오류 상태 (구글 시트 미저장/통신 실패 시 이유 + 할 일 + 재시도 버튼) */}
             {submitStatus === 'error' && serverErrorInfo && (
               <div
                 role="alert"
@@ -995,7 +1015,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
               >
                 <div className="font-bold flex items-center space-x-1.5 text-red-800 text-sm">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span>⚠️ [오류 상태] 원격 구글 시트 전송에 실패했습니다</span>
+                  <span>⚠️ [접수 미완료 · 저장 실패] 구글 시트에 신청이 저장되지 않았습니다</span>
                 </div>
                 <p><strong>• 실패 이유:</strong> {serverErrorInfo.reason}</p>
                 <p><strong>• 해야 할 일:</strong> {serverErrorInfo.action}</p>
@@ -1009,7 +1029,7 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
                     className="px-3 py-1.5 bg-red-800 hover:bg-red-900 text-white font-bold rounded text-xs inline-flex items-center space-x-1"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>오류 해제 후 다시 제출하기</span>
+                    <span>다시 제출하기 (시트 저장 재시도)</span>
                   </button>
                 </div>
               </div>

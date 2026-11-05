@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, Shuffle, Users, Maximize2, Minimize2, 
-  Download, Plus, Trash2, RefreshCw, CheckCircle2, ExternalLink
+  Download, Plus, Trash2, RefreshCw, CheckCircle2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { toPng } from 'html-to-image';
-import { fetchGoogleSheetRecords, GOOGLE_SHEET_VIEW_URL } from '../utils/googleSheetSync';
+import { fetchGoogleSheetRecords, maskNameValue } from '../utils/googleSheetSync';
 import planetLogo from '../assets/planet-logo.png';
 
 interface Participant {
@@ -18,37 +18,37 @@ interface Participant {
   seatIndex?: number;
 }
 
-// 기본 샘플 참가자 명단 (24인 - 기존여6, 기존남6, 신규여6, 신규남6 황금비율 구성)
+// 기본 샘플 참가자 명단 (개인정보 보호를 위해 모두 마스킹 처리된 상태)
 const DEFAULT_PARTICIPANTS: Participant[] = [
   // 1분단 배정 후보군
-  { id: 'p1', name: '김하늘', gender: 'F', type: 'senior' },
-  { id: 'p2', name: '박서연', gender: 'F', type: 'senior' },
-  { id: 'p3', name: '정민우', gender: 'M', type: 'senior' },
-  { id: 'p4', name: '강도현', gender: 'M', type: 'senior' },
-  { id: 'p5', name: '최지우', gender: 'F', type: 'new' },
-  { id: 'p6', name: '한소희', gender: 'F', type: 'new' },
-  { id: 'p7', name: '이준호', gender: 'M', type: 'new' },
-  { id: 'p8', name: '임태양', gender: 'M', type: 'new' },
+  { id: 'p1', name: '김*늘', gender: 'F', type: 'senior' },
+  { id: 'p2', name: '박*연', gender: 'F', type: 'senior' },
+  { id: 'p3', name: '정*우', gender: 'M', type: 'senior' },
+  { id: 'p4', name: '강*현', gender: 'M', type: 'senior' },
+  { id: 'p5', name: '최*우', gender: 'F', type: 'new' },
+  { id: 'p6', name: '한*희', gender: 'F', type: 'new' },
+  { id: 'p7', name: '이*호', gender: 'M', type: 'new' },
+  { id: 'p8', name: '임*양', gender: 'M', type: 'new' },
 
   // 2분단 배정 후보군
-  { id: 'p9', name: '윤채원', gender: 'F', type: 'senior' },
-  { id: 'p10', name: '송예진', gender: 'F', type: 'senior' },
-  { id: 'p11', name: '오승재', gender: 'M', type: 'senior' },
-  { id: 'p12', name: '배진우', gender: 'M', type: 'senior' },
-  { id: 'p13', name: '신유나', gender: 'F', type: 'new' },
-  { id: 'p14', name: '노다혜', gender: 'F', type: 'new' },
-  { id: 'p15', name: '권혁주', gender: 'M', type: 'new' },
-  { id: 'p16', name: '유시온', gender: 'M', type: 'new' },
+  { id: 'p9', name: '윤*원', gender: 'F', type: 'senior' },
+  { id: 'p10', name: '송*진', gender: 'F', type: 'senior' },
+  { id: 'p11', name: '오*재', gender: 'M', type: 'senior' },
+  { id: 'p12', name: '배*우', gender: 'M', type: 'senior' },
+  { id: 'p13', name: '신*나', gender: 'F', type: 'new' },
+  { id: 'p14', name: '노*혜', gender: 'F', type: 'new' },
+  { id: 'p15', name: '권*주', gender: 'M', type: 'new' },
+  { id: 'p16', name: '유*온', gender: 'M', type: 'new' },
 
   // 3분단 배정 후보군
-  { id: 'p17', name: '백서린', gender: 'F', type: 'senior' },
-  { id: 'p18', name: '황가람', gender: 'F', type: 'senior' },
-  { id: 'p19', name: '문재원', gender: 'M', type: 'senior' },
-  { id: 'p20', name: '조현우', gender: 'M', type: 'senior' },
-  { id: 'p21', name: '전민서', gender: 'F', type: 'new' },
-  { id: 'p22', name: '양다은', gender: 'F', type: 'new' },
-  { id: 'p23', name: '서강진', gender: 'M', type: 'senior' },
-  { id: 'p24', name: '구동혁', gender: 'M', type: 'new' }
+  { id: 'p17', name: '백*린', gender: 'F', type: 'senior' },
+  { id: 'p18', name: '황*람', gender: 'F', type: 'senior' },
+  { id: 'p19', name: '문*원', gender: 'M', type: 'senior' },
+  { id: 'p20', name: '조*우', gender: 'M', type: 'senior' },
+  { id: 'p21', name: '전*서', gender: 'F', type: 'new' },
+  { id: 'p22', name: '양*은', gender: 'F', type: 'new' },
+  { id: 'p23', name: '서*진', gender: 'M', type: 'senior' },
+  { id: 'p24', name: '구*혁', gender: 'M', type: 'new' }
 ];
 
 interface ClassroomSeatShuffleProps {
@@ -70,7 +70,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
 
   const classroomRef = useRef<HTMLDivElement>(null);
 
-  // 구글 시트 신청자 명단(gid=1206999111) + 로컬 신청자 실시간 동기화
+  // 비공개 구글 시트 보안 서버 신청자 명단 + 로컬 신청자 실시간 동기화 (성명 마스킹 적용)
   const handleSyncApplicantsToSeats = async () => {
     setIsSyncing(true);
     try {
@@ -78,7 +78,7 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
       if (records.length > 0) {
         const mapped: Participant[] = records.map((rec, idx) => ({
           id: rec.studentNumber || `rsvp_${idx}`,
-          name: rec.name,
+          name: maskNameValue(rec.name),
           gender: (idx % 2 === 0 ? 'F' : 'M') as 'M' | 'F',
           type: (rec.grade && rec.grade.includes('1학년') ? 'new' : Math.floor(idx / 2) % 2 === 0 ? 'senior' : 'new') as 'senior' | 'new',
           studentNumber: rec.studentNumber,
@@ -355,20 +355,20 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
         </div>
       </header>
 
-      {/* 상단 구글 시트 신청자 명단 실시간 연동 바 */}
+      {/* 상단 비공개 구글 시트 보안 서버 명단 연동 바 */}
       <div role="status" aria-live="polite" className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border-b border-[#e8e4dc] bg-[#f0f7f2]">
         <div className="flex items-center space-x-2 text-[#1f3d27] font-serif">
           <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
           <span className="font-bold">
             {isSyncing
-              ? `[로딩 상태] 구글 시트(gid=1206999111)에서 신청자 명단을 불러오는 중...`
+              ? `[로딩 상태] 보안 서버에서 마스킹된 신청자 명단을 불러오는 중...`
               : isUsingSheetList
-                ? `[정상 상태] 구글 시트 신청자 명단 연동 중 (${participants.length}명)`
-                : `[정상 상태] 24인 시연용 샘플 명단 사용 중 (${participants.length}명)`}
+                ? `[정상 상태] 보안 서버 마스킹 명단 연동 중 (${participants.length}명 · 성명 보호됨)`
+                : `[정상 상태] 24인 시연용 마스킹 샘플 명단 사용 중 (${participants.length}명)`}
           </span>
           {lastSyncedAt && (
             <span className="text-[11px] text-[#3c6347] font-sans">
-              (갱신일: 2026-10-19 {lastSyncedAt})
+              (갱신 시각: {lastSyncedAt})
             </span>
           )}
         </div>
@@ -384,18 +384,8 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
             <span>{isSyncing ? '불러오는 중...' : '신청자 명단 새로고침'}</span>
           </button>
 
-          <a
-            href={GOOGLE_SHEET_VIEW_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-2.5 py-1 rounded bg-[#2e5238] hover:bg-[#23402c] text-white text-[11px] font-serif font-bold flex items-center space-x-1 transition-all shadow-xs"
-          >
-            <span>신청자 시트 열기</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-
           <span className="text-[10px] sm:text-[11px] text-[#555] font-mono hidden sm:inline">
-            • 총 24석 (1·2·3분단 각 8석)
+            • 총 24석 (1·2·3분단 각 8석 · 개인정보 마스킹 적용)
           </span>
         </div>
       </div>

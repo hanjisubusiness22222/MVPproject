@@ -6,12 +6,10 @@ import {
   Download, 
   Printer, 
   RefreshCw,
-  ExternalLink,
   X
 } from 'lucide-react';
 import {
   fetchGoogleSheetSettlements,
-  GOOGLE_SHEET_VIEW_URL,
   GOOGLE_SHEET_RECEIPT_TAB_NAME,
   SyncedSettlementItem
 } from '../utils/googleSheetSync';
@@ -422,18 +420,8 @@ export const SettlementReport: React.FC<SettlementReportProps> = ({
               className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#ede8dc] border border-[#1f1b18] text-[#1f1b18] text-xs font-serif font-bold flex items-center space-x-1 transition-all shadow-xs"
             >
               <Download className="w-3.5 h-3.5 text-[#b82828]" />
-              <span>업로드용 샘플 CSV</span>
+              <span>정산 내역 CSV 다운로드</span>
             </button>
-
-            <a
-              href={GOOGLE_SHEET_VIEW_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-lg bg-[#2e5238] hover:bg-[#23402c] text-white text-xs font-serif font-bold flex items-center space-x-1 transition-all shadow-xs"
-            >
-              <span>구글 시트 열기</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
           </div>
         </div>
 

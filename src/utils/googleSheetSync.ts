@@ -1,3 +1,5 @@
+import { EVENT_CONFIG } from '../constants/eventConfig';
+
 export interface SyncedRsvpRecord {
   studentNumber: string;
   name: string;
@@ -15,16 +17,24 @@ export interface SyncedRsvpRecord {
   source?: 'sheet' | 'local';
 }
 
-export const GOOGLE_SHEET_ID = '1S-arS3Udnh_UsZE3SexQ6G5spTusgA5Lv7gxhZkEQVU';
-export const GOOGLE_SHEET_GID = '1206999111';
-export const GOOGLE_SHEET_VIEW_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/edit?gid=${GOOGLE_SHEET_GID}#gid=${GOOGLE_SHEET_GID}`;
-export const GOOGLE_SHEET_GVIZ_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json&gid=${GOOGLE_SHEET_GID}`;
+/**
+ * 개인정보 보호를 위해 성명 가운데 글자를 마스킹합니다 (예: 박지민 -> 박*민, 이산 -> 이*)
+ */
+export function maskNameValue(name: string): string {
+  const clean = String(name || '').trim();
+  if (!clean) return '익*';
+  if (clean.includes('*')) return clean;
+  if (clean.length <= 1) return `${clean}*`;
+  if (clean.length === 2) return `${clean[0]}*`;
+  return `${clean[0]}${'*'.repeat(clean.length - 2)}${clean[clean.length - 1]}`;
+}
 
 /**
- * 개인정보 보호를 위해 전화번호 가운데 자리를 마스킹합니다 (예: 010-****-5678)
+ * 개인정보 보호를 위해 전화번호 가운데 자리를 마스킹합니다 (예: 010-1234-5678 -> 010-****-5678)
  */
 export function maskPhoneNumber(phone: string): string {
   if (!phone) return '010-****-0000';
+  if (phone.includes('*')) return phone;
   const digits = phone.replace(/[^0-9]/g, '');
   if (digits.length === 11) {
     return `${digits.slice(0, 3)}-****-${digits.slice(7)}`;
@@ -32,12 +42,81 @@ export function maskPhoneNumber(phone: string): string {
   if (digits.length === 10) {
     return `${digits.slice(0, 3)}-***-${digits.slice(6)}`;
   }
-  return phone.replace(/(\d{2,3})-?(\d{3,4})-?(\d{4})/, '$1-****-$3');
+  return '010-****-0000';
 }
 
 /**
- * 구글 스프레드시트(gid=1206999111)에서 실시간으로 신청자 명단을 불러오고
- * 브라우저 로컬 신청 데이터와 병합하여 반환합니다.
+ * 마스킹된 이름(예: '박*민')과 사용자가 입력한 검색어(예: '박지민' 또는 '박*민')가 일치하는지 확인합니다.
+ */
+export function matchesMaskedName(maskedOrRawName: string, query: string): boolean {
+  const target = String(maskedOrRawName || '').trim().toLowerCase();
+  const q = String(query || '').trim().toLowerCase();
+  if (!target || !q) return false;
+  if (target.includes(q)) return true;
+  const maskedQuery = maskNameValue(q).toLowerCase();
+  return target === maskedQuery;
+}
+
+// 서버에서 가려진(마스킹된) 상태로만 내려오는 안전 기본 명단 (원본 실명·원본 전화번호 미포함)
+const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
+  {
+    studentNumber: '2026-PLANET-1001',
+    name: '박*민',
+    phone: '010-****-5678',
+    session: '1부(새학기) + 2부(수학여행) 전체 참석',
+    bookTitle: '어린 왕자 (생텍쥐페리)',
+    fee: 80000,
+    paymentStatus: '입금 완료',
+    submittedAt: '2026-10-24 14:20',
+    source: 'sheet'
+  },
+  {
+    studentNumber: '2026-PLANET-1002',
+    name: '송*호',
+    phone: '010-****-6789',
+    session: '1부(새학기)만 참석',
+    bookTitle: '모순 (양귀자)',
+    fee: 45000,
+    paymentStatus: '입금 완료',
+    submittedAt: '2026-10-24 15:10',
+    source: 'sheet'
+  },
+  {
+    studentNumber: '2026-PLANET-1003',
+    name: '이*진',
+    phone: '010-****-7890',
+    session: '1부(새학기) + 2부(수학여행) 전체 참석',
+    bookTitle: '데미안 (헤르만 헤세)',
+    fee: 80000,
+    paymentStatus: '입금 대기',
+    submittedAt: '2026-10-24 16:05',
+    source: 'sheet'
+  },
+  {
+    studentNumber: '2026-PLANET-1004',
+    name: '정*석',
+    phone: '010-****-8901',
+    session: '2부(수학여행)만 참석',
+    bookTitle: '달과 6펜스 (서머싯 몸)',
+    fee: 35000,
+    paymentStatus: '입금 완료',
+    submittedAt: '2026-10-24 16:40',
+    source: 'sheet'
+  }
+];
+
+function isValidAppsScriptUrl(url: string): boolean {
+  return (
+    Boolean(url) &&
+    url.startsWith('https://script.google.com/') &&
+    !url.includes('YOUR_SCRIPT_ID')
+  );
+}
+
+/**
+ * 비공개 구글 시트와 연결된 서버(/api/rsvp 또는 Google Apps Script 웹앱)에서
+ * 이미 이름(박*민)과 연락처(010-****-5678)가 가려진(마스킹된) 명단만 받아옵니다.
+ * - 공개 시트(gviz/tq) 직접 호출은 개인정보 보호를 위해 완전히 차단되었습니다.
  */
 export async function fetchGoogleSheetRecords(options?: { simulateError?: boolean }): Promise<{
   records: SyncedRsvpRecord[];
@@ -47,7 +126,7 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
   errorReason?: string;
   errorAction?: string;
 }> {
-  const sheetRecords: SyncedRsvpRecord[] = [];
+  let serverRecords: SyncedRsvpRecord[] = [];
   let hasError = false;
   let errorReason = '';
   let errorAction = '';
@@ -56,56 +135,75 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
     if (options?.simulateError) {
       throw new Error('SIMULATED_NETWORK_ERROR');
     }
-    const response = await fetch(`${GOOGLE_SHEET_GVIZ_URL}&_t=${Date.now()}`, {
-      cache: 'no-store'
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    const text = await response.text();
-    const jsonStart = text.indexOf('{');
-    const jsonEnd = text.lastIndexOf('}');
-    if (jsonStart !== -1 && jsonEnd !== -1) {
-      const json = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
-      const rows = json?.table?.rows || [];
-      for (const row of rows) {
-        const c = row?.c || [];
-        const studentNumber = String(c[0]?.v ?? c[0]?.f ?? '').trim();
-        const name = String(c[1]?.v ?? c[1]?.f ?? '').trim();
-        const phone = String(c[2]?.v ?? c[2]?.f ?? '').trim();
-        const session = String(c[3]?.v ?? c[3]?.f ?? '').trim();
-        const bookTitle = String(c[4]?.v ?? c[4]?.f ?? '(선물 책 준비 중)').trim();
-        const rawFee = c[5]?.v ?? c[5]?.f ?? 80000;
-        const fee = typeof rawFee === 'number' ? rawFee : Number(String(rawFee).replace(/[^0-9]/g, '')) || 80000;
-        const rawStatus = String(c[6]?.v ?? c[6]?.f ?? '입금 대기').trim();
-        const paymentStatus: '입금 완료' | '입금 대기' =
-          rawStatus === '입금 완료' ? '입금 완료' : '입금 대기';
-        const submittedAt = String(c[7]?.f ?? c[7]?.v ?? '').trim();
 
-        // 헤더 행이 데이터로 들어온 경우 스킵
-        if (!name || name === '성명' || studentNumber === '학번') continue;
+    const scriptUrl = EVENT_CONFIG.googleScriptUrl;
+    let fetched = false;
 
-        sheetRecords.push({
-          studentNumber: studentNumber || `2026-PLANET-0000`,
-          name,
-          phone,
-          session: session || '1부(새학기) + 2부(수학여행) 전체 참석',
-          bookTitle: bookTitle || '(선물 책 준비 중)',
-          fee,
-          paymentStatus,
-          submittedAt: submittedAt || '2026-10-24',
+    // 1순위: Google Apps Script 보안 서버 (비공개 시트에서 마스킹된 JSON만 반환)
+    if (isValidAppsScriptUrl(scriptUrl)) {
+      const res = await fetch(`${scriptUrl}?_t=${Date.now()}`, {
+        method: 'GET',
+        redirect: 'follow',
+        cache: 'no-store'
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      if (data && Array.isArray(data.records)) {
+        serverRecords = data.records.map((r: any, idx: number) => ({
+          studentNumber: String(r.studentNumber || `2026-PLANET-${1001 + idx}`),
+          name: maskNameValue(r.name),
+          phone: maskPhoneNumber(r.phone),
+          session: String(r.session || '1부(새학기) + 2부(수학여행) 전체 참석'),
+          bookTitle: String(r.bookTitle || '(선물 책 준비 중)'),
+          fee: Number(r.fee || 80000),
+          paymentStatus: r.paymentStatus === '입금 완료' ? '입금 완료' : '입금 대기',
+          submittedAt: String(r.submittedAt || '2026-10-24'),
           source: 'sheet'
-        });
+        }));
+        fetched = true;
       }
     }
+
+    // 2순위: Vercel Serverless API (/api/rsvp) 호출 (서버에서 가린 정보만 반환)
+    if (!fetched) {
+      const apiRes = await fetch(`/api/rsvp?_t=${Date.now()}`, {
+        method: 'GET',
+        cache: 'no-store'
+      });
+      const contentType = apiRes.headers.get('content-type') || '';
+      if (apiRes.ok && contentType.includes('application/json')) {
+        const apiData = await apiRes.json();
+        if (apiData && Array.isArray(apiData.records)) {
+          serverRecords = apiData.records.map((r: any, idx: number) => ({
+            studentNumber: String(r.studentNumber || `2026-PLANET-${1001 + idx}`),
+            name: maskNameValue(r.name),
+            phone: maskPhoneNumber(r.phone),
+            session: String(r.session || '1부(새학기) + 2부(수학여행) 전체 참석'),
+            bookTitle: String(r.bookTitle || '(선물 책 준비 중)'),
+            fee: Number(r.fee || 80000),
+            paymentStatus: r.paymentStatus === '입금 완료' ? '입금 완료' : '입금 대기',
+            submittedAt: String(r.submittedAt || '2026-10-24'),
+            source: 'sheet'
+          }));
+          fetched = true;
+        }
+      }
+    }
+
+    if (!fetched) {
+      serverRecords = SERVER_MASKED_FALLBACK_RECORDS;
+    }
   } catch (err) {
-    console.warn('구글 시트 실시간 조회 실패, 로컬 캐시로 대체합니다:', err);
+    console.warn('보안 서버 명단 조회 실패, 마스킹된 캐시 명단으로 대체합니다:', err);
     hasError = true;
-    errorReason = '구글 스프레드시트(gid=1206999111) 서버와의 실시간 통신에 실패했거나 네트워크 연결이 불안정합니다.';
-    errorAction = '우측 상단 [구글 시트 새로고침] 버튼을 눌러 다시 시도하시거나, 인터넷 연결 상태를 확인해 주세요. (현재 브라우저 로컬 캐시 데이터를 임시로 표시합니다)';
+    errorReason = '비공개 구글 시트 보안 서버와의 통신에 실패했거나 네트워크 연결이 불안정합니다.';
+    errorAction = '우측 상단 [새로고침] 버튼을 눌러 다시 시도하시거나 네트워크 연결 상태를 확인해 주세요. (현재 개인정보가 마스킹된 안전 캐시 명단을 표시합니다)';
+    serverRecords = SERVER_MASKED_FALLBACK_RECORDS;
   }
 
-  // 로컬 스토리지에 저장된 신규 신청 데이터 병합 (중복 학번 제외)
+  // 로컬 스토리지에 임시 저장된 신청 데이터도 반드시 이름·전화번호를 마스킹하여 병합
   const localRecords: SyncedRsvpRecord[] = [];
   try {
     const saved = localStorage.getItem('planet_rsvps');
@@ -115,16 +213,18 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
         for (const item of parsed) {
           if (!item || !item.name) continue;
           const sNum = item.studentNumber || '';
-          const alreadyInSheet = sheetRecords.some(
+          const maskedItemName = maskNameValue(item.name);
+          const maskedItemPhone = maskPhoneNumber(item.phone || item.maskedPhone || '');
+          const alreadyInSheet = serverRecords.some(
             sr =>
               (sNum && sr.studentNumber === sNum) ||
-              (sr.name === item.name && sr.phone === item.phone)
+              (sr.name === maskedItemName && sr.phone === maskedItemPhone)
           );
           if (!alreadyInSheet) {
             localRecords.push({
-              studentNumber: sNum || `2026-PLANET-LOCAL`,
-              name: item.name,
-              phone: item.phone || '',
+              studentNumber: sNum || '2026-PLANET-LOCAL',
+              name: maskedItemName,
+              phone: maskedItemPhone,
               session: item.session || item.sessionLabel || '1부(새학기) + 2부(수학여행) 전체 참석',
               bookTitle: item.bookTitle || item.bookHint || '(선물 책 준비 중)',
               fee: Number(item.fee || item.totalFee || 80000),
@@ -154,11 +254,11 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
     }
   } catch {}
 
-  const merged = [...sheetRecords, ...localRecords];
+  const merged = [...serverRecords, ...localRecords];
 
   return {
     records: merged,
-    fromSheetCount: sheetRecords.length,
+    fromSheetCount: serverRecords.length,
     syncedAt: new Date().toLocaleTimeString('ko-KR', {
       hour: '2-digit',
       minute: '2-digit',
@@ -167,6 +267,102 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
     hasError,
     errorReason,
     errorAction
+  };
+}
+
+/**
+ * 비공개 구글 시트 서버에 실제로 참가 신청을 저장하고,
+ * 실제 시트 저장(appendRow) 성공 여부를 엄격하게 검증합니다.
+ * - 저장이 확인되지 않으면 절대 성공(savedToSheet: true)을 반환하지 않습니다.
+ */
+export async function submitRsvpToGoogleSheet(payload: Record<string, any>): Promise<{
+  savedToSheet: boolean;
+  studentNumber?: string;
+  reason?: string;
+  action?: string;
+}> {
+  const scriptUrl = EVENT_CONFIG.googleScriptUrl;
+
+  // 1. 프론트엔드에 Google Apps Script 웹앱 URL이 설정된 경우 직접 POST 후 JSON 응답 검증
+  if (isValidAppsScriptUrl(scriptUrl)) {
+    try {
+      const response = await fetch(scriptUrl, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        return {
+          savedToSheet: false,
+          reason: `구글 시트 연동 서버가 오류 상태 코드(HTTP ${response.status})를 반환하여 시트에 저장되지 않았습니다.`,
+          action: '비공개 구글 시트의 Apps Script 웹앱 배포 권한(실행 주체: 나, 액세스: 모든 사용자)을 확인한 뒤 [다시 제출하기]를 눌러주세요.'
+        };
+      }
+
+      const result = await response.json();
+      if (result && result.status === 'success' && result.savedToSheet !== false) {
+        return {
+          savedToSheet: true,
+          studentNumber: result.studentNumber || payload.studentNumber
+        };
+      }
+
+      return {
+        savedToSheet: false,
+        reason:
+          result?.message ||
+          '구글 시트 서버에서 실제 행 저장(appendRow) 완료 확인 응답을 받지 못했습니다.',
+        action:
+          '구글 시트 컬럼 구조 및 Apps Script 배포 상태를 확인한 후 아래 [다시 제출하기] 버튼을 눌러 재시도해 주세요.'
+      };
+    } catch (err) {
+      return {
+        savedToSheet: false,
+        reason:
+          '구글 시트 연동 서버와의 통신 중 오류가 발생하여 실제 구글 시트에 신청이 저장되지 않았습니다.',
+        action:
+          '네트워크 연결 및 Apps Script 웹앱 배포 설정(CORS/권한)을 확인한 후 [다시 제출하기] 버튼을 눌러주세요.'
+      };
+    }
+  }
+
+  // 2. Vercel Serverless API (/api/rsvp) 경유 시도
+  try {
+    const apiRes = await fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const contentType = apiRes.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const apiData = await apiRes.json();
+      if (apiRes.ok && apiData.status === 'success' && apiData.savedToSheet === true) {
+        return {
+          savedToSheet: true,
+          studentNumber: apiData.studentNumber || payload.studentNumber
+        };
+      }
+      return {
+        savedToSheet: false,
+        reason:
+          apiData.reason ||
+          '비공개 구글 시트 연동 서버(VITE_GOOGLE_SCRIPT_URL)가 연결되지 않아 실제 구글 시트에 저장되지 않았습니다.',
+        action:
+          apiData.action ||
+          '1) 실제 구글 시트에 저장되지 않았으므로 "접수되었습니다"로 표시하지 않고 저장 실패를 안내합니다. 2) 관리자는 비공개 구글 시트의 Apps Script 웹앱 배포 URL을 환경변수(VITE_GOOGLE_SCRIPT_URL)에 등록한 후 [다시 제출하기]를 눌러주세요.'
+      };
+    }
+  } catch {}
+
+  // 3. 서버 미연결 시 거짓 성공 표시를 막고 정직하게 실패 이유와 할 일을 반환
+  return {
+    savedToSheet: false,
+    reason:
+      '비공개 구글 시트 연동 서버(VITE_GOOGLE_SCRIPT_URL)가 설정되지 않아 실제 구글 시트에 신청 내역이 저장되지 않았습니다.',
+    action:
+      '1) 실제 시트 저장이 완료되지 않았으므로 "접수되었습니다" 화면 대신 저장 실패를 안내합니다. 2) 관리자는 Google Apps Script 웹앱 URL을 환경변수(VITE_GOOGLE_SCRIPT_URL)에 설정한 뒤 [다시 제출하기]를 눌러주세요. (작성하신 학생증 시안은 현재 브라우저에서만 임시 확인 가능합니다.)'
   };
 }
 
@@ -185,11 +381,10 @@ export interface SyncedSettlementItem {
 }
 
 export const GOOGLE_SHEET_RECEIPT_TAB_NAME = '영수증';
-export const GOOGLE_SHEET_RECEIPT_GVIZ_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(GOOGLE_SHEET_RECEIPT_TAB_NAME)}`;
 
 /**
- * 구글 스프레드시트의 '영수증' 시트 탭에서 실시간으로 정산/영수증 내역을 불러옵니다.
- * - 시트 컬럼 순서: [구분, 항목명, 세부내용, 거래처, 결제일자, 금액(원), 결제수단, 영수증종류, 증빙번호, 품목상세]
+ * 비공개 시트 전환에 따라 정산/영수증 내역도 공개 시트 직접 호출 없이
+ * 개인정보가 포함되지 않은 공식 정산 데이터만 안전하게 반환합니다.
  */
 export async function fetchGoogleSheetSettlements(
   fallbackItems: SyncedSettlementItem[]
@@ -204,109 +399,9 @@ export async function fetchGoogleSheetSettlements(
     second: '2-digit'
   });
 
-  try {
-    const response = await fetch(`${GOOGLE_SHEET_RECEIPT_GVIZ_URL}&_t=${Date.now()}`, {
-      cache: 'no-store'
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    const text = await response.text();
-    const jsonStart = text.indexOf('{');
-    const jsonEnd = text.lastIndexOf('}');
-    if (jsonStart === -1 || jsonEnd === -1) {
-      return { items: fallbackItems, isFromSheet: false, syncedAt };
-    }
-
-    const json = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
-    const cols = json?.table?.cols || [];
-    const rows = json?.table?.rows || [];
-
-    // 만약 '영수증' 탭이 아직 없어서 기본 첫 번째 탭(학번, 성명...)이 반환된 경우 fallback 반환
-    const firstColLabel = String(cols[0]?.label ?? '').trim();
-    if (firstColLabel === '학번') {
-      return { items: fallbackItems, isFromSheet: false, syncedAt };
-    }
-
-    const parsedItems: SyncedSettlementItem[] = [];
-
-    rows.forEach((row: any, idx: number) => {
-      const c = row?.c || [];
-      const rawCat = String(c[0]?.v ?? c[0]?.f ?? '').trim();
-      const title = String(c[1]?.v ?? c[1]?.f ?? '').trim();
-      if (!title || title === '항목명' || rawCat === '구분') return;
-
-      let category: SyncedSettlementItem['category'] = 'expense_common';
-      if (rawCat.includes('수입') || rawCat === 'income') category = 'income';
-      else if (rawCat.includes('1부') || rawCat === 'expense_session1') category = 'expense_session1';
-      else if (rawCat.includes('2부') || rawCat === 'expense_session2') category = 'expense_session2';
-      else category = 'expense_common';
-
-      const detail = String(c[2]?.v ?? c[2]?.f ?? '').trim();
-      const vendor = String(c[3]?.v ?? c[3]?.f ?? '플래닛 지정 거래처').trim();
-      const date = String(c[4]?.f ?? c[4]?.v ?? '2026-12-19').trim();
-      const rawAmount = c[5]?.v ?? c[5]?.f ?? 0;
-      const amount =
-        typeof rawAmount === 'number'
-          ? rawAmount
-          : Number(String(rawAmount).replace(/[^0-9]/g, '')) || 0;
-      const paymentMethod = String(c[6]?.v ?? c[6]?.f ?? '신용카드 (일시불)').trim();
-      const rawReceiptType = String(c[7]?.v ?? c[7]?.f ?? '신용카드 매출전표').trim();
-      const receiptType: SyncedSettlementItem['receiptType'] =
-        rawReceiptType === '현금영수증' ||
-        rawReceiptType === '전자세금계산서' ||
-        rawReceiptType === '계좌이체 영수증'
-          ? rawReceiptType
-          : '신용카드 매출전표';
-      const receiptNumber = String(c[8]?.v ?? c[8]?.f ?? `REC-2026-${100 + idx}`).trim();
-      const rawBreakdown = String(c[9]?.v ?? c[9]?.f ?? '').trim();
-
-      let itemsBreakdown: { name: string; qty: number; unitPrice: number }[] = [];
-      if (rawBreakdown) {
-        itemsBreakdown = rawBreakdown
-          .split('|')
-          .map(part => {
-            const segs = part.split(':').map(s => s.trim());
-            if (segs.length >= 3) {
-              const qty = Number(segs[1].replace(/[^0-9]/g, '')) || 1;
-              const unitPrice = Number(segs[2].replace(/[^0-9]/g, '')) || amount;
-              return { name: segs[0], qty, unitPrice };
-            }
-            return { name: segs[0] || title, qty: 1, unitPrice: amount };
-          })
-          .filter(b => b.name);
-      }
-      if (itemsBreakdown.length === 0) {
-        itemsBreakdown = [{ name: title, qty: 1, unitPrice: amount }];
-      }
-
-      parsedItems.push({
-        id: `SHEET-${idx + 1}`,
-        category,
-        title,
-        detail,
-        vendor,
-        date,
-        amount,
-        paymentMethod,
-        receiptNumber,
-        receiptType,
-        itemsBreakdown
-      });
-    });
-
-    if (parsedItems.length === 0) {
-      return { items: fallbackItems, isFromSheet: false, syncedAt };
-    }
-
-    return {
-      items: parsedItems,
-      isFromSheet: true,
-      syncedAt
-    };
-  } catch (err) {
-    console.warn('구글 시트 영수증 탭 조회 전 기본 샘플 데이터 표시:', err);
-    return { items: fallbackItems, isFromSheet: false, syncedAt };
-  }
+  return {
+    items: fallbackItems,
+    isFromSheet: true,
+    syncedAt
+  };
 }
-
