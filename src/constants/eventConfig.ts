@@ -94,8 +94,8 @@ export const EVENT_CONFIG: EventConfig = {
     inquiryEmail: "contact@planet-school.org",
   },
   
-  // 배포된 Google Apps Script Web App URL (.env.local 및 GitHub Secrets에서만 주입)
-  googleScriptUrl: ((import.meta.env.VITE_GOOGLE_SCRIPT_URL as string) || "").replace(
+  // 배포된 Google Apps Script Web App URL (.env.local, GitHub Secrets, 기본 웹앱 연동)
+  googleScriptUrl: ((import.meta.env.VITE_GOOGLE_SCRIPT_URL as string) || "https://script.google.com/macros/s/AKfycbxdb9EY-JBOPxtuWaFJv4jA0ZHIIrGHWkDkkjlsJZZGzYemtoUvVvYZNroAHeCI5HtmKg/exec").replace(
     /^https:\/\/script\.google\.com\/macros\/s\/https:\/\/script\.google\.com\/macros\/s\//,
     "https://script.google.com/macros/s/"
   )

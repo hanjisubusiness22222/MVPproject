@@ -75,7 +75,10 @@ const SERVER_MASKED_RECORDS = [
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
-  const scriptUrl = process.env.GOOGLE_SCRIPT_URL || process.env.VITE_GOOGLE_SCRIPT_URL || '';
+  const scriptUrl =
+    process.env.GOOGLE_SCRIPT_URL ||
+    process.env.VITE_GOOGLE_SCRIPT_URL ||
+    'https://script.google.com/macros/s/AKfycbxdb9EY-JBOPxtuWaFJv4jA0ZHIIrGHWkDkkjlsJZZGzYemtoUvVvYZNroAHeCI5HtmKg/exec';
   const hasValidScriptUrl =
     Boolean(scriptUrl) &&
     scriptUrl.startsWith('https://script.google.com/') &&
