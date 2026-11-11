@@ -1,9 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 import { validateGuestbookInput } from '../lib/guestbookValidation.js';
 
+export function normalizeSupabaseUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return '';
+  const trimmed = rawUrl.trim().replace(/\/+$/, '');
+  return trimmed.replace(/\/rest\/v1$/i, '');
+}
+
 function getSupabaseReadConfig() {
-  const url = process.env.SUPABASE_URL;
-  const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+  const url = normalizeSupabaseUrl(process.env.SUPABASE_URL);
+  const publishableKey = (process.env.SUPABASE_PUBLISHABLE_KEY || '').trim();
   if (!url || !publishableKey) {
     return null;
   }
@@ -11,8 +17,8 @@ function getSupabaseReadConfig() {
 }
 
 function getSupabaseWriteConfig() {
-  const url = process.env.SUPABASE_URL;
-  const secretKey = process.env.SUPABASE_SECRET_KEY;
+  const url = normalizeSupabaseUrl(process.env.SUPABASE_URL);
+  const secretKey = (process.env.SUPABASE_SECRET_KEY || '').trim();
   if (!url || !secretKey) {
     return null;
   }

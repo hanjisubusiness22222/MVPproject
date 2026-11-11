@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateGuestbookInput } from '../lib/guestbookValidation.js';
-import guestbookHandler from '../api/guestbook.js';
+import guestbookHandler, { normalizeSupabaseUrl } from '../api/guestbook.js';
 
 function createMockRes() {
   return {
@@ -125,4 +125,19 @@ test('API는 GET/POST 외의 메서드에 405를 반환한다', async () => {
 
   assert.equal(res.statusCode, 405);
   assert.equal(res.headers.Allow, 'GET, POST');
+});
+
+test('SUPABASE_URL 끝에 /rest/v1이나 슬래시가 붙어 있어도 프로젝트 기본 URL로 정규화한다', () => {
+  assert.equal(
+    normalizeSupabaseUrl('https://example.supabase.co/rest/v1/'),
+    'https://example.supabase.co'
+  );
+  assert.equal(
+    normalizeSupabaseUrl('https://example.supabase.co/rest/v1'),
+    'https://example.supabase.co'
+  );
+  assert.equal(
+    normalizeSupabaseUrl(' https://example.supabase.co/ '),
+    'https://example.supabase.co'
+  );
 });
