@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 플래닛 독서학교 | 한 줄 방명록</title>
+  <style>
+    :root {
+      --bg: #f6f3eb;
+      --paper: #fcfbf9;
+      --ink: #1f1b18;
+      --muted: #665f57;
+      --accent: #b82828;
+      --green: #2e5238;
+      --border: #d8d1c5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 14px 48px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .back-link:hover {
+      background: #ede8dc;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(31, 27, 24, 0.08);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      line-height: 1.3;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .form-row {
+      margin-top: 14px;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .counter {
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--ink);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 76px;
+    }
+
+    input:focus-visible,
+    textarea:focus-visible,
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #223f2b;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      font-size: 13px;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #ede8dc;
+    }
+
+    .status-box {
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .status-loading {
+      background: #fffbeb;
+      border: 1.5px solid #f59e0b;
+      color: #78350f;
+    }
+
+    .status-success {
+      background: #f0f7f2;
+      border: 1.5px solid #2e5238;
+      color: #1f3d27;
+    }
+
+    .status-empty {
+      background: #f8f6f0;
+      border: 1.5px dashed #b9b1a3;
+      color: #4a443e;
+      text-align: center;
+    }
+
+    .status-error {
+      background: #fff5f5;
+      border: 1.5px solid var(--accent);
+      color: #7f1d1d;
+    }
+
+    .status-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .list-header h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .guestbook-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .guestbook-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .item-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .item-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .item-content {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="topbar">
+      <a href="/" class="back-link">← 가정통신문 메인으로</a>
+      <span style="font-size:12px;color:#665f57;">2026 플래닛 독서학교 연말모임</span>
+    </div>
+
+    <section class="card" aria-labelledby="guestbook-title">
+      <h1 id="guestbook-title">📝 한 줄 방명록</h1>
+      <p class="subtitle">연말모임을 함께하는 학우들에게 짧은 인사나 기대평을 남겨 주세요. (최근 20개 표시)</p>
+
+      <form id="guestbook-form" novalidate>
+        <div class="form-row">
+          <label for="gb-name">
+            <span>이름 (1~20자)</span>
+            <span id="name-counter" class="counter">0 / 20</span>
+          </label>
+          <input id="gb-name" name="name" type="text" maxlength="20" placeholder="예: 김플래닛" required />
+        </div>
+
+        <div class="form-row">
+          <label for="gb-content">
+            <span>한 줄 내용 (1~200자)</span>
+            <span id="content-counter" class="counter">0 / 200</span>
+          </label>
+          <textarea id="gb-content" name="content" maxlength="200" placeholder="예: 올해도 좋은 책과 함께 연말을 마무리해서 설레요!" required></textarea>
+        </div>
+
+        <div id="form-feedback" class="status-box hidden" role="status" aria-live="polite" style="margin-top:14px;margin-bottom:0;"></div>
+
+        <div class="actions">
+          <span style="font-size:12px;color:#665f57;">공개 페이지는 읽기만 허용되며, 등록은 서버 검증 후 저장됩니다.</span>
+          <button id="submit-btn" type="submit" class="btn-primary">방명록 남기기</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="list-title">
+      <div class="list-header">
+        <h2 id="list-title">최근 방명록 <span id="entry-count" style="font-size:13px;color:#665f57;"></span></h2>
+        <button id="refresh-btn" type="button" class="btn-secondary">새로고침</button>
+      </div>
+
+      <!-- 상태 1: 로딩 -->
+      <div id="state-loading" class="status-box status-loading hidden" role="status" aria-live="polite">
+        <div class="status-title">[로딩 상태] 방명록을 불러오는 중입니다...</div>
+        <div>Supabase 데이터베이스에서 최근 20개의 한 줄 방명록을 가져오고 있습니다.</div>
+      </div>
+
+      <!-- 상태 2: 오류 -->
+      <div id="state-error" class="status-box status-error hidden" role="alert" aria-live="assertive">
+        <div class="status-title">⚠️ [오류 상태] 방명록을 불러오지 못했습니다</div>
+        <div id="error-reason"></div>
+        <div id="error-action" style="margin-top:4px;"></div>
+        <div style="margin-top:10px;">
+          <button id="retry-btn" type="button" class="btn-secondary">다시 불러오기</button>
+        </div>
+      </div>
+
+      <!-- 상태 3: 빈 결과 -->
+      <div id="state-empty" class="status-box status-empty hidden" role="status" aria-live="polite">
+        <div class="status-title">📭 [빈 결과 상태] 아직 등록된 한 줄 방명록이 없습니다</div>
+        <div>첫 번째 방명록을 작성해 플래닛 학우들에게 인사를 건네 보세요!</div>
+      </div>
+
+      <!-- 상태 4: 정상 목록 -->
+      <div id="state-success" class="hidden">
+        <div id="list-success-banner" class="status-box status-success" role="status" aria-live="polite">
+          <div class="status-title">✅ [정상 상태] 최근 한 줄 방명록이 표시되었습니다</div>
+          <div id="list-success-detail"></div>
+        </div>
+        <ul id="guestbook-list" class="guestbook-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const formEl = document.getElementById('guestbook-form');
+    const nameInput = document.getElementById('gb-name');
+    const contentInput = document.getElementById('gb-content');
+    const nameCounter = document.getElementById('name-counter');
+    const contentCounter = document.getElementById('content-counter');
+    const submitBtn = document.getElementById('submit-btn');
+    const refreshBtn = document.getElementById('refresh-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const formFeedback = document.getElementById('form-feedback');
+
+    const stateLoading = document.getElementById('state-loading');
+    const stateError = document.getElementById('state-error');
+    const stateEmpty = document.getElementById('state-empty');
+    const stateSuccess = document.getElementById('state-success');
+    const errorReasonEl = document.getElementById('error-reason');
+    const errorActionEl = document.getElementById('error-action');
+    const listSuccessDetail = document.getElementById('list-success-detail');
+    const guestbookList = document.getElementById('guestbook-list');
+    const entryCount = document.getElementById('entry-count');
+
+    function charCount(text) {
+      return Array.from(text).length;
+    }
+
+    function updateCounters() {
+      nameCounter.textContent = charCount(nameInput.value.trim()) + ' / 20';
+      contentCounter.textContent = charCount(contentInput.value.trim()) + ' / 200';
+    }
+
+    nameInput.addEventListener('input', updateCounters);
+    contentInput.addEventListener('input', updateCounters);
+
+    function showFormFeedback(type, title, lines) {
+      formFeedback.className = 'status-box status-' + type;
+      formFeedback.textContent = '';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'status-title';
+      titleEl.textContent = title;
+      formFeedback.appendChild(titleEl);
+
+      for (const line of lines) {
+        const p = document.createElement('div');
+        p.textContent = line;
+        formFeedback.appendChild(p);
+      }
+    }
+
+    function setListState(state, payload) {
+      stateLoading.classList.add('hidden');
+      stateError.classList.add('hidden');
+      stateEmpty.classList.add('hidden');
+      stateSuccess.classList.add('hidden');
+
+      if (state === 'loading') {
+        stateLoading.classList.remove('hidden');
+        entryCount.textContent = '';
+      } else if (state === 'error') {
+        stateError.classList.remove('hidden');
+        errorReasonEl.textContent = '• 이유: ' + (payload && payload.reason ? payload.reason : '서버 응답을 받지 못했습니다.');
+        errorActionEl.textContent = '• 할 일: ' + (payload && payload.action ? payload.action : '잠시 후 다시 불러오기 버튼을 눌러 주세요.');
+        entryCount.textContent = '';
+      } else if (state === 'empty') {
+        stateEmpty.classList.remove('hidden');
+        entryCount.textContent = '(0건)';
+      } else if (state === 'success') {
+        stateSuccess.classList.remove('hidden');
+        const entries = (payload && payload.entries) || [];
+        entryCount.textContent = '(' + entries.length + '건)';
+        listSuccessDetail.textContent = '총 ' + entries.length + '개의 방명록이 불러와졌습니다 (최신순 최대 20개).';
+        renderEntries(entries);
+      }
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    function renderEntries(entries) {
+      guestbookList.textContent = '';
+      for (const item of entries) {
+        const li = document.createElement('li');
+        li.className = 'guestbook-item';
+
+        const meta = document.createElement('div');
+        meta.className = 'item-meta';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'item-name';
+        nameSpan.textContent = item.name || '익명';
+
+        const dateSpan = document.createElement('span');
+        dateSpan.textContent = formatDate(item.created_at);
+
+        meta.appendChild(nameSpan);
+        meta.appendChild(dateSpan);
+
+        const bodyP = document.createElement('p');
+        bodyP.className = 'item-content';
+        bodyP.textContent = item.content || '';
+
+        li.appendChild(meta);
+        li.appendChild(bodyP);
+        guestbookList.appendChild(li);
+      }
+    }
+
+    async function loadGuestbook() {
+      setListState('loading');
+      refreshBtn.disabled = true;
+      try {
+        const res = await fetch('/api/guestbook', { cache: 'no-store' });
+        const data = await res.json();
+        if (!res.ok || data.status !== 'success') {
+          setListState('error', {
+            reason: data.reason || '방명록 목록 조회에 실패했습니다.',
+            action: data.action || '새로고침 버튼을 눌러 다시 시도해 주세요.'
+          });
+          return;
+        }
+        const entries = Array.isArray(data.entries) ? data.entries : [];
+        if (entries.length === 0) {
+          setListState('empty');
+        } else {
+          setListState('success', { entries });
+        }
+      } catch {
+        setListState('error', {
+          reason: '네트워크 연결이 불안정하거나 서버에 접속할 수 없습니다.',
+          action: '인터넷 연결을 확인한 뒤 다시 불러오기 버튼을 눌러 주세요.'
+        });
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    }
+
+    formEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const trimmedName = nameInput.value.trim();
+      const trimmedContent = contentInput.value.trim();
+      const nameLen = charCount(trimmedName);
+      const contentLen = charCount(trimmedContent);
+
+      if (nameLen < 1 || nameLen > 20) {
+        showFormFeedback('error', '⚠️ [오류 상태] 이름을 확인해 주세요', [
+          '• 이유: 이름은 공백 제외 1~20자여야 합니다 (현재 ' + nameLen + '자).',
+          '• 할 일: 이름 입력란을 수정한 뒤 다시 방명록 남기기 버튼을 눌러 주세요.'
+        ]);
+        nameInput.focus();
+        return;
+      }
+
+      if (contentLen < 1 || contentLen > 200) {
+        showFormFeedback('error', '⚠️ [오류 상태] 방명록 내용을 확인해 주세요', [
+          '• 이유: 내용은 공백 제외 1~200자여야 합니다 (현재 ' + contentLen + '자).',
+          '• 할 일: 내용 입력란을 수정한 뒤 다시 방명록 남기기 버튼을 눌러 주세요.'
+        ]);
+        contentInput.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      showFormFeedback('loading', '[로딩 상태] 방명록을 저장하는 중입니다...', [
+        '서버에서 입력값을 검사한 뒤 Supabase에 안전하게 기록하고 있습니다.'
+      ]);
+
+      try {
+        const res = await fetch('/api/guestbook', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: trimmedName, content: trimmedContent })
+        });
+        const data = await res.json();
+
+        if (!res.ok || data.status !== 'success') {
+          showFormFeedback('error', '⚠️ [오류 상태] 방명록 저장에 실패했습니다', [
+            '• 이유: ' + (data.reason || '서버 저장 요청이 거절되었습니다.'),
+            '• 할 일: ' + (data.action || '입력값 또는 서버 설정을 확인한 뒤 다시 시도해 주세요.')
+          ]);
+          return;
+        }
+
+        formEl.reset();
+        updateCounters();
+        showFormFeedback('success', '✅ [정상 상태] 한 줄 방명록이 등록되었습니다!', [
+          '작성하신 인사말이 방명록 상단에 반영되었습니다.'
+        ]);
+        await loadGuestbook();
+      } catch {
+        showFormFeedback('error', '⚠️ [오류 상태] 방명록 저장 중 통신 오류가 발생했습니다', [
+          '• 이유: 네트워크 연결이 끊어졌거나 서버 응답이 지연되고 있습니다.',
+          '• 할 일: 연결 상태를 확인한 뒤 다시 방명록 남기기 버튼을 눌러 주세요.'
+        ]);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    refreshBtn.addEventListener('click', loadGuestbook);
+    retryBtn.addEventListener('click', loadGuestbook);
+
+    updateCounters();
+    loadGuestbook();
+  </script>
+</body>
+</html>

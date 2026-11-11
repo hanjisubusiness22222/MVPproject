@@ -829,8 +829,14 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
             <strong>이용 조건 및 보안 처리:</strong> 참석 확인·좌석 배정·정산 목적으로만 최소한의 정보를 활용하며, 연락처 마스킹(<code className="font-mono">010-****-1234</code>) 및 <code className="font-mono">GitHub Secrets</code> 인증키 분리로 개인정보를 보호합니다.
           </p>
         </div>
-        {onGoToSettlement && (
-          <div className="pt-1">
+        <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
+          <a
+            href="guestbook.html"
+            className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#2e5238] bg-[#f0f7f2] hover:bg-[#e1efe5] text-[11px] text-[#1f3d27] font-bold transition-all shadow-xs"
+          >
+            <span>📝 한 줄 방명록 남기기</span>
+          </a>
+          {onGoToSettlement && (
             <button
               type="button"
               onClick={onGoToSettlement}
@@ -838,8 +844,8 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
             >
               <span>🧾 학생회비 투명 정산 보고서 열람</span>
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </footer>
 
     </div>
