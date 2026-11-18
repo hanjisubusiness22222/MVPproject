@@ -14,6 +14,7 @@ import planetLogo from '../assets/planet-logo.png';
 import qrCodeImg from '../assets/qrcode.png';
 import { PencilSketchRsvp } from './PencilSketchRsvp';
 import { GuestbookTab } from './GuestbookTab';
+import { PlanetV3Rsvp } from './PlanetV3Rsvp';
 
 interface OfficialInvitationProps {
   initialTab?: TabType;
@@ -640,7 +641,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
         {/* ========================================================= */}
         {activeTab === 'rsvp' && (
           <div className="space-y-6 animate-fadeIn max-w-4xl mx-auto">
-            <PencilSketchRsvp />
+            <PlanetV3Rsvp />
           </div>
         )}
 
