@@ -241,7 +241,7 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
                 </div>
 
                 <div className="text-xs sm:text-sm font-serif text-[#dfc27d] tracking-widest font-bold">
-                  2026 플래닛 연말모임 컨셉 제안
+                  2026 플래닛 연말모임
                 </div>
 
                 {/* 칠판 분필 감성 글귀 (컨셉제안3 재현) */}
