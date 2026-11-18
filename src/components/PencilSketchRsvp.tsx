@@ -17,6 +17,7 @@ import {
   maskNameValue,
   maskPhoneNumber
 } from '../utils/googleSheetSync';
+import { AiSuggestSection } from './AiSuggestSection';
 
 interface PencilSketchRsvpProps {
   onSuccess?: () => void;
@@ -1221,6 +1222,9 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
           </div>
         )}
       </div>
+
+      {/* 오픈하사 AI 이 달의 추천 섹션 (결과 아래 'AI 추천 받기' 버튼 및 4가지 상태) */}
+      <AiSuggestSection />
 
     </div>
   );

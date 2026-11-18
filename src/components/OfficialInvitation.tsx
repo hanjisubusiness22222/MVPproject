@@ -831,6 +831,13 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
         </div>
         <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
           <a
+            href="#ai-suggest-section"
+            onClick={() => setActiveTab('rsvp')}
+            className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#b82828] bg-[#fff5f5] hover:bg-[#ffebeb] text-[11px] text-[#961f1f] font-bold transition-all shadow-xs"
+          >
+            <span>✨ 오픈하사 AI 이 달의 추천</span>
+          </a>
+          <a
             href="guestbook.html"
             className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#2e5238] bg-[#f0f7f2] hover:bg-[#e1efe5] text-[11px] text-[#1f3d27] font-bold transition-all shadow-xs"
           >
