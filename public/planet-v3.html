@@ -101,14 +101,16 @@
     body.is-embedded {
       background-color: transparent !important;
       padding: 0 !important;
-      min-height: auto !important;
-      overflow-x: hidden;
+      margin: 0 !important;
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: hidden !important;
     }
     body.is-embedded .main-paper-container {
       max-width: 100% !important;
       border: 2px solid rgba(31, 27, 24, 0.4) !important;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12) !important;
-      margin: 0 !important;
+      margin: 0 auto !important;
       border-radius: 0.75rem !important;
     }
   </style>
@@ -1994,16 +1996,10 @@
         
         const reportHeight = () => {
           try {
-            const body = document.body;
-            const html = document.documentElement;
-            const h = Math.max(
-              body ? body.scrollHeight : 0,
-              body ? body.offsetHeight : 0,
-              html ? html.clientHeight : 0,
-              html ? html.scrollHeight : 0,
-              html ? html.offsetHeight : 0
-            );
-            if (window.parent && window.parent.postMessage) {
+            const container = document.querySelector('.main-paper-container');
+            if (!container) return;
+            const h = Math.ceil(container.getBoundingClientRect().height);
+            if (h > 200 && window.parent && window.parent.postMessage) {
               window.parent.postMessage({ type: 'PLANET_RESIZE', height: h }, '*');
             }
           } catch (e) {}
@@ -2014,17 +2010,23 @@
 
         if (window.ResizeObserver) {
           try {
-            const ro = new ResizeObserver(() => reportHeight());
-            ro.observe(document.body);
+            const container = document.querySelector('.main-paper-container');
+            if (container) {
+              const ro = new ResizeObserver(() => reportHeight());
+              ro.observe(container);
+            }
           } catch (e) {}
         }
 
         const observer = new MutationObserver(() => reportHeight());
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        const container = document.querySelector('.main-paper-container');
+        if (container) {
+          observer.observe(container, { childList: true, subtree: true, attributes: true });
+        }
 
-        setTimeout(reportHeight, 300);
-        setTimeout(reportHeight, 800);
-        setTimeout(reportHeight, 2000);
+        setTimeout(reportHeight, 100);
+        setTimeout(reportHeight, 400);
+        setTimeout(reportHeight, 1000);
       }
     })();
   </script>
