@@ -97,6 +97,20 @@
       background: #a8a29e;
       border-radius: 999px;
     }
+    /* 임베드 모드 (OfficialInvitation 탭 내부에 표시될 때 자연스럽게 융합) */
+    body.is-embedded {
+      background-color: transparent !important;
+      padding: 0 !important;
+      min-height: auto !important;
+      overflow-x: hidden;
+    }
+    body.is-embedded .main-paper-container {
+      max-width: 100% !important;
+      border: 2px solid rgba(31, 27, 24, 0.4) !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12) !important;
+      margin: 0 !important;
+      border-radius: 0.75rem !important;
+    }
   </style>
 </head>
 <body class="min-h-screen py-6 px-3 sm:px-6 flex justify-center">
@@ -112,7 +126,7 @@
   </svg>
 
   <!-- 메인 컨테이너 -->
-  <div class="w-full max-w-4xl gengji-paper rounded-xl shadow-2xl border-4 border-stone-800 p-4 sm:p-8 relative">
+  <div class="main-paper-container w-full max-w-4xl gengji-paper rounded-xl shadow-2xl border-4 border-stone-800 p-4 sm:p-8 relative">
 
     <!-- 1. 상단 HWP 가정통신문 헤더 -->
     <div class="border-2 border-black bg-white/60 mb-5 rounded-sm overflow-hidden">
@@ -1971,6 +1985,48 @@
         if (btnText) btnText.textContent = "✓ 참가 신청서 등록 완료 (다시 수정 후 제출 가능)";
       }
     }
+
+    // 임베드 환경 감지 및 부모 프레임과의 높이 동기화
+    (function initEmbeddedMode() {
+      const isEmbedded = window.self !== window.top;
+      if (isEmbedded) {
+        document.body.classList.add('is-embedded');
+        
+        const reportHeight = () => {
+          try {
+            const body = document.body;
+            const html = document.documentElement;
+            const h = Math.max(
+              body ? body.scrollHeight : 0,
+              body ? body.offsetHeight : 0,
+              html ? html.clientHeight : 0,
+              html ? html.scrollHeight : 0,
+              html ? html.offsetHeight : 0
+            );
+            if (window.parent && window.parent.postMessage) {
+              window.parent.postMessage({ type: 'PLANET_RESIZE', height: h }, '*');
+            }
+          } catch (e) {}
+        };
+
+        window.addEventListener('load', reportHeight);
+        window.addEventListener('resize', reportHeight);
+
+        if (window.ResizeObserver) {
+          try {
+            const ro = new ResizeObserver(() => reportHeight());
+            ro.observe(document.body);
+          } catch (e) {}
+        }
+
+        const observer = new MutationObserver(() => reportHeight());
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+        setTimeout(reportHeight, 300);
+        setTimeout(reportHeight, 800);
+        setTimeout(reportHeight, 2000);
+      }
+    })();
   </script>
 </body>
 </html>

@@ -640,7 +640,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
         {/* TAB 4: 가정통신문 회신서 (4B 연필 크로키 아바타 & 참가 신청서) */}
         {/* ========================================================= */}
         {activeTab === 'rsvp' && (
-          <div className="space-y-6 animate-fadeIn max-w-4xl mx-auto">
+          <div className="space-y-6 animate-fadeIn">
             <PlanetV3Rsvp />
           </div>
         )}
@@ -649,7 +649,7 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
         {/* TAB 5: 한 줄 방명록 (Supabase 실시간 연동)                  */}
         {/* ========================================================= */}
         {activeTab === 'guestbook' && (
-          <div className="space-y-6 animate-fadeIn max-w-4xl mx-auto">
+          <div className="space-y-6 animate-fadeIn">
             <GuestbookTab />
           </div>
         )}
