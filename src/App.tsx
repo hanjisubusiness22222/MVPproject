@@ -14,6 +14,7 @@ type ViewMode = 'teaser' | 'main' | 'seat' | 'admin' | 'settlement' | 'avatarStu
 
 export const App: React.FC = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [initialTab, setInitialTab] = useState<'letter' | 'timeline' | 'lookbook' | 'rsvp' | 'guestbook'>('letter');
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const hash = window.location.hash.toLowerCase();
     if (hash === '#seat') return 'seat';
@@ -28,6 +29,11 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.toLowerCase();
+      if (hash === '#guestbook') {
+        setViewMode('main');
+        setInitialTab('guestbook');
+        return;
+      }
       if (hash === '#seat') setViewMode('seat');
       else if (hash === '#settlement') setViewMode('settlement');
       else if (hash === '#avatar-studio' || hash === '#idcard') setViewMode('avatarStudio');
@@ -84,6 +90,7 @@ export const App: React.FC = () => {
       )}
       {viewMode === 'main' && (
         <OfficialInvitation 
+          initialTab={initialTab}
           onBackToTeaser={() => changeView('teaser')} 
           onOpenChatbot={() => setIsChatbotOpen(true)}
         />

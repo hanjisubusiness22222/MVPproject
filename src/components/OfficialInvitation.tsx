@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   BookOpen, Calendar, Clock, MapPin, Sparkles, Glasses, 
   CheckCircle2, ArrowLeft, Send, ShieldCheck, Award, 
@@ -13,21 +13,30 @@ import confetti from 'canvas-confetti';
 import planetLogo from '../assets/planet-logo.png';
 import qrCodeImg from '../assets/qrcode.png';
 import { PencilSketchRsvp } from './PencilSketchRsvp';
+import { GuestbookTab } from './GuestbookTab';
 
 interface OfficialInvitationProps {
+  initialTab?: TabType;
   onBackToTeaser: () => void;
   onGoToSettlement?: () => void;
   onOpenChatbot?: () => void;
 }
 
-type TabType = 'letter' | 'timeline' | 'lookbook' | 'rsvp';
+type TabType = 'letter' | 'timeline' | 'lookbook' | 'rsvp' | 'guestbook';
 
 export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({ 
+  initialTab = 'letter',
   onBackToTeaser,
   onGoToSettlement,
   onOpenChatbot
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('letter');
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedAccount, setCopiedAccount] = useState(false);
@@ -233,7 +242,8 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
                 { id: 'letter', label: '가정통신문' },
                 { id: 'timeline', label: '일과표 안내' },
                 { id: 'lookbook', label: '드레스 코드 룩북' },
-                { id: 'rsvp', label: '참가 신청(회신서)' }
+                { id: 'rsvp', label: '참가 신청(회신서)' },
+                { id: 'guestbook', label: '한 줄 방명록' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -633,6 +643,15 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
             <PencilSketchRsvp />
           </div>
         )}
+
+        {/* ========================================================= */}
+        {/* TAB 5: 한 줄 방명록 (Supabase 실시간 연동)                  */}
+        {/* ========================================================= */}
+        {activeTab === 'guestbook' && (
+          <div className="space-y-6 animate-fadeIn max-w-4xl mx-auto">
+            <GuestbookTab />
+          </div>
+        )}
       </main>
 
       {/* ========================================================= */}
@@ -839,12 +858,13 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
           >
             <span>💬 교무실 챗봇 상담</span>
           </button>
-          <a
-            href="guestbook.html"
+          <button
+            type="button"
+            onClick={() => setActiveTab('guestbook')}
             className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#2e5238] bg-[#f0f7f2] hover:bg-[#e1efe5] text-[11px] text-[#1f3d27] font-bold transition-all shadow-xs"
           >
-            <span>📝 한 줄 방명록 남기기</span>
-          </a>
+            <span>📝 한 줄 방명록</span>
+          </button>
           {onGoToSettlement && (
             <button
               type="button"
