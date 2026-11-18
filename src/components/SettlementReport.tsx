@@ -22,30 +22,30 @@ const SETTLEMENT_DATA: SettlementItem[] = [
     id: 'INC-01',
     category: 'income',
     title: '1부 메인모임 「새학기」 회비 입금',
-    detail: '1부 참가비 45,000원 × 32명 완납',
+    detail: '1부 참가비 30,000원 × 32명 완납',
     vendor: '카카오뱅크 모임통장',
     date: '2026-12-18',
-    amount: 1440000,
+    amount: 960000,
     paymentMethod: '계좌입금',
     receiptNumber: 'BANK-20261218-001',
     receiptType: '계좌이체 영수증',
     itemsBreakdown: [
-      { name: '1부 참가비 (32명)', qty: 32, unitPrice: 45000 }
+      { name: '1부 참가비 (32명)', qty: 32, unitPrice: 30000 }
     ]
   },
   {
     id: 'INC-02',
     category: 'income',
     title: '2부 애프터모임 「수학여행」 회비 입금',
-    detail: '2부 참가비 35,000원 × 25명 완납',
+    detail: '2부 참가비 10,000원 × 25명 완납',
     vendor: '카카오뱅크 모임통장',
     date: '2026-12-18',
-    amount: 875000,
+    amount: 250000,
     paymentMethod: '계좌입금',
     receiptNumber: 'BANK-20261218-002',
     receiptType: '계좌이체 영수증',
     itemsBreakdown: [
-      { name: '2부 참가비 (25명)', qty: 25, unitPrice: 35000 }
+      { name: '2부 참가비 (25명)', qty: 25, unitPrice: 10000 }
     ]
   },
   {
@@ -55,12 +55,12 @@ const SETTLEMENT_DATA: SettlementItem[] = [
     detail: '잔액 0원 정산 및 참가자 전원 웰컴키트 보조를 위한 운영위 자체 지원',
     vendor: '플래닛 운영위원회',
     date: '2026-12-18',
-    amount: 60000,
+    amount: 1165000,
     paymentMethod: '운영비 충당',
     receiptNumber: 'COMM-20261218-001',
     receiptType: '계좌이체 영수증',
     itemsBreakdown: [
-      { name: '운영위 특별 지원금', qty: 1, unitPrice: 60000 }
+      { name: '운영위 특별 지원금', qty: 1, unitPrice: 1165000 }
     ]
   },
 

@@ -32,7 +32,7 @@ const SERVER_MASKED_RECORDS = [
     phone: '010-****-5678',
     session: '1부(새학기) + 2부(수학여행) 전체 참석',
     bookTitle: '어린 왕자 (생텍쥐페리)',
-    fee: 80000,
+    fee: 40000,
     paymentStatus: '입금 완료',
     submittedAt: '2026-10-24 14:20',
     source: 'sheet'
@@ -43,7 +43,7 @@ const SERVER_MASKED_RECORDS = [
     phone: '010-****-6789',
     session: '1부(새학기)만 참석',
     bookTitle: '모순 (양귀자)',
-    fee: 45000,
+    fee: 30000,
     paymentStatus: '입금 완료',
     submittedAt: '2026-10-24 15:10',
     source: 'sheet'
@@ -54,7 +54,7 @@ const SERVER_MASKED_RECORDS = [
     phone: '010-****-7890',
     session: '1부(새학기) + 2부(수학여행) 전체 참석',
     bookTitle: '데미안 (헤르만 헤세)',
-    fee: 80000,
+    fee: 40000,
     paymentStatus: '입금 대기',
     submittedAt: '2026-10-24 16:05',
     source: 'sheet'
@@ -65,7 +65,7 @@ const SERVER_MASKED_RECORDS = [
     phone: '010-****-8901',
     session: '2부(수학여행)만 참석',
     bookTitle: '달과 6펜스 (서머싯 몸)',
-    fee: 35000,
+    fee: 10000,
     paymentStatus: '입금 완료',
     submittedAt: '2026-10-24 16:40',
     source: 'sheet'

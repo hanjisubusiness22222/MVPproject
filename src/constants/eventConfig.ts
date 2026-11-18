@@ -57,7 +57,7 @@ export const EVENT_CONFIG: EventConfig = {
     location: "공간나인 강남점 (서울 강남구)",
     description: "올해의 플래닛 아카이브 회고, 블라인드 책 선물 교환회 및 2026 명예의 전당 어워즈",
     capacity: 35,
-    fee: 45000,
+    fee: 30000,
   },
   
   session2: {
@@ -67,7 +67,7 @@ export const EVENT_CONFIG: EventConfig = {
     location: "강남 프라이빗 파티룸 (추후 안내)",
     description: "추억의 수학여행 밤, 파자마/프라이빗 야간 토크, 심야 책이야기 및 자유 네트워킹",
     capacity: 25,
-    fee: 35000,
+    fee: 10000,
   },
   
   dressCode: {

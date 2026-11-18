@@ -27,10 +27,10 @@ interface RsvpRecord {
 
 // 초기 RSVP 명단 (서버 마스킹 정책에 따라 성명·연락처가 가려진 형태로만 유지)
 const INITIAL_RECORDS: RsvpRecord[] = [
-  { studentNumber: '2026-PLANET-1001', name: '박*민', phone: '010-****-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 80000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1002', name: '송*호', phone: '010-****-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 45000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1003', name: '이*진', phone: '010-****-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 80000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1004', name: '정*석', phone: '010-****-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 35000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', source: 'sheet' }
+  { studentNumber: '2026-PLANET-1001', name: '박*민', phone: '010-****-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 40000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1002', name: '송*호', phone: '010-****-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 30000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1003', name: '이*진', phone: '010-****-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 40000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1004', name: '정*석', phone: '010-****-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 10000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', source: 'sheet' }
 ];
 
 interface AdminDashboardProps {

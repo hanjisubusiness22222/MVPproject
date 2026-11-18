@@ -377,9 +377,9 @@ export const PencilSketchRsvp: React.FC<PencilSketchRsvpProps> = ({ onSuccess })
   const currentStageData = currentStage < 6 ? STAGES[currentStage] : null;
 
   const feeInfo = {
-    both: '80,000원',
-    session1: '45,000원',
-    session2: '35,000원'
+    both: '40,000원',
+    session1: '30,000원',
+    session2: '10,000원'
   };
 
   return (
