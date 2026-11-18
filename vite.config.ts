@@ -10,7 +10,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        guestbook: resolve(__dirname, 'guestbook.html')
+        guestbook: resolve(__dirname, 'guestbook.html'),
+        planetV3: resolve(__dirname, 'planet-v3.html')
       }
     }
   },
