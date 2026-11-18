@@ -110,7 +110,6 @@ export const App: React.FC = () => {
           onBack={() => changeView('main')} 
           onGoToSeat={() => changeView('seat')} 
           onGoToSettlement={() => changeView('settlement')}
-          onGoToAvatarStudio={() => changeView('avatarStudio')}
         />
       )}
       {viewMode === 'avatarStudio' && (

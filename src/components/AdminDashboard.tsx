@@ -37,14 +37,12 @@ interface AdminDashboardProps {
   onBack: () => void;
   onGoToSeat: () => void;
   onGoToSettlement?: () => void;
-  onGoToAvatarStudio?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   onBack, 
   onGoToSeat, 
-  onGoToSettlement,
-  onGoToAvatarStudio 
+  onGoToSettlement
 }) => {
   const [records, setRecords] = useState<RsvpRecord[]>(INITIAL_RECORDS);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -186,15 +184,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 justify-end">
-            {onGoToAvatarStudio && (
-              <button
-                onClick={onGoToAvatarStudio}
-                className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#2563EB] bg-[#eff6ff] text-[#1d4ed8] hover:bg-[#dbeafe] flex items-center space-x-1 shadow-sm transition-all"
-              >
-                <span>🪪 학생증 공작소</span>
-              </button>
-            )}
-
             {onGoToSettlement && (
               <button
                 onClick={onGoToSettlement}
@@ -342,8 +331,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         </div>
 
-        {/* 관리자 주요 업무 메뉴: 자리배치 & 결산보고서 & 아바타 학생증 공작소 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {/* 관리자 주요 업무 메뉴: 자리배치 & 결산보고서 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <button
             type="button"
             onClick={onGoToSeat}
@@ -388,29 +377,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <span className="text-xs text-[#8c6b1b] font-serif font-bold group-hover:translate-x-1 transition-transform">이동 →</span>
           </button>
 
-          {onGoToAvatarStudio && (
-            <button
-              type="button"
-              onClick={onGoToAvatarStudio}
-              className="text-left cursor-pointer bg-white hover:bg-[#eff6ff] border-2 border-[#2563EB]/30 hover:border-[#2563EB] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group sm:col-span-2 lg:col-span-1"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <span className="text-xl">🪪</span>
-                </div>
-                <div>
-                  <div className="font-serif font-bold text-sm text-[#1f1b18] flex items-center space-x-1.5">
-                    <span>아바타 학생증 공작소</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#2563EB] text-white">신규</span>
-                  </div>
-                  <p className="text-[11px] text-[#666] font-serif mt-0.5">
-                    공책 '볼펜 멈춰!' 아바타 뽑기 & 네임택 인쇄
-                  </p>
-                </div>
-              </div>
-              <span className="text-xs text-[#2563EB] font-serif font-bold group-hover:translate-x-1 transition-transform">이동 →</span>
-            </button>
-          )}
+          
         </div>
 
         {/* 필터 및 검색 바 */}
