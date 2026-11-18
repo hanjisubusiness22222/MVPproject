@@ -852,20 +852,6 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
           </p>
         </div>
         <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
-          <button
-            type="button"
-            onClick={onOpenChatbot}
-            className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#872033] bg-[#fff5f6] hover:bg-[#ffe8ea] text-[11px] text-[#872033] font-bold transition-all shadow-xs"
-          >
-            <span>💬 교무실 챗봇 상담</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('guestbook')}
-            className="inline-flex items-center space-x-1 px-3 py-1 rounded-full border border-[#2e5238] bg-[#f0f7f2] hover:bg-[#e1efe5] text-[11px] text-[#1f3d27] font-bold transition-all shadow-xs"
-          >
-            <span>📝 한 줄 방명록</span>
-          </button>
           {onGoToSettlement && (
             <button
               type="button"
