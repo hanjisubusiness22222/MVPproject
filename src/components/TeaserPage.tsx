@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Bell, BellOff, Calendar, Clock, MapPin, 
-  Sparkles, CheckCircle2, X, Send, Key, 
-  HelpCircle, ChevronRight, BookOpen, UserCheck, QrCode
+  Sparkles, CheckCircle2, X, Send, HelpCircle, ChevronRight, BookOpen, UserCheck, QrCode
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { EVENT_CONFIG } from '../constants/eventConfig';
@@ -26,9 +25,6 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
   const [hpCheck, setHpCheck] = useState(''); // 허니팟 봇 차단
 
   // 비밀 분필 코드 상태
-  const [secretCode, setSecretCode] = useState('');
-  const [secretRevealed, setSecretRevealed] = useState(false);
-  const [secretError, setSecretError] = useState(false);
 
   // 음향 효과 (학교 종소리 차임벨)
   const [isMuted, setIsMuted] = useState(false);
@@ -151,37 +147,6 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
       setIsSubmitted(false);
       setContactInput('');
     }, 2200);
-  };
-
-  // 비밀 분필 코드 검증
-  const handleSecretSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const clean = secretCode.trim().toUpperCase();
-
-    // 관리자 코드 입력 시 관리자 대시보드로 바로 이동 ("플래닛연말준비2026")
-    const noSpace = clean.replace(/\s+/g, '');
-    if (noSpace === '플래닛연말준비2026' || clean === 'PLANET2026' || clean === 'ADMIN' || clean === '관리자') {
-      sessionStorage.setItem('planet_admin_auth', 'true');
-      window.location.hash = '#admin';
-      return;
-    }
-
-    const validCodes = ['새학기', '수학여행', '플래닛', '어른이', '여러분', '2026', 'PLANET', 'SCHOOL'];
-
-    if (validCodes.includes(clean)) {
-      setSecretRevealed(true);
-      setSecretError(false);
-      playSchoolBellSound();
-      confetti({
-        particleCount: 80,
-        spread: 80,
-        origin: { y: 0.5 },
-        colors: ['#b82828', '#2e5238', '#dfc27d']
-      });
-    } else {
-      setSecretError(true);
-      setTimeout(() => setSecretError(false), 2000);
-    }
   };
 
   return (
@@ -455,44 +420,6 @@ export const TeaserPage: React.FC<TeaserPageProps> = ({ onExploreFullPage }) => 
               <span className="text-[10px] text-[#777] font-serif">초 (Seconds)</span>
             </div>
           </div>
-        </div>
-
-        {/* 비밀 분필 코드 입력창 */}
-        <div className="w-full max-w-md mt-5 text-center">
-          {!secretRevealed ? (
-            <form onSubmit={handleSecretSubmit} className="flex items-center justify-center space-x-2">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={secretCode}
-                  onChange={(e) => setSecretCode(e.target.value)}
-                  placeholder="비밀 코드 입력 (관리자용)"
-                  className="w-full bg-white border border-[#d5cfc4] rounded-lg py-2 px-3 text-xs text-[#1f1b18] placeholder:text-[#999] font-serif focus:outline-none focus:border-[#b82828] text-center shadow-sm"
-                />
-                <Key className="w-3.5 h-3.5 text-[#999] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-              <button
-                type="submit"
-                className="px-3.5 py-2 rounded-lg border border-[#1f1b18] bg-[#1f1b18] hover:bg-[#333] text-white text-xs font-serif transition-all shadow-sm"
-              >
-                확인
-              </button>
-            </form>
-          ) : (
-            <div className="p-3.5 rounded-lg border border-[#e0dad0] bg-[#f8f6f0] text-[#1f1b18] text-xs space-y-1 shadow-sm">
-              <div className="font-serif font-bold text-[#b82828]">
-                🎒 플래닛 여러분을 위한 수학여행 비밀 힌트!
-              </div>
-              <p className="text-[11px] text-[#555] font-serif">
-                "2부 수학여행에서는 가장 따뜻한 추천사를 써온 학우에게 특별한 반장 임명장과 선물이 수여됩니다."
-              </p>
-            </div>
-          )}
-          {secretError && (
-            <p className="text-[11px] text-[#e06c75] mt-1 font-serif">
-              올바른 코드를 입력해 주세요. (힌트: 새학기, 수학여행, 플래닛, 여러분)
-            </p>
-          )}
         </div>
 
       </main>
