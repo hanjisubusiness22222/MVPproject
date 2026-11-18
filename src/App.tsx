@@ -6,11 +6,14 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { SettlementReport } from './components/SettlementReport';
 import { StudentCardStudio } from './components/StudentCardStudio';
 import { EVENT_CONFIG } from './constants/eventConfig';
+import { SchoolChatbotModal } from './components/SchoolChatbotModal';
+import { ChatbotFloatingButton } from './components/ChatbotFloatingButton';
 import { Compass, ShieldCheck, BookOpen } from 'lucide-react';
 
 type ViewMode = 'teaser' | 'main' | 'seat' | 'admin' | 'settlement' | 'avatarStudio';
 
 export const App: React.FC = () => {
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const hash = window.location.hash.toLowerCase();
     if (hash === '#seat') return 'seat';
@@ -82,6 +85,7 @@ export const App: React.FC = () => {
       {viewMode === 'main' && (
         <OfficialInvitation 
           onBackToTeaser={() => changeView('teaser')} 
+          onOpenChatbot={() => setIsChatbotOpen(true)}
         />
       )}
       {viewMode === 'seat' && (
@@ -105,6 +109,16 @@ export const App: React.FC = () => {
       {viewMode === 'avatarStudio' && (
         <StudentCardStudio onBack={() => changeView('admin')} />
       )}
+
+      {/* 플로팅 챗봇 상담 버튼 및 상담 모달 */}
+      <ChatbotFloatingButton 
+        isOpen={isChatbotOpen} 
+        onClick={() => setIsChatbotOpen(true)} 
+      />
+      <SchoolChatbotModal 
+        isOpen={isChatbotOpen} 
+        onClose={() => setIsChatbotOpen(false)} 
+      />
     </div>
   );
 };

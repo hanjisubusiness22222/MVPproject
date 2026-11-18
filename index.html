@@ -16,61 +16,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   </head>
   <body class="bg-[#fcfbf9] text-[#1f1b18] font-sans antialiased selection:bg-[#b82828]/20 selection:text-[#b82828]">
-    <div id="root">
-      <!-- 정적 렌더링 / 채점 대비 폴백: 결과 아래 'AI 추천 받기' 버튼 및 4가지 상태 안내 -->
-      <section id="ai-suggest-section" class="ai-suggest-container" style="max-width: 640px; margin: 30px auto; padding: 20px; background: #f7f5ef; border: 2px solid #dcd6c8; border-radius: 12px; font-family: sans-serif;">
-        <h3 style="margin-top: 0; font-size: 18px; color: #1f1b18; font-weight: bold;">
-          ✨ 오픈하사(Open HASA) AI 이 달의 추천
-        </h3>
-        <p style="font-size: 13px; color: #555; margin-bottom: 14px;">
-          선택하신 연도와 월의 공휴일을 조회하고, 오픈하사 AI 모델이 &lsquo;이 달에 해 볼 만한 일&rsquo; 3가지를 한 줄씩 추천해 드립니다.
-        </p>
-
-        <!-- 대상 연·월 선택 -->
-        <div style="display: flex; gap: 8px; margin-bottom: 12px; font-size: 13px;">
-          <label>연도: <input type="number" id="ai-input-year" value="2026" min="1900" max="2100" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; width: 70px;" /></label>
-          <label>월: <input type="number" id="ai-input-month" value="12" min="1" max="12" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; width: 50px;" /></label>
-        </div>
-
-        <!-- 공휴일 조회 결과 영역 -->
-        <div id="holiday-result-box" style="padding: 12px; background: #fff; border: 1px solid #e2ddd3; border-radius: 8px; font-size: 13px; margin-bottom: 12px;">
-          <div style="font-weight: bold; margin-bottom: 4px;">📅 2026년 12월 공휴일 조회 결과</div>
-          <div id="holiday-result-content" style="color: #444;">
-            • 2026-12-25: 기독탄신일 (성탄절)
-          </div>
-        </div>
-
-        <!-- 결과 아래: 'AI 추천 받기' 버튼 -->
-        <div style="margin-bottom: 14px;">
-          <button type="button" id="btn-ai-suggest" style="padding: 9px 18px; background: #b82828; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
-            ✨ AI 추천 받기
-          </button>
-        </div>
-
-        <!-- 상태 안내 영역 (불러오는 중 · 결과 · 오류 안내) -->
-        <div id="ai-status-container" aria-live="polite">
-          <!-- 1. 불러오는 중 안내 -->
-          <div id="ai-loading-state" style="display: none; padding: 12px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 6px; font-size: 13px; color: #92400e;">
-            ⏳ <strong>불러오는 중:</strong> 오픈하사 AI 모델이 추천을 생성하고 있습니다... (최대 20초)
-          </div>
-
-          <!-- 2. 결과 안내 -->
-          <div id="ai-result-state" style="display: none; padding: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 13px; color: #166534;">
-            <div style="font-weight: bold; margin-bottom: 8px;">🌿 [추천 결과] 이 달에 해 볼 만한 일 3가지:</div>
-            <ol id="ai-result-list" style="margin: 0; padding-left: 20px; line-height: 1.6;"></ol>
-          </div>
-
-          <!-- 3. 오류 안내 -->
-          <div id="ai-error-state" style="display: none; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; font-size: 13px; color: #991b1b;">
-            <div style="font-weight: bold; margin-bottom: 4px;">⚠️ [오류 안내]</div>
-            <div id="ai-error-message" style="margin-bottom: 8px;">오류가 발생했습니다.</div>
-            <button type="button" id="btn-ai-retry" style="padding: 4px 10px; background: #991b1b; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">
-              다시 시도
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
