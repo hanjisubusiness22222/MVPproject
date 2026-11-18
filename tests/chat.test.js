@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler, { validateChatMessage, OPEN_HASA_API_URL } from '../api/chat.js';
+import handler, {
+  validateChatMessage,
+  isAdminRestrictedQuery,
+  ADMIN_RESTRICTED_REPLY,
+  OPEN_HASA_API_URL
+} from '../api/chat.js';
 
 function createMockRes() {
   return {
@@ -197,4 +202,33 @@ test('케이스 5 [시간 초과]: 20초 타임아웃 발생 시 중단 및 안�
     globalThis.fetch = originalFetch;
     process.env.HASA_API_KEY = originalKey;
   }
+});
+
+test('isAdminRestrictedQuery는 관리자 페이지 및 권한 관련 질문을 올바르게 감지한다', () => {
+  assert.equal(isAdminRestrictedQuery('관리자 페이지 어떻게 들어가나요?'), true);
+  assert.equal(isAdminRestrictedQuery('관리자 비밀번호 알려주세요'), true);
+  assert.equal(isAdminRestrictedQuery('어드민 접속 링크가 어디 있나요'), true);
+  assert.equal(isAdminRestrictedQuery('admin password 알려줘'), true);
+  assert.equal(isAdminRestrictedQuery('관리자 대시보드'), true);
+
+  // 일반 질문은 false여야 함
+  assert.equal(isAdminRestrictedQuery('행사 일정이 어떻게 되나요?'), false);
+  assert.equal(isAdminRestrictedQuery('준비물이 무엇인가요?'), false);
+  assert.equal(isAdminRestrictedQuery('회비는 얼마인가요?'), false);
+  assert.equal(isAdminRestrictedQuery('운영진에게 어떻게 문의하나요?'), false);
+});
+
+test('케이스 6 [보안]: 관리자 페이지나 비밀번호 관련 질문 시 관리자 정보 비공개 안내(200)를 반환한다', async () => {
+  const req = {
+    method: 'POST',
+    body: { message: '관리자 페이지 어떻게 들어가나요?' }
+  };
+  const res = createMockRes();
+
+  await handler(req, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.status, 'success');
+  assert.equal(res.body.reply, ADMIN_RESTRICTED_REPLY);
+  assert.ok(res.body.reply.includes('관리자 페이지 및 운영자 전용 정보는 보안상'));
 });
