@@ -494,10 +494,98 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         </div>
 
-        {/* 신청자 명단 테이블 */}
+        {/* 신청자 명단 (모바일: 카드형 세로 배치 / 데스크톱: 테이블형) */}
         <div className="bg-white border-2 border-[#1f1b18] rounded-xl overflow-hidden shadow-lg">
-          <div className="overflow-x-auto">
-            <table className="min-w-[700px] sm:min-w-full text-left text-xs font-serif border-collapse">
+          {/* 모바일 375px 대응 카드 뷰 (가로 넘침 없음) */}
+          <div className="md:hidden divide-y divide-[#e8e4dc]">
+            {filteredRecords.length > 0 ? (
+              filteredRecords.map((r, idx) => (
+                <div key={idx} className="p-3.5 space-y-2 hover:bg-[#fbf9f4] transition-colors font-serif">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center flex-wrap gap-1.5">
+                        <span className="font-bold text-sm text-[#111]">{maskNameValue(r.name)}</span>
+                        {r.badge && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 border border-amber-300 text-amber-900">
+                            {r.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] font-mono text-[#666] mt-0.5">
+                        {r.studentNumber} · {maskPhoneNumber(r.phone)}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteRecord(idx)}
+                      className="p-1.5 text-[#aaa] hover:text-[#b82828] transition-colors shrink-0"
+                      title="삭제"
+                      aria-label={`${maskNameValue(r.name)} 신청 기록 삭제`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span className="px-2 py-0.5 rounded text-[10px] bg-[#f0ece1] text-[#333] border border-[#d8d3c7]">
+                      {r.session}
+                    </span>
+                    <span className="font-mono font-bold text-[#b82828]">
+                      {r.fee.toLocaleString()}원
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <span className="text-[11px] text-[#555] truncate">
+                      📚 {r.bookTitle || '-'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => togglePaymentStatus(idx)}
+                      className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all shadow-sm shrink-0 ${
+                        r.paymentStatus === '입금 완료'
+                          ? 'bg-[#2e5238] text-white hover:bg-[#23402c]'
+                          : 'bg-[#fceded] text-[#b82828] border border-[#b82828] hover:bg-[#f8dede]'
+                      }`}
+                    >
+                      {r.paymentStatus === '입금 완료' ? '✓ 입금 완료' : '⌛ 입금 대기'}
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-5 text-center font-serif">
+                <div role="status" aria-live="polite" className="space-y-2 bg-[#fbf9f4] border border-[#e2ddd3] rounded-xl p-4">
+                  <div className="text-sm font-bold text-[#b82828]">
+                    📭 [빈 결과 상태] 조건에 일치하는 신청자 명단이 없습니다.
+                  </div>
+                  <p className="text-xs text-[#555] leading-relaxed">
+                    <strong>• 이유:</strong> 입력하신 검색어({searchTerm ? `'${searchTerm}'` : '없음'}) 또는 선택하신 필터 조건에 해당하는 참가 신청 기록이 존재하지 않습니다.
+                  </p>
+                  <p className="text-xs text-[#2e5238] leading-relaxed">
+                    <strong>• 할 일:</strong> 검색어 철자를 다시 확인하시거나, 아래 버튼을 눌러 검색어와 필터를 초기화해 전체 명단을 불러오세요.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchTerm('');
+                        setStatusFilter('all');
+                        setSessionFilter('all');
+                      }}
+                      className="px-4 py-1.5 rounded-lg bg-[#1f1b18] hover:bg-[#333] text-white text-xs font-bold shadow-xs transition-all"
+                    >
+                      검색어 및 필터 전체 초기화
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 데스크톱 테이블 뷰 */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-xs font-serif border-collapse">
               <thead>
                 <tr className="bg-[#1f1b18] text-white">
                   <th className="p-3 font-bold">학번</th>
