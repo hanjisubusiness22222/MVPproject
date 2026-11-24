@@ -11,6 +11,8 @@ export interface SyncedRsvpRecord {
   submittedAt: string;
   team?: string;
   grade?: string;
+  badge?: string;
+  motto?: string;
   avatarCode?: string;
   avatarRecipe?: string;
   selectedIndices?: (number | null)[];
@@ -68,6 +70,9 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
     fee: 40000,
     paymentStatus: '입금 완료',
     submittedAt: '2026-10-24 14:20',
+    badge: '🌸 스프링토',
+    motto: '올해도 플래닛과 함께 완독!',
+    avatarCode: '11111111',
     source: 'sheet'
   },
   {
@@ -79,6 +84,9 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
     fee: 30000,
     paymentStatus: '입금 완료',
     submittedAt: '2026-10-24 15:10',
+    badge: '☀️ 썸머데이',
+    motto: '꺾이지 않는 텐션으로!',
+    avatarCode: '23221223',
     source: 'sheet'
   },
   {
@@ -90,6 +98,9 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
     fee: 40000,
     paymentStatus: '입금 대기',
     submittedAt: '2026-10-24 16:05',
+    badge: '🍂 어텀',
+    motto: '새학기 친구들 반가워요!',
+    avatarCode: '35332342',
     source: 'sheet'
   },
   {
@@ -101,6 +112,9 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
     fee: 10000,
     paymentStatus: '입금 완료',
     submittedAt: '2026-10-24 16:40',
+    badge: '❄️ 윈터블',
+    motto: '겨울밤 책수다 기대됩니다!',
+    avatarCode: '42443454',
     source: 'sheet'
   }
 ];
@@ -227,7 +241,7 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
               phone: maskedItemPhone,
               session: item.session || item.sessionLabel || '1부(새학기) + 2부(수학여행) 전체 참석',
               bookTitle: item.bookTitle || item.bookHint || '(선물 책 준비 중)',
-              fee: Number(item.fee || item.totalFee || 80000),
+              fee: Number(item.fee || item.totalFee || 40000),
               paymentStatus: item.paymentStatus === '입금 완료' ? '입금 완료' : '입금 대기',
               submittedAt: item.submittedAt
                 ? item.submittedAt.includes('T')
@@ -243,6 +257,8 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
                 : '방금 전',
               team: item.team,
               grade: item.grade,
+              badge: item.badge || item.memberType,
+              motto: item.motto,
               avatarCode: item.avatarCode,
               avatarRecipe: item.avatarRecipe,
               selectedIndices: item.selectedIndices,

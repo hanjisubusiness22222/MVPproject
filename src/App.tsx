@@ -5,12 +5,13 @@ import { ClassroomSeatShuffle } from './components/ClassroomSeatShuffle';
 import { AdminDashboard } from './components/AdminDashboard';
 import { SettlementReport } from './components/SettlementReport';
 import { StudentCardStudio } from './components/StudentCardStudio';
+import { StudentPrintStudio } from './components/StudentPrintStudio';
 import { EVENT_CONFIG } from './constants/eventConfig';
 import { SchoolChatbotModal } from './components/SchoolChatbotModal';
 import { ChatbotFloatingButton } from './components/ChatbotFloatingButton';
 import { Compass, ShieldCheck, BookOpen } from 'lucide-react';
 
-type ViewMode = 'teaser' | 'main' | 'seat' | 'admin' | 'settlement' | 'avatarStudio';
+type ViewMode = 'teaser' | 'main' | 'seat' | 'admin' | 'settlement' | 'avatarStudio' | 'print';
 
 export const App: React.FC = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -18,6 +19,7 @@ export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const hash = window.location.hash.toLowerCase();
     if (hash === '#seat') return 'seat';
+    if (hash === '#print') return 'print';
     if (hash === '#settlement') return 'settlement';
     if (hash === '#avatar-studio' || hash === '#idcard') return 'avatarStudio';
     if (hash === '#admin') return 'admin';
@@ -35,6 +37,7 @@ export const App: React.FC = () => {
         return;
       }
       if (hash === '#seat') setViewMode('seat');
+      else if (hash === '#print') setViewMode('print');
       else if (hash === '#settlement') setViewMode('settlement');
       else if (hash === '#avatar-studio' || hash === '#idcard') setViewMode('avatarStudio');
       else if (hash === '#admin') setViewMode('admin');
@@ -51,14 +54,14 @@ export const App: React.FC = () => {
     window.location.hash = mode;
   };
 
-  const isAdminSection = viewMode === 'admin' || viewMode === 'seat' || viewMode === 'settlement' || viewMode === 'avatarStudio';
+  const isAdminSection = viewMode === 'admin' || viewMode === 'seat' || viewMode === 'settlement' || viewMode === 'avatarStudio' || viewMode === 'print';
 
   return (
     <div className="relative min-h-screen">
       {/* 화면 빠른 전환 플로팅 스위처 (모바일 중앙 하단 / 데스크톱 우측 하단) - 일반 참가자용 기본 메뉴 */}
       <aside 
         aria-label="화면 모드 전환"
-        className="fixed bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 sm:left-auto sm:right-3 sm:translate-x-0 z-50 bg-[#16231b]/95 border border-[#ffffff]/30 rounded-full p-1 sm:p-1.5 text-[11px] sm:text-xs text-[#f7f5ed] font-serif flex items-center space-x-1 shadow-2xl backdrop-blur-md max-w-[calc(100vw-16px)] overflow-x-auto scrollbar-none"
+        className="fixed bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 sm:left-auto sm:right-3 sm:translate-x-0 z-50 bg-[#16231b]/95 border border-[#ffffff]/30 rounded-full p-1 sm:p-1.5 text-[11px] sm:text-xs text-[#f7f5ed] font-serif flex items-center space-x-1 shadow-2xl backdrop-blur-md max-w-[calc(100vw-16px)] overflow-x-auto scrollbar-none print:hidden"
       >
         <button
           onClick={() => changeView('teaser')}
@@ -110,6 +113,13 @@ export const App: React.FC = () => {
           onBack={() => changeView('main')} 
           onGoToSeat={() => changeView('seat')} 
           onGoToSettlement={() => changeView('settlement')}
+          onGoToPrint={() => changeView('print')}
+        />
+      )}
+      {viewMode === 'print' && (
+        <StudentPrintStudio
+          onBack={() => changeView('admin')}
+          onGoToSeat={() => changeView('seat')}
         />
       )}
       {viewMode === 'avatarStudio' && (

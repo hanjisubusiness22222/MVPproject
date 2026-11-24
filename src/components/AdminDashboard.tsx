@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, ShieldCheck, Download, Search, CheckCircle2, 
   Clock, Users, DollarSign, Lock, 
-  RefreshCw, Trash2, Receipt
+  RefreshCw, Trash2, Receipt, Printer
 } from 'lucide-react';
 import {
   fetchGoogleSheetRecords,
@@ -37,12 +37,14 @@ interface AdminDashboardProps {
   onBack: () => void;
   onGoToSeat: () => void;
   onGoToSettlement?: () => void;
+  onGoToPrint?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   onBack, 
   onGoToSeat, 
-  onGoToSettlement
+  onGoToSettlement,
+  onGoToPrint
 }) => {
   const [records, setRecords] = useState<RsvpRecord[]>(INITIAL_RECORDS);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -193,6 +195,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </button>
             )}
 
+            {onGoToPrint && (
+              <button
+                onClick={onGoToPrint}
+                className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#b82828] bg-[#fff5f5] text-[#b82828] hover:bg-[#ffe8e8] flex items-center space-x-1 shadow-sm transition-all"
+              >
+                <Printer className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span>학생증 인쇄</span>
+              </button>
+            )}
+
             <button
               onClick={onGoToSeat}
               className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-[11px] sm:text-xs font-serif border border-[#1f1b18] bg-[#1f1b18] text-white hover:bg-[#333] flex items-center space-x-1 shadow-sm transition-all"
@@ -331,15 +343,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         </div>
 
-        {/* 관리자 주요 업무 메뉴: 자리배치 & 결산보고서 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        {/* 관리자 주요 업무 메뉴: 자리배치 & 결산보고서 & 학생증 인쇄 */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <button
             type="button"
             onClick={onGoToSeat}
             className="text-left cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#1f1b18]/20 hover:border-[#1f1b18] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
           >
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-[#2e5238]/10 text-[#2e5238] flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-[#2e5238]/10 text-[#2e5238] flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                 <Users className="w-5 h-5" />
               </div>
               <div>
@@ -348,11 +360,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#2e5238] text-white">현장용</span>
                 </div>
                 <p className="text-[11px] text-[#666] font-serif mt-0.5">
-                  1·2·3분단 좌석 배정 및 빔프로젝터 셔플
+                  1~8분단 좌석 배정 및 빔프로젝터 셔플
                 </p>
               </div>
             </div>
-            <span className="text-xs text-[#2e5238] font-serif font-bold group-hover:translate-x-1 transition-transform">이동 →</span>
+            <span className="text-xs text-[#2e5238] font-serif font-bold group-hover:translate-x-1 transition-transform shrink-0 ml-2">이동 →</span>
           </button>
 
           <button
@@ -361,12 +373,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             className="text-left cursor-pointer bg-white hover:bg-[#fbf9f4] border-2 border-[#c29b38]/30 hover:border-[#c29b38] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
           >
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-[#c29b38]/10 text-[#8c6b1b] flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-[#c29b38]/10 text-[#8c6b1b] flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                 <Receipt className="w-5 h-5" />
               </div>
               <div>
                 <div className="font-serif font-bold text-sm text-[#1f1b18] flex items-center space-x-1.5">
-                  <span>학생회비 투명 정산</span>
+                  <span>정산 보고서</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#c29b38] text-white">결산</span>
                 </div>
                 <p className="text-[11px] text-[#666] font-serif mt-0.5">
@@ -374,10 +386,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </p>
               </div>
             </div>
-            <span className="text-xs text-[#8c6b1b] font-serif font-bold group-hover:translate-x-1 transition-transform">이동 →</span>
+            <span className="text-xs text-[#8c6b1b] font-serif font-bold group-hover:translate-x-1 transition-transform shrink-0 ml-2">이동 →</span>
           </button>
 
-          
+          {onGoToPrint && (
+            <button
+              type="button"
+              onClick={onGoToPrint}
+              className="text-left cursor-pointer bg-white hover:bg-[#fff9f9] border-2 border-[#b82828]/25 hover:border-[#b82828] rounded-xl p-4 shadow-sm hover:shadow transition-all flex items-center justify-between group"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-lg bg-[#b82828]/10 text-[#b82828] flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+                  <Printer className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="font-serif font-bold text-sm text-[#1f1b18] flex items-center space-x-1.5">
+                    <span>학생증 인쇄</span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#b82828] text-white">조판기</span>
+                  </div>
+                  <p className="text-[11px] text-[#666] font-serif mt-0.5">
+                    교무실 A4 8구 학생증 일괄 조판 및 인쇄
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs text-[#b82828] font-serif font-bold group-hover:translate-x-1 transition-transform shrink-0 ml-2">이동 →</span>
+            </button>
+          )}
         </div>
 
         {/* 필터 및 검색 바 */}
