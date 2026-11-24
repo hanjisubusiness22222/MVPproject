@@ -366,7 +366,17 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
                       <td className="border border-[#1f1b18] p-1.5 sm:p-3 font-bold text-[#b82828]">
                         플래닛 연말파티<br />「플래닛의 새학기」
                       </td>
-                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">공간나인 강남점</td>
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">
+                        <div>공간나인 강남점</div>
+                        <a
+                          href="https://naver.me/5YFcRJ4m"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block mt-0.5 text-[10px] font-bold text-[#2e5238] hover:underline"
+                        >
+                          📍 지도보기 ↗
+                        </a>
+                      </td>
                       <td className="border border-[#1f1b18] p-1.5 sm:p-3">플래닛 멤버<br />누구나</td>
                     </tr>
                     <tr className="bg-white/80">
@@ -376,7 +386,17 @@ export const OfficialInvitation: React.FC<OfficialInvitationProps> = ({
                       <td className="border border-[#1f1b18] p-1.5 sm:p-3 font-bold text-[#2e5238]">
                         연말파티 뒷풀이<br />「플래닛의 수학여행」
                       </td>
-                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">강남 프라이빗 파티룸<br /><span className="text-[10px] text-[#777]">(추후 지정)</span></td>
+                      <td className="border border-[#1f1b18] p-1.5 sm:p-3">
+                        <div>포켓데이라운지</div>
+                        <a
+                          href="https://naver.me/FRoU25qb"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block mt-0.5 text-[10px] font-bold text-[#2e5238] hover:underline"
+                        >
+                          📍 지도보기 ↗
+                        </a>
+                      </td>
                       <td className="border border-[#1f1b18] p-1.5 sm:p-3">연말파티 참여자<br />中 희망자</td>
                     </tr>
                   </tbody>
