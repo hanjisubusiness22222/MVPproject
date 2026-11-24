@@ -22,15 +22,19 @@ interface RsvpRecord {
   fee: number;
   paymentStatus: '입금 완료' | '입금 대기';
   submittedAt?: string;
+  badge?: string;
+  motto?: string;
+  avatarCode?: string;
+  avatarRecipe?: string;
   source?: 'sheet' | 'local';
 }
 
 // 초기 RSVP 명단 (서버 마스킹 정책에 따라 성명·연락처가 가려진 형태로만 유지)
 const INITIAL_RECORDS: RsvpRecord[] = [
-  { studentNumber: '2026-PLANET-1001', name: '박*민', phone: '010-****-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 40000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1002', name: '송*호', phone: '010-****-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 30000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1003', name: '이*진', phone: '010-****-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 40000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1004', name: '정*석', phone: '010-****-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 10000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', source: 'sheet' }
+  { studentNumber: '2026-PLANET-1001', name: '박*민', phone: '010-****-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 40000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', badge: '🌸 스프링토', motto: '올해도 플래닛과 함께 완독!', avatarCode: '11111111', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1002', name: '송*호', phone: '010-****-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 30000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', badge: '☀️ 썸머데이', motto: '꺾이지 않는 텐션으로!', avatarCode: '23221223', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1003', name: '이*진', phone: '010-****-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 40000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', badge: '🍂 어텀', motto: '새학기 친구들 반가워요!', avatarCode: '35332342', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1004', name: '정*석', phone: '010-****-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 10000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', badge: '❄️ 윈터블', motto: '겨울밤 책수다 기대됩니다!', avatarCode: '42443454', source: 'sheet' }
 ];
 
 interface AdminDashboardProps {
@@ -104,7 +108,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // CSV 엑셀 다운로드 (한글 깨짐 방지 UTF-8 BOM, 서버 마스킹 정책에 따라 성명·연락처 모두 마스킹 유지)
   const handleExportCsv = () => {
-    const headers = ['학번', '성명(마스킹)', '연락처(마스킹)', '참석세션', '도서제목', '회비(원)', '회비납부여부', '신청일시'];
+    const headers = [
+      '학번',
+      '성명(마스킹)',
+      '연락처(마스킹)',
+      '참석세션',
+      '도서제목',
+      '회비(원)',
+      '회비납부여부',
+      '신청일시',
+      '반뱃지',
+      '아바타코드',
+      '좌우명',
+      '아바타조합'
+    ];
     const rows = records.map(r => [
       r.studentNumber || '',
       maskNameValue(r.name),
@@ -113,7 +130,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       `"${(r.bookTitle || '').replace(/"/g, '""')}"`,
       r.fee,
       r.paymentStatus,
-      r.submittedAt || ''
+      r.submittedAt || '',
+      `"${(r.badge || '').replace(/"/g, '""')}"`,
+      r.avatarCode || '',
+      `"${(r.motto || '').replace(/"/g, '""')}"`,
+      `"${(r.avatarRecipe || '').replace(/"/g, '""')}"`
     ]);
 
     const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
@@ -494,7 +515,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   filteredRecords.map((r, idx) => (
                     <tr key={idx} className="hover:bg-[#fbf9f4] transition-colors">
                       <td className="p-3 font-mono text-[11px] text-[#666]">{r.studentNumber}</td>
-                      <td className="p-3 font-bold text-sm text-[#111]">{maskNameValue(r.name)}</td>
+                      <td className="p-3 font-bold text-sm text-[#111]">
+                        <span>{maskNameValue(r.name)}</span>
+                        {r.badge && (
+                          <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 border border-amber-300 text-amber-900 font-normal whitespace-nowrap">
+                            {r.badge}
+                          </span>
+                        )}
+                      </td>
                       <td className="p-3 font-mono text-[#333]">
                         {maskPhoneNumber(r.phone)}
                       </td>

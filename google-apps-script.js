@@ -73,12 +73,16 @@ function doGet(e) {
       var session = String(row[3] || '').trim();
       var bookTitle = String(row[4] || '(선물 책 준비 중)').trim();
       var rawFee = row[5];
-      var fee = typeof rawFee === 'number' ? rawFee : (Number(String(rawFee).replace(/[^0-9]/g, '')) || 80000);
+      var fee = typeof rawFee === 'number' ? rawFee : (Number(String(rawFee).replace(/[^0-9]/g, '')) || 40000);
       var rawStatus = String(row[6] || '입금 대기').trim();
       var paymentStatus = rawStatus === '입금 완료' ? '입금 완료' : '입금 대기';
       var submittedAt = row[7] instanceof Date
         ? Utilities.formatDate(row[7], 'Asia/Seoul', 'yyyy-MM-dd HH:mm')
         : String(row[7] || '').trim();
+      var badge = String(row[8] || '').trim();
+      var avatarCode = String(row[9] || '').trim();
+      var motto = String(row[10] || '').trim();
+      var avatarRecipe = String(row[11] || '').trim();
 
       if (!rawName || rawName === '성명' || studentNumber === '학번') {
         continue;
@@ -93,7 +97,11 @@ function doGet(e) {
         bookTitle: bookTitle || '(선물 책 준비 중)',
         fee: fee,
         paymentStatus: paymentStatus,
-        submittedAt: submittedAt || '2026-10-24'
+        submittedAt: submittedAt || '2026-10-24',
+        badge: badge,
+        avatarCode: avatarCode,
+        motto: motto,
+        avatarRecipe: avatarRecipe
       });
     }
 
@@ -134,8 +142,12 @@ function doPost(e) {
     var phone = String(data.phone || '').trim();
     var session = String(data.session || data.sessionLabel || '').trim();
     var bookTitle = String(data.bookTitle || data.bookHint || '(선물 책 준비 중)').trim();
-    var fee = Number(data.fee || data.totalFee || 80000);
+    var fee = Number(data.fee || data.totalFee || 40000);
     var paymentStatus = data.paymentStatus || '입금 대기';
+    var badge = String(data.badge || data.memberType || '').trim();
+    var avatarCode = String(data.avatarCode || '').trim();
+    var motto = String(data.motto || '').trim();
+    var avatarRecipe = String(data.avatarRecipe || '').trim();
     var now = new Date();
     var formattedDate = Utilities.formatDate(now, 'Asia/Seoul', 'yyyy-MM-dd HH:mm');
 
@@ -149,7 +161,7 @@ function doPost(e) {
 
     var beforeRowCount = sheet.getLastRow();
 
-    // [A:학번, B:성명, C:연락처, D:참석세션, E:도서제목, F:회비(원), G:회비납부여부, H:신청일시]
+    // [A:학번, B:성명, C:연락처, D:참석세션, E:도서제목, F:회비(원), G:회비납부여부, H:신청일시, I:반뱃지, J:아바타코드, K:좌우명, L:아바타조합]
     sheet.appendRow([
       studentNumber,
       name,
@@ -158,7 +170,11 @@ function doPost(e) {
       bookTitle,
       fee,
       paymentStatus,
-      formattedDate
+      formattedDate,
+      badge,
+      avatarCode,
+      motto,
+      avatarRecipe
     ]);
 
     // 실제 시트 반영 강제 확정 및 행 증가 검증
