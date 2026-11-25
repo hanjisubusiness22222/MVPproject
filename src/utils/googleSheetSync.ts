@@ -3,6 +3,7 @@ import { EVENT_CONFIG } from '../constants/eventConfig';
 export interface SyncedRsvpRecord {
   studentNumber: string;
   name: string;
+  rawName?: string;
   phone: string;
   session: string;
   bookTitle: string;
@@ -238,6 +239,7 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
             localRecords.push({
               studentNumber: sNum || '2026-PLANET-LOCAL',
               name: maskedItemName,
+              rawName: String(item.name).trim(),
               phone: maskedItemPhone,
               session: item.session || item.sessionLabel || '1부(새학기) + 2부(수학여행) 전체 참석',
               bookTitle: item.bookTitle || item.bookHint || '(선물 책 준비 중)',
