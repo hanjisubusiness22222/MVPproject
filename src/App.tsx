@@ -6,6 +6,8 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { SettlementReport } from './components/SettlementReport';
 import { StudentCardStudio } from './components/StudentCardStudio';
 import { StudentPrintStudio } from './components/StudentPrintStudio';
+import { AdminLoginGate } from './components/AdminLoginGate';
+import { isAdminAuthenticated } from './utils/security';
 import { EVENT_CONFIG } from './constants/eventConfig';
 import { SchoolChatbotModal } from './components/SchoolChatbotModal';
 import { ChatbotFloatingButton } from './components/ChatbotFloatingButton';
@@ -15,6 +17,7 @@ type ViewMode = 'teaser' | 'main' | 'seat' | 'admin' | 'settlement' | 'avatarStu
 
 export const App: React.FC = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isAdminAuthed, setIsAdminAuthed] = useState<boolean>(() => isAdminAuthenticated());
   const [initialTab, setInitialTab] = useState<'letter' | 'timeline' | 'lookbook' | 'rsvp' | 'guestbook'>('letter');
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const hash = window.location.hash.toLowerCase();
@@ -98,32 +101,41 @@ export const App: React.FC = () => {
           onOpenChatbot={() => setIsChatbotOpen(true)}
         />
       )}
-      {viewMode === 'seat' && (
-        <ClassroomSeatShuffle onBack={() => changeView('admin')} />
-      )}
-      {viewMode === 'settlement' && (
-        <SettlementReport 
-          onBack={() => changeView('admin')} 
-          onGoToSeat={() => changeView('seat')} 
-          onGoToTeaser={() => changeView('teaser')} 
+      {isAdminSection && !isAdminAuthed ? (
+        <AdminLoginGate
+          onSuccess={() => setIsAdminAuthed(true)}
+          onBack={() => changeView('main')}
         />
-      )}
-      {viewMode === 'admin' && (
-        <AdminDashboard 
-          onBack={() => changeView('main')} 
-          onGoToSeat={() => changeView('seat')} 
-          onGoToSettlement={() => changeView('settlement')}
-          onGoToPrint={() => changeView('print')}
-        />
-      )}
-      {viewMode === 'print' && (
-        <StudentPrintStudio
-          onBack={() => changeView('admin')}
-          onGoToSeat={() => changeView('seat')}
-        />
-      )}
-      {viewMode === 'avatarStudio' && (
-        <StudentCardStudio onBack={() => changeView('admin')} />
+      ) : (
+        <>
+          {viewMode === 'seat' && (
+            <ClassroomSeatShuffle onBack={() => changeView('admin')} />
+          )}
+          {viewMode === 'settlement' && (
+            <SettlementReport 
+              onBack={() => changeView('admin')} 
+              onGoToSeat={() => changeView('seat')} 
+              onGoToTeaser={() => changeView('teaser')} 
+            />
+          )}
+          {viewMode === 'admin' && (
+            <AdminDashboard 
+              onBack={() => changeView('main')} 
+              onGoToSeat={() => changeView('seat')} 
+              onGoToSettlement={() => changeView('settlement')}
+              onGoToPrint={() => changeView('print')}
+            />
+          )}
+          {viewMode === 'print' && (
+            <StudentPrintStudio
+              onBack={() => changeView('admin')}
+              onGoToSeat={() => changeView('seat')}
+            />
+          )}
+          {viewMode === 'avatarStudio' && (
+            <StudentCardStudio onBack={() => changeView('admin')} />
+          )}
+        </>
       )}
 
       {/* 플로팅 챗봇 상담 버튼 및 상담 모달 */}

@@ -5,6 +5,7 @@ export interface SyncedRsvpRecord {
   name: string;
   rawName?: string;
   phone: string;
+  rawPhone?: string;
   session: string;
   bookTitle: string;
   fee: number;
@@ -64,8 +65,8 @@ export function matchesMaskedName(maskedOrRawName: string, query: string): boole
 const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   {
     studentNumber: '2026-PLANET-1001',
-    name: '박*민',
-    phone: '010-****-5678',
+    name: '박지민',
+    phone: '010-1234-5678',
     session: '1부(새학기) + 2부(수학여행) 전체 참석',
     bookTitle: '어린 왕자 (생텍쥐페리)',
     fee: 40000,
@@ -78,8 +79,8 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   },
   {
     studentNumber: '2026-PLANET-1002',
-    name: '송*호',
-    phone: '010-****-6789',
+    name: '송준호',
+    phone: '010-2345-6789',
     session: '1부(새학기)만 참석',
     bookTitle: '모순 (양귀자)',
     fee: 30000,
@@ -92,8 +93,8 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   },
   {
     studentNumber: '2026-PLANET-1003',
-    name: '이*진',
-    phone: '010-****-7890',
+    name: '이서진',
+    phone: '010-3456-7890',
     session: '1부(새학기) + 2부(수학여행) 전체 참석',
     bookTitle: '데미안 (헤르만 헤세)',
     fee: 40000,
@@ -106,8 +107,8 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   },
   {
     studentNumber: '2026-PLANET-1004',
-    name: '정*석',
-    phone: '010-****-8901',
+    name: '정우석',
+    phone: '010-4567-8901',
     session: '2부(수학여행)만 참석',
     bookTitle: '달과 6펜스 (서머싯 몸)',
     fee: 10000,
@@ -228,19 +229,20 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
         for (const item of parsed) {
           if (!item || !item.name) continue;
           const sNum = item.studentNumber || '';
-          const maskedItemName = maskNameValue(item.name);
-          const maskedItemPhone = maskPhoneNumber(item.phone || item.maskedPhone || '');
+          const rawItemName = String(item.name).trim();
+          const rawItemPhone = String(item.phone || item.maskedPhone || '').trim();
           const alreadyInSheet = serverRecords.some(
             sr =>
               (sNum && sr.studentNumber === sNum) ||
-              (sr.name === maskedItemName && sr.phone === maskedItemPhone)
+              (sr.name === rawItemName && sr.phone === rawItemPhone)
           );
           if (!alreadyInSheet) {
             localRecords.push({
               studentNumber: sNum || '2026-PLANET-LOCAL',
-              name: maskedItemName,
-              rawName: String(item.name).trim(),
-              phone: maskedItemPhone,
+              name: rawItemName,
+              rawName: rawItemName,
+              phone: rawItemPhone,
+              rawPhone: rawItemPhone,
               session: item.session || item.sessionLabel || '1부(새학기) + 2부(수학여행) 전체 참석',
               bookTitle: item.bookTitle || item.bookHint || '(선물 책 준비 중)',
               fee: Number(item.fee || item.totalFee || 40000),

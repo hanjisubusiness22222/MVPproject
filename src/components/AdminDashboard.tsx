@@ -29,12 +29,12 @@ interface RsvpRecord {
   source?: 'sheet' | 'local';
 }
 
-// 초기 RSVP 명단 (서버 마스킹 정책에 따라 성명·연락처가 가려진 형태로만 유지)
+// 초기 RSVP 더미 명단 (관리자 인증 후 조회용)
 const INITIAL_RECORDS: RsvpRecord[] = [
-  { studentNumber: '2026-PLANET-1001', name: '박*민', phone: '010-****-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 40000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', badge: '🌸 스프링토', motto: '올해도 플래닛과 함께 완독!', avatarCode: '11111111', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1002', name: '송*호', phone: '010-****-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 30000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', badge: '☀️ 썸머데이', motto: '꺾이지 않는 텐션으로!', avatarCode: '23221223', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1003', name: '이*진', phone: '010-****-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 40000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', badge: '🍂 어텀', motto: '새학기 친구들 반가워요!', avatarCode: '35332342', source: 'sheet' },
-  { studentNumber: '2026-PLANET-1004', name: '정*석', phone: '010-****-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 10000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', badge: '❄️ 윈터블', motto: '겨울밤 책수다 기대됩니다!', avatarCode: '42443454', source: 'sheet' }
+  { studentNumber: '2026-PLANET-1001', name: '박지민', phone: '010-1234-5678', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '어린 왕자 (생텍쥐페리)', fee: 40000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 14:20', badge: '🌸 스프링토', motto: '올해도 플래닛과 함께 완독!', avatarCode: '11111111', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1002', name: '송준호', phone: '010-2345-6789', session: '1부(새학기)만 참석', bookTitle: '모순 (양귀자)', fee: 30000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 15:10', badge: '☀️ 썸머데이', motto: '꺾이지 않는 텐션으로!', avatarCode: '23221223', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1003', name: '이서진', phone: '010-3456-7890', session: '1부(새학기) + 2부(수학여행) 전체 참석', bookTitle: '데미안 (헤르만 헤세)', fee: 40000, paymentStatus: '입금 대기', submittedAt: '2026-10-24 16:05', badge: '🍂 어텀', motto: '새학기 친구들 반가워요!', avatarCode: '35332342', source: 'sheet' },
+  { studentNumber: '2026-PLANET-1004', name: '정우석', phone: '010-4567-8901', session: '2부(수학여행)만 참석', bookTitle: '달과 6펜스 (서머싯 몸)', fee: 10000, paymentStatus: '입금 완료', submittedAt: '2026-10-24 16:40', badge: '❄️ 윈터블', motto: '겨울밤 책수다 기대됩니다!', avatarCode: '42443454', source: 'sheet' }
 ];
 
 interface AdminDashboardProps {
@@ -106,12 +106,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  // CSV 엑셀 다운로드 (한글 깨짐 방지 UTF-8 BOM, 서버 마스킹 정책에 따라 성명·연락처 모두 마스킹 유지)
+  // CSV 엑셀 다운로드 (한글 깨짐 방지 UTF-8 BOM)
   const handleExportCsv = () => {
     const headers = [
       '학번',
-      '성명(마스킹)',
-      '연락처(마스킹)',
+      '성명',
+      '연락처',
       '참석세션',
       '도서제목',
       '회비(원)',
@@ -124,8 +124,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     ];
     const rows = records.map(r => [
       r.studentNumber || '',
-      maskNameValue(r.name),
-      maskPhoneNumber(r.phone),
+      r.name,
+      r.phone,
       r.session,
       `"${(r.bookTitle || '').replace(/"/g, '""')}"`,
       r.fee,
@@ -265,7 +265,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {isSyncing ? (
               <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#92400e]">
                 <RefreshCw className="w-4 h-4 animate-spin text-[#d97706] flex-shrink-0" />
-                <span>[로딩 상태] 비공개 구글 시트 보안 서버에서 마스킹된 신청자 명단을 불러오는 중입니다...</span>
+                <span>[로딩 상태] 구글 시트 및 로컬 저장소에서 신청자 명단을 불러오는 중입니다...</span>
               </div>
             ) : syncError ? (
               <div className="space-y-1 text-xs font-serif">
@@ -283,7 +283,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <>
                 <div className="flex items-center space-x-2 text-xs sm:text-sm font-serif font-bold text-[#1f3d27]">
                   <CheckCircle2 className="w-4 h-4 text-[#2e5238] flex-shrink-0" />
-                  <span>[정상 상태] 비공개 구글 시트 보안 서버 연동 중 (원본 시트 공유 차단 · 서버 마스킹 적용)</span>
+                  <span>[정상 상태] 관리자 인증 완료 · 신청자 명단 실시간 연동 중</span>
                 </div>
                 <p className="text-[11px] text-[#3c6347] font-sans">
                   서버에서 이름(박*민)과 연락처(010-****-1234)를 가린 데이터 {sheetRowCount}건 수신 완료 {lastSyncedAt ? `(최근 갱신: ${lastSyncedAt})` : ''}
@@ -462,10 +462,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center flex-wrap gap-2 text-xs font-serif">
             <span
               className="px-2.5 py-1.5 rounded border bg-[#f0f7f2] border-[#2e5238] text-[#2e5238] flex items-center space-x-1 font-bold"
-              title="구글 시트 공유가 비공개로 전환되었으며, 서버에서 성명(박*민)과 연락처(010-****-1234)를 마스킹한 데이터만 내보냅니다"
+              title="관리자 비밀번호 인증 완료 상태입니다"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>서버 마스킹 보호 중 (성명·연락처 가림)</span>
+              <span>관리자 인증 완료</span>
             </span>
 
             <select 
@@ -504,7 +504,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center flex-wrap gap-1.5">
-                        <span className="font-bold text-sm text-[#111]">{maskNameValue(r.name)}</span>
+                        <span className="font-bold text-sm text-[#111]">{r.name}</span>
                         {r.badge && (
                           <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 border border-amber-300 text-amber-900">
                             {r.badge}
@@ -512,7 +512,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         )}
                       </div>
                       <div className="text-[10px] font-mono text-[#666] mt-0.5">
-                        {r.studentNumber} · {maskPhoneNumber(r.phone)}
+                        {r.studentNumber} · {r.phone}
                       </div>
                     </div>
                     <button
@@ -520,7 +520,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       onClick={() => handleDeleteRecord(idx)}
                       className="p-1.5 text-[#aaa] hover:text-[#b82828] transition-colors shrink-0"
                       title="삭제"
-                      aria-label={`${maskNameValue(r.name)} 신청 기록 삭제`}
+                      aria-label={`${r.name} 신청 기록 삭제`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -589,8 +589,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <thead>
                 <tr className="bg-[#1f1b18] text-white">
                   <th className="p-3 font-bold">학번</th>
-                  <th className="p-3 font-bold">성명 (마스킹)</th>
-                  <th className="p-3 font-bold">연락처 (마스킹)</th>
+                  <th className="p-3 font-bold">성명</th>
+                  <th className="p-3 font-bold">연락처</th>
                   <th className="p-3 font-bold">참석 세션</th>
                   <th className="p-3 font-bold">선물 도서 제목</th>
                   <th className="p-3 font-bold">회비</th>
@@ -604,7 +604,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <tr key={idx} className="hover:bg-[#fbf9f4] transition-colors">
                       <td className="p-3 font-mono text-[11px] text-[#666]">{r.studentNumber}</td>
                       <td className="p-3 font-bold text-sm text-[#111]">
-                        <span>{maskNameValue(r.name)}</span>
+                        <span>{r.name}</span>
                         {r.badge && (
                           <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 border border-amber-300 text-amber-900 font-normal whitespace-nowrap">
                             {r.badge}
@@ -612,7 +612,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         )}
                       </td>
                       <td className="p-3 font-mono text-[#333]">
-                        {maskPhoneNumber(r.phone)}
+                        {r.phone}
                       </td>
                       <td className="p-3">
                         <span className="px-2 py-0.5 rounded text-[10px] bg-[#f0ece1] text-[#333] border border-[#d8d3c7]">
@@ -644,7 +644,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           onClick={() => handleDeleteRecord(idx)}
                           className="p-1 text-[#aaa] hover:text-[#b82828] transition-colors"
                           title="삭제"
-                          aria-label={`${maskNameValue(r.name)} 신청 기록 삭제`}
+                          aria-label={`${r.name} 신청 기록 삭제`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -698,7 +698,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <p><strong>• 데이터 갱신일:</strong> 2026-11-05 (페이지 진입 및 새로고침 시 보안 서버 동기화 {lastSyncedAt ? `/ 최근 확인: ${lastSyncedAt}` : ''})</p>
             </div>
             <div>
-              <p><strong>• 이용 조건 및 개인정보 보호:</strong> 원본 구글 시트 공유를 비공개로 차단하고, 서버에서 성명(<code className="font-mono bg-[#f4f1ea] px-1 rounded">박*민</code>)과 연락처(<code className="font-mono bg-[#f4f1ea] px-1 rounded">010-****-1234</code>)를 가린(마스킹) 정보만 클라이언트로 내보냅니다.</p>
+              <p><strong>• 이용 조건 및 개인정보 보호:</strong> 관리자 인증(비밀번호) 후에만 명단을 열람할 수 있으며, 행사 운영 목적으로만 활용합니다.</p>
               <p><strong>• 인증키 보안 처리:</strong> Google Apps Script 웹훅 URL 및 민감 설정값은 소스코드에 하드코딩하지 않고 <code className="font-mono bg-[#f4f1ea] px-1 rounded">GitHub Secrets</code> / 서버 환경변수로만 관리합니다.</p>
             </div>
           </div>

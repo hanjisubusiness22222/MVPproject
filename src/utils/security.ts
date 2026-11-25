@@ -3,9 +3,9 @@
  * 평문 비밀번호가 클라이언트 번들에 노출되는 것을 방지합니다.
  */
 
-// 관리자 기본 비밀번호 ("planet2026!")의 SHA-256 해시값
-// echo -n "planet2026!" | sha256sum -> c0dbfc724e52834b6e511470ce22619bfdc84e7240c5e7b57bf10bbcd1cf4ee8
-const DEFAULT_ADMIN_HASH = "c0dbfc724e52834b6e511470ce22619bfdc84e7240c5e7b57bf10bbcd1cf4ee8";
+// 관리자 기본 비밀번호 ("0000")의 SHA-256 해시값
+// echo -n "0000" | sha256sum -> 9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0
+const DEFAULT_ADMIN_HASH = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0";
 
 /**
  * 임의의 문자열을 SHA-256 16진수 문자열로 해시화
