@@ -1785,7 +1785,9 @@
 
     function renderAdminRosterGrid() {
       const grid = document.getElementById('admin-roster-grid');
-      document.getElementById('roster-count').textContent = submittedRoster.length;
+      const countEl = document.getElementById('roster-count');
+      if (!grid || !countEl) return;
+      countEl.textContent = submittedRoster.length;
       grid.innerHTML = submittedRoster.map((st, i) => `
         <div class="border-2 border-dashed border-stone-400 p-2 bg-[#fffdf9] rounded-lg relative">
           <div class="flex justify-between items-center border-b border-stone-800 pb-1 mb-1.5">
@@ -1811,7 +1813,7 @@
 
     function toggleAdminPrintSection() {
       const sec = document.getElementById('admin-print-section');
-      sec.classList.toggle('hidden');
+      if (sec) sec.classList.toggle('hidden');
     }
 
     function addSampleStudentToRoster() {
@@ -1929,7 +1931,8 @@
         hair: [HAIR_MAIN, HAIR_SUB]
       });
       renderAdminRosterGrid();
-      document.getElementById('admin-print-section').classList.remove('hidden');
+      const adminPrintSection = document.getElementById('admin-print-section');
+      if (adminPrintSection) adminPrintSection.classList.remove('hidden');
 
       // 구글 시트 연동 전송 데이터 규격
       const googlePayload = {
