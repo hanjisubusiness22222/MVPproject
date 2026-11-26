@@ -26,16 +26,8 @@ interface PrintCardItem {
   isExtraBlank?: boolean;
 }
 
-const DEFAULT_PRINT_ROSTER: PrintCardItem[] = [
-  { id: 'pr1', studentNumber: '2026-PLANET-1001', name: '김하늘', session: '1부 새학기 + 2부 수학여행', bookTitle: '어린 왕자', motto: '올해도 플래닛과 함께 완독!', badge: '🌸 스프링토', avatarCode: '11111111' },
-  { id: 'pr2', studentNumber: '2026-PLANET-1002', name: '박서연', session: '1부 새학기 + 2부 수학여행', bookTitle: '모순 (양귀자)', motto: '꺾이지 않는 텐션으로!', badge: '☀️ 썸머데이', avatarCode: '24221232' },
-  { id: 'pr3', studentNumber: '2026-PLANET-1003', name: '정민우', session: '1부 플래닛의 새학기 (낮)', bookTitle: '데미안', motto: '새학기 친구들 반가워요!', badge: '🍂 어텀', avatarCode: '32332413' },
-  { id: 'pr4', studentNumber: '2026-PLANET-1004', name: '강현수', session: '1부 새학기 + 2부 수학여행', bookTitle: '우리가 빛의 속도로 갈 수 없다면', motto: '겨울밤 책수다 기대됩니다!', badge: '❄️ 윈터블', avatarCode: '46413124' },
-  { id: 'pr5', studentNumber: '2026-PLANET-1005', name: '최지우', session: '2부 플래닛의 수학여행 (밤)', bookTitle: '달과 6펜스', motto: '밤새 책 이야기 나눠요!', badge: '🌸 스프링토', avatarCode: '53524341' },
-  { id: 'pr6', studentNumber: '2026-PLANET-1006', name: '한서희', session: '1부 새학기 + 2부 수학여행', bookTitle: '불편한 편의점', motto: '따뜻한 연말 되세요!', badge: '☀️ 썸머데이', avatarCode: '65145265' },
-  { id: 'pr7', studentNumber: '2026-PLANET-1007', name: '이준호', session: '1부 플래닛의 새학기 (낮)', bookTitle: '사피엔스', motto: '좋은 책 추천 기다려요', badge: '🍂 어텀', avatarCode: '71236452' },
-  { id: 'pr8', studentNumber: '2026-PLANET-1008', name: '임태양', session: '1부 새학기 + 2부 수학여행', bookTitle: '작별하지 않는다', motto: '2026년 마무리 잘해요!', badge: '❄️ 윈터블', avatarCode: '87457676' }
-];
+// 기본 인쇄 명단 (구글 시트를 단일 데이터 소스로 사용)
+const DEFAULT_PRINT_ROSTER: PrintCardItem[] = [];
 
 interface StudentPrintStudioProps {
   onBack: () => void;

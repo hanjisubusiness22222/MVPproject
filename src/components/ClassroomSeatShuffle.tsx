@@ -40,29 +40,8 @@ const DIVISION_NAMES = [
   '8 분단 뒷자리 자유 라인'
 ];
 
-// 기본 더미 참가자 명단 (20명, 테스트용 가상 성명)
-const DEFAULT_PARTICIPANTS: Participant[] = [
-  { id: 'p1', name: '김하늘', session: '1부 새학기 + 2부 수학여행', bookTitle: '어린 왕자', badge: '🌸 스프링토', avatarCode: '11111111' },
-  { id: 'p2', name: '박서연', session: '1부 새학기 + 2부 수학여행', bookTitle: '모순 (양귀자)', badge: '☀️ 썸머데이', avatarCode: '24221232' },
-  { id: 'p3', name: '정민우', session: '1부 플래닛의 새학기 (낮)', bookTitle: '데미안', badge: '🍂 어텀', avatarCode: '32332413' },
-  { id: 'p4', name: '강현수', session: '1부 새학기 + 2부 수학여행', bookTitle: '우리가 빛의 속도로 갈 수 없다면', badge: '❄️ 윈터블', avatarCode: '46413124' },
-  { id: 'p5', name: '최지우', session: '2부 플래닛의 수학여행 (밤)', bookTitle: '달과 6펜스', badge: '🌸 스프링토', avatarCode: '53524341' },
-  { id: 'p6', name: '한서희', session: '1부 새학기 + 2부 수학여행', bookTitle: '불편한 편의점', badge: '☀️ 썸머데이', avatarCode: '65145265' },
-  { id: 'p7', name: '이준호', session: '1부 플래닛의 새학기 (낮)', bookTitle: '사피엔스', badge: '🍂 어텀', avatarCode: '71236452' },
-  { id: 'p8', name: '임태양', session: '1부 새학기 + 2부 수학여행', bookTitle: '작별하지 않는다', badge: '❄️ 윈터블', avatarCode: '87457676' },
-  { id: 'p9', name: '윤도원', session: '1부 새학기 + 2부 수학여행', bookTitle: '물고기는 존재하지 않는다', badge: '🌸 스프링토', avatarCode: '14628134' },
-  { id: 'p10', name: '송유진', session: '1부 새학기 + 2부 수학여행', bookTitle: '아몬드', badge: '☀️ 썸머데이', avatarCode: '28361527' },
-  { id: 'p11', name: '오민재', session: '1부 플래닛의 새학기 (낮)', bookTitle: '코스모스', badge: '🍂 어텀', avatarCode: '31572348' },
-  { id: 'p12', name: '배진우', session: '1부 새학기 + 2부 수학여행', bookTitle: '파친코', badge: '❄️ 윈터블', avatarCode: '42783461' },
-  { id: 'p13', name: '신하나', session: '1부 새학기 + 2부 수학여행', bookTitle: '구의 증명', badge: '🌸 스프링토', avatarCode: '56814572' },
-  { id: 'p14', name: '노은혜', session: '2부 플래닛의 수학여행 (밤)', bookTitle: '밤의 여행자들', badge: '☀️ 썸머데이', avatarCode: '63245683' },
-  { id: 'p15', name: '권석주', session: '1부 새학기 + 2부 수학여행', bookTitle: '나는 메트로폴리탄 미술관의 경비원입니다', badge: '🍂 어텀', avatarCode: '74156714' },
-  { id: 'p16', name: '유시온', session: '1부 플래닛의 새학기 (낮)', bookTitle: '이방인', badge: '❄️ 윈터블', avatarCode: '85367825' },
-  { id: 'p17', name: '백예린', session: '1부 새학기 + 2부 수학여행', bookTitle: '채식주의자', badge: '🌸 스프링토', avatarCode: '16478136' },
-  { id: 'p18', name: '황보람', session: '1부 새학기 + 2부 수학여행', bookTitle: '참을 수 없는 존재의 가벼움', badge: '☀️ 썸머데이', avatarCode: '27581247' },
-  { id: 'p19', name: '문지원', session: '1부 플래닛의 새학기 (낮)', bookTitle: '호밀밭의 파수꾼', badge: '🍂 어텀', avatarCode: '38612358' },
-  { id: 'p20', name: '조현우', session: '1부 새학기 + 2부 수학여행', bookTitle: '1984 (조지 오웰)', badge: '❄️ 윈터블', avatarCode: '41723461' }
-];
+// 기본 참가자 명단 (구글 시트를 단일 데이터 소스로 사용)
+const DEFAULT_PARTICIPANTS: Participant[] = [];
 
 function getShortSessionLabel(session: string): string {
   if (session.includes('1부') && session.includes('2부')) return '1차+2차';
