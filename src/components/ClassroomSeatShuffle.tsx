@@ -106,22 +106,23 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
     try {
       const { records, syncedAt } = await fetchGoogleSheetRecords();
       if (records.length > 0) {
-        const localEntries: Participant[] = records
-          .filter((rec) => rec.source === 'local')
-          .map((rec, idx) => ({
-            id: rec.studentNumber || `local_${idx}`,
-            studentNumber: rec.studentNumber,
-            name: rec.rawName || rec.name,
-            session: rec.session,
-            bookTitle: rec.bookTitle || '(선물 책 준비 중)',
-            badge: rec.badge || CLASS_BADGE_OPTIONS[idx % CLASS_BADGE_OPTIONS.length],
-            avatarCode: rec.avatarCode,
-            selectedIndices: rec.selectedIndices?.map((v) => (v ?? 0))
-          }));
+        const syncedEntries: Participant[] = records.map((rec, idx) => ({
+          id: rec.studentNumber || `synced_${idx}`,
+          studentNumber: rec.studentNumber,
+          name: rec.rawName || rec.name,
+          session: rec.session,
+          bookTitle: rec.bookTitle || '(선물 책 준비 중)',
+          badge: rec.badge || CLASS_BADGE_OPTIONS[idx % CLASS_BADGE_OPTIONS.length],
+          avatarCode: rec.avatarCode,
+          selectedIndices: rec.selectedIndices?.map((v) => (v ?? 0))
+        }));
 
-        // 로컬 신규 신청자가 있으면 기본 더미 명단과 병합 (중복 방지)
-        const combined = [...localEntries, ...DEFAULT_PARTICIPANTS];
-        setParticipants(combined);
+        // 시트·로컬 신청자를 최상단에 두고, 중복되지 않는 기본 더미 명단을 이어붙여 풍성하게 표시
+        const seenNames = new Set(syncedEntries.map((e) => `${e.studentNumber || ''}|${e.name}`));
+        const extraDummies = DEFAULT_PARTICIPANTS.filter(
+          (d) => !seenNames.has(`${d.studentNumber || ''}|${d.name}`)
+        );
+        setParticipants([...syncedEntries, ...extraDummies]);
         setLastSyncedAt(syncedAt);
       }
     } catch (err) {

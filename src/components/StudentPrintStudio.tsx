@@ -53,20 +53,22 @@ export const StudentPrintStudio: React.FC<StudentPrintStudioProps> = ({ onBack, 
     setIsSyncing(true);
     try {
       const { records } = await fetchGoogleSheetRecords();
-      const localItems: PrintCardItem[] = records
-        .filter((r) => r.source === 'local')
-        .map((r, idx) => ({
-          id: r.studentNumber || `local_${idx}`,
-          studentNumber: r.studentNumber,
-          name: r.rawName || r.name,
-          session: r.session,
-          bookTitle: r.bookTitle || '(선물 책 준비 중)',
-          motto: r.motto || '새학기처럼 신선하게!',
-          badge: r.badge || CLASS_BADGE_OPTIONS[idx % CLASS_BADGE_OPTIONS.length],
-          avatarCode: r.avatarCode,
-          selectedIndices: r.selectedIndices?.map((v) => v ?? 0)
-        }));
-      setCards([...localItems, ...DEFAULT_PRINT_ROSTER]);
+      const syncedItems: PrintCardItem[] = records.map((r, idx) => ({
+        id: r.studentNumber || `synced_${idx}`,
+        studentNumber: r.studentNumber,
+        name: r.rawName || r.name,
+        session: r.session,
+        bookTitle: r.bookTitle || '(선물 책 준비 중)',
+        motto: r.motto || '새학기처럼 신선하게!',
+        badge: r.badge || CLASS_BADGE_OPTIONS[idx % CLASS_BADGE_OPTIONS.length],
+        avatarCode: r.avatarCode,
+        selectedIndices: r.selectedIndices?.map((v) => v ?? 0)
+      }));
+      const seenKeys = new Set(syncedItems.map((i) => `${i.studentNumber}|${i.name}`));
+      const extraDummies = DEFAULT_PRINT_ROSTER.filter(
+        (d) => !seenKeys.has(`${d.studentNumber}|${d.name}`)
+      );
+      setCards([...syncedItems, ...extraDummies]);
     } catch (err) {
       console.error('인쇄 명단 동기화 오류:', err);
     } finally {

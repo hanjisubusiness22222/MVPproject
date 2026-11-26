@@ -169,13 +169,19 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
       if (data && Array.isArray(data.records)) {
         serverRecords = data.records.map((r: any, idx: number) => ({
           studentNumber: String(r.studentNumber || `2026-PLANET-${1001 + idx}`),
-          name: maskNameValue(r.name),
-          phone: maskPhoneNumber(r.phone),
+          name: String(r.name || ''),
+          rawName: String(r.name || ''),
+          phone: String(r.phone || ''),
+          rawPhone: String(r.phone || ''),
           session: String(r.session || '1부(새학기) + 2부(수학여행) 전체 참석'),
           bookTitle: String(r.bookTitle || '(선물 책 준비 중)'),
-          fee: Number(r.fee || 80000),
+          fee: Number(r.fee || 40000),
           paymentStatus: r.paymentStatus === '입금 완료' ? '입금 완료' : '입금 대기',
           submittedAt: String(r.submittedAt || '2026-10-24'),
+          badge: r.badge ? String(r.badge) : undefined,
+          motto: r.motto ? String(r.motto) : undefined,
+          avatarCode: r.avatarCode ? String(r.avatarCode) : undefined,
+          avatarRecipe: r.avatarRecipe ? String(r.avatarRecipe) : undefined,
           source: 'sheet'
         }));
         fetched = true;
@@ -194,13 +200,19 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
         if (apiData && Array.isArray(apiData.records)) {
           serverRecords = apiData.records.map((r: any, idx: number) => ({
             studentNumber: String(r.studentNumber || `2026-PLANET-${1001 + idx}`),
-            name: maskNameValue(r.name),
-            phone: maskPhoneNumber(r.phone),
+            name: String(r.name || ''),
+            rawName: String(r.name || ''),
+            phone: String(r.phone || ''),
+            rawPhone: String(r.phone || ''),
             session: String(r.session || '1부(새학기) + 2부(수학여행) 전체 참석'),
             bookTitle: String(r.bookTitle || '(선물 책 준비 중)'),
-            fee: Number(r.fee || 80000),
+            fee: Number(r.fee || 40000),
             paymentStatus: r.paymentStatus === '입금 완료' ? '입금 완료' : '입금 대기',
             submittedAt: String(r.submittedAt || '2026-10-24'),
+            badge: r.badge ? String(r.badge) : undefined,
+            motto: r.motto ? String(r.motto) : undefined,
+            avatarCode: r.avatarCode ? String(r.avatarCode) : undefined,
+            avatarRecipe: r.avatarRecipe ? String(r.avatarRecipe) : undefined,
             source: 'sheet'
           }));
           fetched = true;

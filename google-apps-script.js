@@ -88,11 +88,11 @@ function doGet(e) {
         continue;
       }
 
-      // 서버에서 이름과 연락처를 마스킹한 데이터만 외부로 내보냄
+      // 전체 명단 반환 (관리자 비밀번호 인증 후 조회용)
       maskedRecords.push({
         studentNumber: studentNumber || ('2026-PLANET-' + (1000 + i)),
-        name: maskNameOnServer(rawName),
-        phone: maskPhoneOnServer(rawPhone),
+        name: rawName,
+        phone: rawPhone,
         session: session || '1부(새학기) + 2부(수학여행) 전체 참석',
         bookTitle: bookTitle || '(선물 책 준비 중)',
         fee: fee,
