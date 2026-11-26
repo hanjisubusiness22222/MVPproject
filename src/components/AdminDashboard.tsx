@@ -99,13 +99,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     updateAdminOverride(updated[idx].studentNumber, { paymentStatus: nextStatus });
   };
 
-  // 신청 기록 삭제
+  // 신청 기록 삭제 (로컬 저장소에서도 함께 제거)
   const handleDeleteRecord = (idx: number) => {
     const target = records[idx];
     if (window.confirm(`${target.name} 님의 신청 기록을 삭제하시겠습니까?`)) {
       const updated = records.filter((_, i) => i !== idx);
       setRecords(updated);
       updateAdminOverride(target.studentNumber, { deleted: true });
+      try {
+        const localSaved = JSON.parse(localStorage.getItem('planet_rsvps') || '[]');
+        if (Array.isArray(localSaved)) {
+          const filteredLocal = localSaved.filter(
+            (item: any) => item?.studentNumber !== target.studentNumber
+          );
+          localStorage.setItem('planet_rsvps', JSON.stringify(filteredLocal));
+        }
+      } catch {}
+    }
+  };
+
+  // 브라우저 로컬 테스트 캐시(planet_rsvps) 일괄 비우기
+  const handleClearLocalCache = () => {
+    if (window.confirm('브라우저에 임시 저장된 로컬 신청 캐시(테스트 기록)를 모두 비우고 구글 시트 데이터만 불러올까요?')) {
+      localStorage.removeItem('planet_rsvps');
+      localStorage.removeItem('planet_admin_overrides');
+      handleSyncFromGoogleSheet(false);
     }
   };
 
@@ -289,7 +307,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span>[정상 상태] 관리자 인증 완료 · 신청자 명단 실시간 연동 중</span>
                 </div>
                 <p className="text-[11px] text-[#3c6347] font-sans">
-                  서버에서 이름(박*민)과 연락처(010-****-1234)를 가린 데이터 {sheetRowCount}건 수신 완료 {lastSyncedAt ? `(최근 갱신: ${lastSyncedAt})` : ''}
+                  구글 시트 실시간 데이터 {sheetRowCount}건 수신 완료 {lastSyncedAt ? `(최근 갱신: ${lastSyncedAt})` : ''}
                 </p>
               </>
             )}
@@ -304,6 +322,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>{isSyncing ? '동기화 중...' : '보안 서버 새로고침'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleClearLocalCache}
+              disabled={isSyncing}
+              className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#f5f2eb] border border-[#ccc] text-[#555] text-[11px] font-serif flex items-center space-x-1 transition-all"
+              title="브라우저에 임시 저장된 테스트 신청 내역을 비웁니다"
+            >
+              <Trash2 className="w-3 h-3" />
+              <span>로컬 캐시 비우기</span>
             </button>
 
             <button
