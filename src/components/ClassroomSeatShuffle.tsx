@@ -117,13 +117,11 @@ export const ClassroomSeatShuffle: React.FC<ClassroomSeatShuffleProps> = ({ onBa
           selectedIndices: rec.selectedIndices?.map((v) => (v ?? 0))
         }));
 
-        // 시트·로컬 신청자를 최상단에 두고, 중복되지 않는 기본 더미 명단을 이어붙여 풍성하게 표시
-        const seenNames = new Set(syncedEntries.map((e) => `${e.studentNumber || ''}|${e.name}`));
-        const extraDummies = DEFAULT_PARTICIPANTS.filter(
-          (d) => !seenNames.has(`${d.studentNumber || ''}|${d.name}`)
-        );
-        setParticipants([...syncedEntries, ...extraDummies]);
+        // 구글 시트 + 로컬 신청 명단 그대로 사용 (중복 더미 혼합 방지)
+        setParticipants(syncedEntries);
         setLastSyncedAt(syncedAt);
+      } else {
+        setParticipants(DEFAULT_PARTICIPANTS);
       }
     } catch (err) {
       console.error('자리배치 명단 동기화 오류:', err);

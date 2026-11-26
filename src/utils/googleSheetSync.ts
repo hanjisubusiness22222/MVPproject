@@ -65,13 +65,13 @@ export function matchesMaskedName(maskedOrRawName: string, query: string): boole
 const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   {
     studentNumber: '2026-PLANET-1001',
-    name: '박지민',
+    name: '김하늘',
     phone: '010-1234-5678',
     session: '1부(새학기) + 2부(수학여행) 전체 참석',
     bookTitle: '어린 왕자 (생텍쥐페리)',
     fee: 40000,
     paymentStatus: '입금 완료',
-    submittedAt: '2026-10-24 14:20',
+    submittedAt: '2026-10-25 06:20',
     badge: '🌸 스프링토',
     motto: '올해도 플래닛과 함께 완독!',
     avatarCode: '11111111',
@@ -79,13 +79,13 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   },
   {
     studentNumber: '2026-PLANET-1002',
-    name: '송준호',
+    name: '이준호',
     phone: '010-2345-6789',
     session: '1부(새학기)만 참석',
     bookTitle: '모순 (양귀자)',
     fee: 30000,
     paymentStatus: '입금 완료',
-    submittedAt: '2026-10-24 15:10',
+    submittedAt: '2026-10-25 07:10',
     badge: '☀️ 썸머데이',
     motto: '꺾이지 않는 텐션으로!',
     avatarCode: '23221223',
@@ -93,13 +93,13 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   },
   {
     studentNumber: '2026-PLANET-1003',
-    name: '이서진',
+    name: '박서연',
     phone: '010-3456-7890',
     session: '1부(새학기) + 2부(수학여행) 전체 참석',
     bookTitle: '데미안 (헤르만 헤세)',
     fee: 40000,
     paymentStatus: '입금 대기',
-    submittedAt: '2026-10-24 16:05',
+    submittedAt: '2026-10-25 08:05',
     badge: '🍂 어텀',
     motto: '새학기 친구들 반가워요!',
     avatarCode: '35332342',
@@ -107,16 +107,30 @@ const SERVER_MASKED_FALLBACK_RECORDS: SyncedRsvpRecord[] = [
   },
   {
     studentNumber: '2026-PLANET-1004',
-    name: '정우석',
+    name: '정민우',
     phone: '010-4567-8901',
     session: '2부(수학여행)만 참석',
     bookTitle: '달과 6펜스 (서머싯 몸)',
     fee: 10000,
     paymentStatus: '입금 완료',
-    submittedAt: '2026-10-24 16:40',
+    submittedAt: '2026-10-25 08:40',
     badge: '❄️ 윈터블',
     motto: '겨울밤 책수다 기대됩니다!',
     avatarCode: '42443454',
+    source: 'sheet'
+  },
+  {
+    studentNumber: '2026-PLANET-1005',
+    name: '최지우',
+    phone: '010-5678-9012',
+    session: '1부(새학기) + 2부(수학여행) 전체 참석',
+    bookTitle: '물고기는 존재하지 않는다',
+    fee: 40000,
+    paymentStatus: '입금 대기',
+    submittedAt: '2026-10-25 09:15',
+    badge: '🌸 스프링토',
+    motto: '함께 읽는 즐거움!',
+    avatarCode: '53524341',
     source: 'sheet'
   }
 ];
@@ -240,13 +254,16 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
       if (Array.isArray(parsed)) {
         for (const item of parsed) {
           if (!item || !item.name) continue;
+          // 과거 AdminDashboard가 잘못 캐시한 sheet/더미 레코드가 localStorage에 섞여 있으면 건너뜀
+          if (item.source === 'sheet') continue;
           const sNum = item.studentNumber || '';
           const rawItemName = String(item.name).trim();
           const rawItemPhone = String(item.phone || item.maskedPhone || '').trim();
           const alreadyInSheet = serverRecords.some(
             sr =>
               (sNum && sr.studentNumber === sNum) ||
-              (sr.name === rawItemName && sr.phone === rawItemPhone)
+              (sr.name === rawItemName && sr.phone === rawItemPhone) ||
+              (sr.name.includes('*') && sr.name === maskNameValue(rawItemName))
           );
           if (!alreadyInSheet) {
             localRecords.push({
@@ -288,8 +305,27 @@ export async function fetchGoogleSheetRecords(options?: { simulateError?: boolea
 
   const merged = [...serverRecords, ...localRecords];
 
+  // 관리자 화면에서 변경한 입금 상태 / 삭제 내역(planet_admin_overrides) 반영
+  let finalRecords = merged;
+  try {
+    const rawOverrides = localStorage.getItem('planet_admin_overrides');
+    if (rawOverrides) {
+      const overrides = JSON.parse(rawOverrides) as Record<
+        string,
+        { paymentStatus?: '입금 완료' | '입금 대기'; deleted?: boolean }
+      >;
+      finalRecords = merged
+        .filter((r) => !overrides[r.studentNumber]?.deleted)
+        .map((r) =>
+          overrides[r.studentNumber]?.paymentStatus
+            ? { ...r, paymentStatus: overrides[r.studentNumber].paymentStatus! }
+            : r
+        );
+    }
+  } catch {}
+
   return {
-    records: merged,
+    records: finalRecords,
     fromSheetCount: serverRecords.length,
     syncedAt: new Date().toLocaleTimeString('ko-KR', {
       hour: '2-digit',
