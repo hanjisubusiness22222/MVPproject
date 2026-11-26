@@ -78,7 +78,7 @@ export default async function handler(req, res) {
   const scriptUrl =
     process.env.GOOGLE_SCRIPT_URL ||
     process.env.VITE_GOOGLE_SCRIPT_URL ||
-    'https://script.google.com/macros/s/AKfycbxdb9EY-JBOPxtuWaFJv4jA0ZHIIrGHWkDkkjlsJZZGzYemtoUvVvYZNroAHeCI5HtmKg/exec';
+    'https://script.google.com/macros/s/AKfycbwC8jd6hk6Hqp4cd3cw8Rvanc8GZgBBQaBlE8ZFcrnpFIqe9ooJo2ExyNzcVn37QKvLVg/exec';
   const hasValidScriptUrl =
     Boolean(scriptUrl) &&
     scriptUrl.startsWith('https://script.google.com/') &&
