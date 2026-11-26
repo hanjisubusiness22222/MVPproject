@@ -520,8 +520,13 @@
             </div>
           </div>
 
-          <!-- 선물할 도서 (히든 필드 보존) -->
-          <input type="hidden" id="input-book" value="(선물 책 준비 중)">
+          <!-- 선물할 도서 제목 -->
+          <div>
+            <label for="input-book" class="block font-bold text-stone-800 mb-1">선물할 도서 제목 <span class="text-stone-500 font-normal">(선택 · 미정 시 비워두세요)</span></label>
+            <input type="text" id="input-book" placeholder="예: 어린 왕자 (생텍쥐페리)"
+              oninput="syncCardText()"
+              class="w-full border-2 border-stone-800 rounded-lg bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-600 font-sans text-sm">
+          </div>
 
           <!-- 새학기 한 줄 다짐 / 좌우명 (신규 입력 콤포넌트) -->
           <div>
